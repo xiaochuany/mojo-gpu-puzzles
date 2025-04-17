@@ -1,0 +1,601 @@
+/* Modular-inspired mdbook theme */
+
+:root {
+    --sidebar-width: 300px;
+    --page-padding: 15px;
+    --content-max-width: 900px;
+    --menu-bar-height: 50px;
+    --modular-blue: #08a5e1;
+    --modular-dark-blue: #016b93;
+    --modular-bg: #ffffff;
+    --modular-text: #2c3e50;
+    --modular-heading: #1a202c;
+    --modular-code-bg: #f8f9fa;
+    --modular-border: #e2e8f0;
+    --modular-header-height: 60px;
+}
+
+/* Dark theme variables */
+.ayu {
+    --modular-blue: #33c9ff;
+    --modular-dark-blue: #5bd0ff;
+    --modular-bg: #0f1419;
+    --modular-text: #c5c5c5;
+    --modular-heading: #e6e6e6;
+    --modular-code-bg: #191f26;
+    --modular-border: #2d3748;
+}
+
+.navy {
+    --modular-blue: #39c4ff;
+    --modular-dark-blue: #5bd0ff;
+    --modular-bg: #161923;
+    --modular-text: #bcbdd0;
+    --modular-heading: #ffffff;
+    --modular-code-bg: #1c1e2d;
+    --modular-border: #2c3043;
+}
+
+.coal {
+    --modular-blue: #33c9ff;
+    --modular-dark-blue: #5bd0ff;
+    --modular-bg: #141617;
+    --modular-text: #98a3ad;
+    --modular-heading: #e2e4e5;
+    --modular-code-bg: #191b1c;
+    --modular-border: #363a3e;
+}
+
+/* Custom Modular Header */
+.modular-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--modular-bg);
+    height: var(--modular-header-height);
+    border-bottom: 1px solid var(--modular-border);
+    padding: 0 20px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.modular-logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.modular-logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.modular-title {
+    margin-left: 10px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--modular-heading);
+}
+
+.modular-nav {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-link {
+    color: var(--modular-text);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 5px 0;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: var(--modular-blue);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--modular-blue);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* Adjust content for header */
+html {
+    scroll-padding-top: var(--modular-header-height);
+}
+
+.content {
+    padding-top: 20px;
+}
+
+/* Adjust sidebar position */
+.sidebar {
+    top: var(--modular-header-height);
+    height: calc(100vh - var(--modular-header-height));
+}
+
+/* Base styling */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    color: var(--modular-text);
+    line-height: 1.6;
+    background-color: var(--modular-bg);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--modular-heading);
+    font-weight: 600;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+h1 {
+    font-size: 2.2em;
+    border-bottom: 1px solid var(--modular-border);
+    padding-bottom: 0.3em;
+}
+
+h2 {
+    font-size: 1.8em;
+}
+
+h3 {
+    font-size: 1.5em;
+}
+
+a {
+    color: var(--modular-blue);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--modular-dark-blue);
+    text-decoration: underline;
+}
+
+/* Sidebar styling */
+.sidebar {
+    background-color: var(--modular-bg);
+    border-right: 1px solid var(--modular-border);
+}
+
+.sidebar h2 {
+    font-size: 1.3em;
+    margin-top: 1em;
+    margin-left: 0.6em;
+    color: var(--modular-heading);
+}
+
+.sidebar ul li a {
+    color: var(--modular-text);
+    font-size: 0.95em;
+    padding: 10px 15px;
+}
+
+.sidebar ul li a:hover {
+    background-color: rgba(8, 165, 225, 0.1);
+}
+
+.sidebar ul li a.active {
+    background-color: rgba(8, 165, 225, 0.15);
+    color: var(--modular-blue);
+    font-weight: 500;
+}
+
+/* Specific for dark themes */
+.ayu .sidebar,
+.navy .sidebar,
+.coal .sidebar {
+    background-color: var(--modular-bg);
+}
+
+/* Chapter content */
+.content {
+    padding: 0 var(--page-padding);
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+}
+
+.content p {
+    margin-bottom: 1em;
+}
+
+/* Code blocks */
+pre {
+    background-color: var(--modular-code-bg);
+    border: 1px solid var(--modular-border);
+    border-radius: 4px;
+    padding: 1em;
+    margin: 1em 0;
+    overflow-x: auto;
+}
+
+code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 0.9em;
+    background-color: var(--modular-code-bg);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+}
+
+pre code {
+    background-color: transparent;
+    padding: 0;
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+}
+
+table th,
+table td {
+    padding: 8px 12px;
+    border: 1px solid var(--modular-border);
+}
+
+table th {
+    background-color: rgba(200, 200, 200, 0.05);
+    font-weight: 600;
+    text-align: left;
+}
+
+/* Navigation */
+.nav-chapters {
+    color: var(--modular-blue);
+    background-color: transparent;
+    opacity: 0.75;
+}
+
+.nav-chapters:hover {
+    color: var(--modular-dark-blue);
+    opacity: 1;
+}
+
+/* Menu bar */
+.menu-bar {
+    border-bottom: 1px solid var(--modular-border);
+    height: var(--menu-bar-height);
+    background-color: var(--modular-bg);
+    color: var(--modular-text);
+}
+
+/* Button styling */
+.theme-popup button,
+.theme-button {
+    background-color: var(--modular-code-bg);
+    border: 1px solid var(--modular-border);
+    color: var(--modular-text);
+    border-radius: 4px;
+}
+
+.theme-popup button:hover,
+.theme-button:hover {
+    background-color: rgba(200, 200, 200, 0.05);
+}
+
+/* Images */
+img {
+    max-width: 100%;
+    display: block;
+    margin: 1em auto;
+}
+
+/* Mojo-specific syntax highlighting for light mode */
+.language-mojo .kw,
+.language-mojo .hljs-keyword,
+.language-mojo .keyword {
+    color: #0000ff;
+    font-weight: bold;
+}
+
+.language-mojo .builtin {
+    color: #0086b3;
+}
+
+.language-mojo .string,
+.language-mojo .hljs-string {
+    color: #008000;
+}
+
+.language-mojo .function,
+.language-mojo .hljs-function,
+.language-mojo .hljs-title {
+    color: #7928a1;
+}
+
+.language-mojo .comment,
+.language-mojo .hljs-comment {
+    color: #808080;
+    font-style: italic;
+}
+
+.language-mojo .number,
+.language-mojo .hljs-number {
+    color: #0086b3;
+}
+
+.language-mojo .operator,
+.language-mojo .hljs-operator {
+    color: #000000;
+}
+
+.language-mojo .punctuation,
+.language-mojo .hljs-punctuation {
+    color: #333333;
+}
+
+.language-mojo .decorator,
+.language-mojo .hljs-decorator,
+.language-mojo .hljs-meta {
+    color: #df5000;
+}
+
+/* Mojo-specific syntax highlighting for dark mode */
+.ayu .language-mojo .kw,
+.ayu .language-mojo .hljs-keyword,
+.ayu .language-mojo .keyword,
+.navy .language-mojo .kw,
+.navy .language-mojo .hljs-keyword,
+.navy .language-mojo .keyword,
+.coal .language-mojo .kw,
+.coal .language-mojo .hljs-keyword,
+.coal .language-mojo .keyword {
+    color: #79b8ff;
+    font-weight: bold;
+}
+
+.ayu .language-mojo .builtin,
+.navy .language-mojo .builtin,
+.coal .language-mojo .builtin {
+    color: #56d4ff;
+}
+
+.ayu .language-mojo .string,
+.ayu .language-mojo .hljs-string,
+.navy .language-mojo .string,
+.navy .language-mojo .hljs-string,
+.coal .language-mojo .string,
+.coal .language-mojo .hljs-string {
+    color: #a8ff60;
+}
+
+.ayu .language-mojo .function,
+.ayu .language-mojo .hljs-function,
+.ayu .language-mojo .hljs-title,
+.navy .language-mojo .function,
+.navy .language-mojo .hljs-function,
+.navy .language-mojo .hljs-title,
+.coal .language-mojo .function,
+.coal .language-mojo .hljs-function,
+.coal .language-mojo .hljs-title {
+    color: #b392f0;
+}
+
+.ayu .language-mojo .comment,
+.ayu .language-mojo .hljs-comment,
+.navy .language-mojo .comment,
+.navy .language-mojo .hljs-comment,
+.coal .language-mojo .comment,
+.coal .language-mojo .hljs-comment {
+    color: #959da5;
+    font-style: italic;
+}
+
+.ayu .language-mojo .number,
+.ayu .language-mojo .hljs-number,
+.navy .language-mojo .number,
+.navy .language-mojo .hljs-number,
+.coal .language-mojo .number,
+.coal .language-mojo .hljs-number {
+    color: #56d4ff;
+}
+
+.ayu .language-mojo .operator,
+.ayu .language-mojo .hljs-operator,
+.navy .language-mojo .operator,
+.navy .language-mojo .hljs-operator,
+.coal .language-mojo .operator,
+.coal .language-mojo .hljs-operator {
+    color: #f8f8f2;
+}
+
+.ayu .language-mojo .punctuation,
+.ayu .language-mojo .hljs-punctuation,
+.navy .language-mojo .punctuation,
+.navy .language-mojo .hljs-punctuation,
+.coal .language-mojo .punctuation,
+.coal .language-mojo .hljs-punctuation {
+    color: #e1e4e8;
+}
+
+.ayu .language-mojo .decorator,
+.ayu .language-mojo .hljs-decorator,
+.ayu .language-mojo .hljs-meta,
+.navy .language-mojo .decorator,
+.navy .language-mojo .hljs-decorator,
+.navy .language-mojo .hljs-meta,
+.coal .language-mojo .decorator,
+.coal .language-mojo .hljs-decorator,
+.coal .language-mojo .hljs-meta {
+    color: #ffab70;
+}
+
+/* Visual improvements for Mojo code blocks */
+.language-mojo {
+    background-color: rgba(8, 165, 225, 0.05);
+    border-left: 3px solid var(--modular-blue);
+}
+
+/* Override default mdBook code styling to properly color Mojo code */
+.hljs.language-mojo {
+    color: var(--modular-text);
+    background-color: transparent;
+}
+
+/* Visual representation boxes */
+.visual-box {
+    background-color: rgba(200, 200, 200, 0.05);
+    border: 1px solid var(--modular-border);
+    border-radius: 4px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+/* Expected output box */
+.expected-output {
+    background-color: rgba(76, 175, 80, 0.05);
+    border-left: 3px solid #4caf50;
+    padding: 10px 15px;
+    margin: 15px 0;
+}
+
+/* Mojo container navigation */
+.previous-next-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 2em 0;
+    padding-top: 1em;
+    border-top: 1px solid var(--modular-border);
+}
+
+.previous-next-container a {
+    padding: 10px 15px;
+    background-color: var(--modular-code-bg);
+    border-radius: 4px;
+    display: inline-block;
+    color: var(--modular-blue);
+}
+
+.previous-next-container a:hover {
+    background-color: rgba(200, 200, 200, 0.05);
+    text-decoration: none;
+}
+
+/* Fix for search result highlighting */
+.search-results a {
+    color: var(--modular-blue) !important;
+}
+
+mark {
+    background-color: rgba(8, 165, 225, 0.2);
+    color: var(--modular-heading);
+    padding: 0 0.2em;
+}
+
+/* Add responsive adjustments */
+@media screen and (max-width: 768px) {
+    :root {
+        --sidebar-width: 250px;
+        --page-padding: 10px;
+    }
+
+    h1 {
+        font-size: 1.8em;
+    }
+
+    h2 {
+        font-size: 1.5em;
+    }
+
+    h3 {
+        font-size: 1.2em;
+    }
+
+    .modular-header {
+        padding: 0 10px;
+    }
+
+    .modular-title {
+        font-size: 1.2rem;
+    }
+
+    .modular-nav {
+        gap: 10px;
+    }
+}
+
+/* Fix for theme selection menu */
+#theme-list {
+    background-color: var(--modular-bg);
+    border: 1px solid var(--modular-border);
+}
+
+#theme-list button {
+    color: var(--modular-text);
+}
+
+#theme-list button:hover {
+    background-color: rgba(8, 165, 225, 0.1);
+}
+
+/* Other UI elements */
+.chapter li.part-title {
+    color: var(--modular-heading);
+}
+
+.chapter .spacer {
+    background-color: var(--modular-border);
+}
+
+/* Print styles */
+@media print {
+
+    .sidebar,
+    .menu-bar,
+    .nav-chapters,
+    .modular-header {
+        display: none;
+    }
+
+    .content {
+        max-width: 100%;
+    }
+}
+
+/* Add styles for logo images */
+.modular-logo-container img.light-logo,
+.modular-logo-container img.dark-logo {
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.modular-logo-container img.light-logo {
+    display: inline-block;
+}
+
+.modular-logo-container img.dark-logo {
+    display: none;
+}
+
+.ayu .modular-logo-container img.light-logo,
+.coal .modular-logo-container img.light-logo,
+.navy .modular-logo-container img.light-logo {
+    display: none;
+}
+
+.ayu .modular-logo-container img.dark-logo,
+.coal .modular-logo-container img.dark-logo,
+.navy .modular-logo-container img.dark-logo {
+    display: inline-block;
+}

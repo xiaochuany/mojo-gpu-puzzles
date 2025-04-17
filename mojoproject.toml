@@ -1,0 +1,31 @@
+[project]
+authors = ["ehsanmok <6980212+ehsanmok@users.noreply.github.com>"]
+channels = ["https://conda.modular.com/max-nightly", "https://conda.modular.com/max", "https://repo.prefix.dev/modular-community", "conda-forge"]
+name = "devrel-internal"
+platforms = ["linux-64"]
+version = "0.0.0"
+
+[tasks]
+tests = { cmd = "bash test_solutions.sh" }
+book = { cmd = "cd book && mdbook build && mdbook serve --open"}
+
+p01 = "mojo problems/p01.mojo"
+p02 = "mojo problems/p02.mojo"
+p03 = "mojo problems/p03.mojo"
+p04 = "mojo problems/p04.mojo"
+p05 = "mojo problems/p05.mojo"
+p06 = "mojo problems/p06.mojo"
+p07 = "mojo problems/p07.mojo"
+p08 = "mojo problems/p08.mojo"
+p09 = "mojo problems/p09.mojo"
+p10 = "mojo problems/p10.mojo"
+p11 = "mojo problems/p11.mojo"
+p12 = "mojo problems/p12.mojo"
+p13 = "mojo problems/p13.mojo"
+p14 = "mojo problems/p14.mojo"
+
+
+[dependencies]
+max = "*"
+bash = ">=5.2.21,<6"
+mdbook = ">=0.4.48,<0.5"

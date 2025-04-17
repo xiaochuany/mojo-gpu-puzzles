@@ -1,0 +1,17 @@
+# Summary
+
+- [Introduction](./introduction.md)
+- [Puzzle 1: Map](./puzzle_01_map.md)
+- [Puzzle 2: Zip](./puzzle_02_zip.md)
+- [Puzzle 3: Guards](./puzzle_03_guards.md)
+- [Puzzle 4: Map 2D](./puzzle_04_map_2d.md)
+- [Puzzle 5: Broadcast](./puzzle_05_broadcast.md)
+- [Puzzle 6: Blocks](./puzzle_06_blocks.md)
+- [Puzzle 7: Blocks 2D](./puzzle_07_blocks_2d.md)
+- [Puzzle 8: Shared](./puzzle_08_shared.md)
+- [Puzzle 9: Pooling](./puzzle_09_pooling.md)
+- [Puzzle 10: Dot Product](./puzzle_10_dot_product.md)
+- [Puzzle 11: 1D Convolution](./puzzle_11_1d_convolution.md)
+- [Puzzle 12: Prefix Sum](./puzzle_12_prefix_sum.md)
+- [Puzzle 13: Axis Sum](./puzzle_13_axis_sum.md)
+- [Puzzle 14: Matrix Multiply](./puzzle_14_matrix_multiply.md)
