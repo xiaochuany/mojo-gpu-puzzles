@@ -6,15 +6,18 @@ src = "src"
 title = "Mojo GPU Puzzles"
 
 [output.html]
-additional-css = ["theme/css/custom.css", "theme/css/highlight.css"]
-additional-js = ["theme/highlight.js", "theme/init.js"]
+additional-css = ["theme/css/custom.css"]
+additional-js = ["theme/copy.js"]
 default-theme = "light"
 preferred-dark-theme = "ayu"
+additional-theme = ["navy", "coal", "ayu"]
 copy-fonts = true
 curly-quotes = true
-no-section-label = false
+no-section-label = true
 git-repository-url = "https://github.com/modularml/mojo-gpu-puzzles"
 mathjax-support = true
+theme-switcher = true
+no-theme-selection = false
 
 [output.html.print]
 enable = true
@@ -36,6 +39,7 @@ enable = false
 [build]
 build-dir = "book"
 create-missing = true
+extra-files = ["logo"]
 
 [preprocessor.index]
 index = false

@@ -9,6 +9,7 @@ version = "0.0.0"
 format = "mojo format -l 100 problems solutions"
 tests = { cmd = "bash solutions/run.sh" }
 book = { cmd = "cd book && mdbook build && mdbook serve --open"}
+clean = { cmd = "cd book && mdbook clean"}
 
 p01 = "mojo problems/p01/p01.mojo"
 p02 = "mojo problems/p02/p02.mojo"

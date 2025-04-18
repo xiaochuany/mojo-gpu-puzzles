@@ -117,6 +117,7 @@ html {
 
 .content {
     padding-top: 20px;
+    padding-bottom: 60px;
 }
 
 /* Adjust sidebar position */
@@ -598,4 +599,196 @@ mark {
 .coal .modular-logo-container img.dark-logo,
 .navy .modular-logo-container img.dark-logo {
     display: inline-block;
+}
+
+/* Copy button styles */
+.copy-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 3px 8px;
+    font-size: 0.8em;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.copy-button:hover {
+    opacity: 1;
+}
+
+pre {
+    position: relative;
+}
+
+
+/* Add to custom.css */
+pre code.hljs {
+    display: block;
+    padding: 1em;
+    overflow-x: auto;
+}
+
+code.mojo {
+    color: #333;
+    background: #f8f8f8;
+}
+
+/* Basic styling for Mojo keywords */
+.hljs-keyword {
+    color: #0000ff;
+    font-weight: bold;
+}
+
+.hljs-built_in {
+    color: #0086b3;
+}
+
+.hljs-string {
+    color: #d14;
+}
+
+.hljs-number {
+    color: #099;
+}
+
+.hljs-comment {
+    color: #998;
+    font-style: italic;
+}
+
+/* Force code highlighting to work properly */
+pre code {
+    background-color: transparent !important;
+}
+
+/* Force hljs styles to take precedence */
+pre code.hljs {
+    display: block !important;
+    overflow-x: auto !important;
+    padding: 1em !important;
+}
+
+/* Theme selector styles */
+.theme-popup {
+    background: var(--modular-bg);
+    border: 1px solid var(--modular-border);
+}
+
+#theme-list {
+    background: var(--modular-bg);
+    border: 1px solid var(--modular-border);
+}
+
+/* Fix theme list styling */
+#theme-list {
+    background: var(--modular-bg);
+    border: 1px solid var(--modular-border);
+}
+
+/* Force theme button to be visible */
+#theme-toggle {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Fix icon display */
+.fa-paint-brush,
+.fa-paintbrush {
+    display: inline-block !important;
+    visibility: visible !important;
+}
+
+/* Logo visibility rules */
+.light-logo {
+    display: inline-block;
+}
+
+.dark-logo {
+    display: none;
+}
+
+/* Dark theme logo display */
+.ayu .light-logo,
+.coal .light-logo,
+.navy .light-logo {
+    display: none;
+}
+
+.ayu .dark-logo,
+.coal .dark-logo,
+.navy .dark-logo {
+    display: inline-block;
+}
+
+/* Solution styling */
+.solution-toggle {
+    cursor: pointer;
+    padding: 10px 15px;
+    background-color: var(--modular-blue);
+    color: white;
+    border-radius: 4px;
+    display: inline-block;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.solution-toggle:hover {
+    background-color: var(--modular-dark-blue);
+}
+
+.solution-container {
+    margin-top: 15px;
+    border-left: 3px solid var(--modular-blue);
+    padding-left: 15px;
+    margin-bottom: 30px;
+}
+
+.solution-explanation {
+    margin-top: 15px;
+    padding: 10px 15px;
+    background-color: rgba(8, 165, 225, 0.1);
+    border-radius: 4px;
+}
+
+.solution-tips {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-left: 3px solid #4caf50;
+    border-radius: 0 4px 4px 0;
+}
+
+/* Dark theme adjustments */
+.ayu .solution-tips,
+.navy .solution-tips,
+.coal .solution-tips {
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+/* Add a subtle indicator that there's more content */
+.content::after {
+    content: "";
+    display: block;
+    height: 40px;
+    margin-top: 20px;
+    border-bottom: 1px solid var(--modular-border);
+    opacity: 0.5;
+}
+
+/* Ensure the last section has good spacing */
+.content> :last-child {
+    margin-bottom: 60px;
+}
+
+/* Enhance solution section visibility */
+details {
+    margin-bottom: 40px;
+}
+
+details:last-child {
+    margin-bottom: 60px;
 }
