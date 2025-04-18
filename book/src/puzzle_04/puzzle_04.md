@@ -1,7 +1,7 @@
 # Puzzle 4: Map 2D
 
-Implement a kernel that adds 10 to each position of `a` and stores it in `out`.
-Input `a` is 2D and square. **You have more threads than positions**.
+Implement a kernel that adds 10 to each position of 2D square matrix `a` and stores it in 2D square matrix `out`.
+**You have more threads than positions**.
 
 ## Visual Representation
 

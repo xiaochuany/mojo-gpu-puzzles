@@ -9,6 +9,7 @@ alias THREADS_PER_BLOCK = (4, 1)
 alias dtype = DType.float32
 
 
+# ANCHOR: add_10_blocks_solution
 fn add_10_blocks(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
@@ -17,6 +18,9 @@ fn add_10_blocks(
     global_i = block_dim.x * block_idx.x + thread_idx.x
     if global_i < size:
         out[global_i] = a[global_i] + 10.0
+
+
+# ANCHOR_END: add_10_blocks_solution
 
 
 def main():

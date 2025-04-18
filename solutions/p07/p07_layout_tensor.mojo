@@ -11,6 +11,7 @@ alias out_layout = Layout.row_major(SIZE, SIZE)
 alias a_layout = Layout.row_major(SIZE, 1)
 
 
+# ANCHOR: add_10_blocks_2d_layout_tensor_solution
 fn add_10_blocks_2d[
     out_layout: Layout,
     a_layout: Layout,
@@ -23,6 +24,9 @@ fn add_10_blocks_2d[
     global_j = block_dim.y * block_idx.y + thread_idx.y
     if global_i < size and global_j < size:
         out[global_i, global_j] = a[global_i, global_j] + 10.0
+
+
+# ANCHOR_END: add_10_blocks_2d_layout_tensor_solution
 
 
 def main():

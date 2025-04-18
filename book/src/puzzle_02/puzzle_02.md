@@ -1,6 +1,6 @@
 # Puzzle 2: Zip
 
-Implement a kernel that adds together each position of `a` and `b` and stores it in `out`.
+Implement a kernel that adds together each position of vector `a` and vector `b` and stores it in `out`.
 You have 1 thread per position.
 
 ## Visual Representation

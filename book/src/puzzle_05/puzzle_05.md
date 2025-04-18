@@ -1,7 +1,7 @@
 # Puzzle 5: Broadcast
 
-Implement a kernel that adds `a` and `b` and stores it in `out`.
-Inputs `a` and `b` are vectors. You have more threads than positions.
+Implement a kernel that broadcast adds vector `a` and vector `b` and stores it in 2D matrix `out`.
+You have more threads than positions.
 
 ## Visual Representation
 

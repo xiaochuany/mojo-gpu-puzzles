@@ -24,7 +24,11 @@ p05 = "mojo problems/p05/p05.mojo"
 p05_layout_tensor = "mojo problems/p05/p05_layout_tensor.mojo"
 
 p06 = "mojo problems/p06/p06.mojo"
+
 p07 = "mojo problems/p07/p07.mojo"
+p07_layout_tensor = "mojo problems/p07/p07_layout_tensor.mojo"
+
+
 p08 = "mojo problems/p08/p08.mojo"
 p09 = "mojo problems/p09/p09.mojo"
 p10 = "mojo problems/p10/p10.mojo"

@@ -1,6 +1,6 @@
 # Puzzle 3: Guards
 
-Implement a kernel that adds 10 to each position of `a` and stores it in `out`.
+Implement a kernel that adds 10 to each position of vector `a` and stores it in vector `out`.
 **You have more threads than positions.**
 
 ## Visual Representation

@@ -9,6 +9,7 @@ alias THREADS_PER_BLOCK = (3, 3)
 alias dtype = DType.float32
 
 
+# ANCHOR: add_10_blocks_2d_solution
 fn add_10_blocks_2d(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
@@ -17,7 +18,10 @@ fn add_10_blocks_2d(
     global_i = block_dim.x * block_idx.x + thread_idx.x
     global_j = block_dim.y * block_idx.y + thread_idx.y
     if global_i < size and global_j < size:
-        out[global_i * size + global_j] = a[global_i * size + global_j] + 10.0
+        out[global_j * size + global_i] = a[global_j * size + global_i] + 10.0
+
+
+# ANCHOR_END: add_10_blocks_2d_solution
 
 
 def main():
@@ -35,13 +39,13 @@ def main():
 
         ctx.synchronize()
 
-        for i in range(SIZE):
-            for j in range(SIZE):
-                expected[i * SIZE + j] += 10
+        for y in range(SIZE):
+            for x in range(SIZE):
+                expected[y * SIZE + x] += 10
 
         with out.map_to_host() as out_host:
             print("out:", out_host)
             print("expected:", expected)
-            for i in range(SIZE):
-                for j in range(SIZE):
-                    assert_equal(out_host[i * SIZE + j], expected[i * SIZE + j])
+            for y in range(SIZE):
+                for x in range(SIZE):
+                    assert_equal(out_host[y * SIZE + x], expected[y * SIZE + x])
