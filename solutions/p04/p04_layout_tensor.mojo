@@ -10,6 +10,7 @@ alias dtype = DType.float32
 alias layout = Layout.row_major(SIZE, SIZE)
 
 
+# ANCHOR: add_10_2d_layout_tensor_solution
 fn add_10_2d(
     out: LayoutTensor[mut=True, dtype, layout],
     a: LayoutTensor[mut=True, dtype, layout],
@@ -19,6 +20,9 @@ fn add_10_2d(
     local_j = thread_idx.y
     if local_i < size and local_j < size:
         out[local_i, local_j] = a[local_i, local_j] + 10.0
+
+
+# ANCHOR_END: add_10_2d_layout_tensor_solution
 
 
 def main():

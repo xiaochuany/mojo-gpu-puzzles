@@ -9,6 +9,7 @@ alias THREADS_PER_BLOCK = (3, 3)
 alias dtype = DType.float32
 
 
+# ANCHOR: broadcast_add_solution
 fn broadcast_add(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
@@ -18,7 +19,10 @@ fn broadcast_add(
     local_i = thread_idx.x
     local_j = thread_idx.y
     if local_i < size and local_j < size:
-        out[local_i * size + local_j] = a[local_i] + b[local_j]
+        out[local_j * size + local_i] = a[local_i] + b[local_j]
+
+
+# ANCHOR_END: broadcast_add_solution
 
 
 def main():
@@ -32,9 +36,9 @@ def main():
                 a_host[i] = i
                 b_host[i] = i
 
-            for i in range(SIZE):
-                for j in range(SIZE):
-                    expected[i * SIZE + j] = a_host[i] + b_host[j]
+            for y in range(SIZE):
+                for x in range(SIZE):
+                    expected[y * SIZE + x] = a_host[x] + b_host[y]
 
         ctx.enqueue_function[broadcast_add](
             out.unsafe_ptr(),
@@ -50,6 +54,6 @@ def main():
         with out.map_to_host() as out_host:
             print("out:", out_host)
             print("expected:", expected)
-            for i in range(SIZE):
-                for j in range(SIZE):
-                    assert_equal(out_host[i * SIZE + j], expected[i * SIZE + j])
+            for y in range(SIZE):
+                for x in range(SIZE):
+                    assert_equal(out_host[y * SIZE + x], expected[y * SIZE + x])

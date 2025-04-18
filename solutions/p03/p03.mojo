@@ -9,6 +9,7 @@ alias THREADS_PER_BLOCK = (8, 1)
 alias dtype = DType.float32
 
 
+# ANCHOR: add_10_guard_solution
 fn add_10_guard(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
@@ -17,6 +18,9 @@ fn add_10_guard(
     local_i = thread_idx.x
     if local_i < size:
         out[local_i] = a[local_i] + 10.0
+
+
+# ANCHOR_END: add_10_guard_solution
 
 
 def main():

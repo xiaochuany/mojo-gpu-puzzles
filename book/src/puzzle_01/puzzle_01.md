@@ -70,7 +70,7 @@ This solution:
 
 - Uses `local_i` (thread index) to access the correct element
 - Adds 10 to the value
-</div>
 
+</div>
 </details>
 

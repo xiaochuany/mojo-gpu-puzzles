@@ -3,6 +3,7 @@ from gpu import thread_idx
 from gpu.host import DeviceContext
 from testing import assert_equal
 
+# ANCHOR: add_10_guard
 alias SIZE = 4
 alias BLOCKS_PER_GRID = 1
 alias THREADS_PER_BLOCK = (8, 1)
@@ -16,6 +17,9 @@ fn add_10_guard(
 ):
     local_i = thread_idx.x
     # FILL ME IN (roughly 2 lines)
+
+
+# ANCHOR_END: add_10_guard
 
 
 def main():

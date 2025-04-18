@@ -3,6 +3,7 @@ from gpu.host import DeviceContext
 from layout import Layout, LayoutTensor
 from testing import assert_equal
 
+# ANCHOR: add_10_2d_layout_tensor
 alias SIZE = 2
 alias BLOCKS_PER_GRID = 1
 alias THREADS_PER_BLOCK = (3, 3)
@@ -17,14 +18,16 @@ fn add_10_2d(
 ):
     local_i = thread_idx.x
     local_j = thread_idx.y
-    if local_i < size and local_j < size:
-        out[local_i, local_j] = a[local_i, local_j] + 10.0
+    # FILL ME IN (roughly 2 lines)
+
+
+# ANCHOR_END: add_10_2d_layout_tensor
 
 
 def main():
     with DeviceContext() as ctx:
         out_buf = ctx.enqueue_create_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
-        out_tensor = LayoutTensor[mut=True, dtype, layout](out_buf.unsafe_ptr()).reshape[layout]()
+        out_tensor = LayoutTensor[mut=True, dtype, layout](out_buf.unsafe_ptr())
         print("out shape:", out_tensor.shape[0](), "x", out_tensor.shape[1]())
 
         expected = ctx.enqueue_create_host_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
@@ -35,7 +38,7 @@ def main():
                 a_host[i] = i
                 expected[i] = a_host[i] + 10
 
-        a_tensor = LayoutTensor[mut=True, dtype, layout](a.unsafe_ptr()).reshape[layout]()
+        a_tensor = LayoutTensor[mut=True, dtype, layout](a.unsafe_ptr())
 
         ctx.enqueue_function[add_10_2d](
             out_tensor,

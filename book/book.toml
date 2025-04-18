@@ -7,12 +7,11 @@ title = "Mojo GPU Puzzles"
 
 [output.html]
 additional-css = ["theme/css/custom.css"]
-additional-js = ["theme/copy.js"]
 default-theme = "light"
 preferred-dark-theme = "ayu"
 additional-theme = ["navy", "coal", "ayu"]
 copy-fonts = true
-curly-quotes = true
+smart-punctuation = true
 no-section-label = true
 git-repository-url = "https://github.com/modularml/mojo-gpu-puzzles"
 mathjax-support = true

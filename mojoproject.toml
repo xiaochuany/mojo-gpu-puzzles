@@ -12,10 +12,17 @@ book = { cmd = "cd book && mdbook build && mdbook serve --open"}
 clean = { cmd = "cd book && mdbook clean"}
 
 p01 = "mojo problems/p01/p01.mojo"
+
 p02 = "mojo problems/p02/p02.mojo"
+
 p03 = "mojo problems/p03/p03.mojo"
+
 p04 = "mojo problems/p04/p04.mojo"
+p04_layout_tensor = "mojo problems/p04/p04_layout_tensor.mojo"
+
 p05 = "mojo problems/p05/p05.mojo"
+p05_layout_tensor = "mojo problems/p05/p05_layout_tensor.mojo"
+
 p06 = "mojo problems/p06/p06.mojo"
 p07 = "mojo problems/p07/p07.mojo"
 p08 = "mojo problems/p08/p08.mojo"

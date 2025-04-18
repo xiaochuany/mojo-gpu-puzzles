@@ -9,6 +9,7 @@ alias THREADS_PER_BLOCK = (3, 3)
 alias dtype = DType.float32
 
 
+# ANCHOR: broadcast_add
 fn broadcast_add(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
@@ -20,6 +21,7 @@ fn broadcast_add(
     # FILL ME IN (roughly 2 lines)
 
 
+# ANCHOR_END: broadcast_add
 def main():
     with DeviceContext() as ctx:
         out = ctx.enqueue_create_buffer[dtype](SIZE * SIZE).enqueue_fill(0)

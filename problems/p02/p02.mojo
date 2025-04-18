@@ -3,6 +3,7 @@ from gpu import thread_idx, block_dim, block_idx
 from gpu.host import DeviceContext
 from testing import assert_equal
 
+# ANCHOR: add
 alias SIZE = 4
 alias BLOCKS_PER_GRID = 1
 alias THREADS_PER_BLOCK = SIZE
@@ -16,6 +17,9 @@ fn add(
 ):
     local_i = thread_idx.x
     # FILL ME IN (roughly 1 line)
+
+
+# ANCHOR_END: add
 
 
 def main():

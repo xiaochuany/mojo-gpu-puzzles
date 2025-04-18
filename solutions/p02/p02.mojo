@@ -9,6 +9,7 @@ alias THREADS_PER_BLOCK = SIZE
 alias dtype = DType.float32
 
 
+# ANCHOR: add_solution
 fn add(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
@@ -16,6 +17,9 @@ fn add(
 ):
     local_i = thread_idx.x
     out[local_i] = a[local_i] + b[local_i]
+
+
+# ANCHOR_END: add_solution
 
 
 def main():

@@ -12,6 +12,7 @@ alias a_layout = Layout.row_major(SIZE, 1)
 alias b_layout = Layout.row_major(1, SIZE)
 
 
+# ANCHOR: broadcast_add_layout_tensor_solution
 fn broadcast_add[
     out_layout: Layout,
     a_layout: Layout,
@@ -26,6 +27,9 @@ fn broadcast_add[
     local_j = thread_idx.y
     if local_i < size and local_j < size:
         out[local_i, local_j] = a[local_i, 0] + b[0, local_j]
+
+
+# ANCHOR_END: broadcast_add_layout_tensor_solution
 
 
 def main():

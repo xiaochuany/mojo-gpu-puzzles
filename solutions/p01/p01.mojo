@@ -8,11 +8,15 @@ alias BLOCKS_PER_GRID = 1
 alias THREADS_PER_BLOCK = SIZE
 alias dtype = DType.float32
 
+
 # ANCHOR: add_10_solution
 fn add_10(out: UnsafePointer[Scalar[dtype]], a: UnsafePointer[Scalar[dtype]]):
     local_i = thread_idx.x
     out[local_i] = a[local_i] + 10.0
+
+
 # ANCHOR_END: add_10_solution
+
 
 def main():
     with DeviceContext() as ctx:
