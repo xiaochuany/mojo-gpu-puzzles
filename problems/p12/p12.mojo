@@ -24,6 +24,7 @@ alias THREADS_PER_BLOCK = (TPB, 1)
 
 alias dtype = DType.float32
 
+
 # this only works when there's a single block
 fn prefix_sum_simple(
     out: UnsafePointer[Scalar[dtype]],

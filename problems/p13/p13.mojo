@@ -32,6 +32,7 @@ fn axis_sum(
     batch = block_idx.y
     # FILL ME IN (roughly 12 lines)
 
+
 def main():
     with DeviceContext() as ctx:
         out = ctx.enqueue_create_buffer[dtype](BATCH).enqueue_fill(0)

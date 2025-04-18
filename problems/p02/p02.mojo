@@ -17,6 +17,7 @@ fn add(
     local_i = thread_idx.x
     # FILL ME IN (roughly 1 line)
 
+
 def main():
     with DeviceContext() as ctx:
         out = ctx.enqueue_create_buffer[dtype](SIZE).enqueue_fill(0)

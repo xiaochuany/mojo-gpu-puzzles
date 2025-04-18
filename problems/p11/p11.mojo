@@ -22,6 +22,7 @@ alias THREADS_PER_BLOCK = (TPB, 1)
 
 alias dtype = DType.float32
 
+
 # this is good enough to pass test 1 but why it doesn't work for test 2
 fn conv_1d_simple(
     out: UnsafePointer[Scalar[dtype]],
@@ -42,32 +43,7 @@ fn conv_1d_simple(
     ]()
     global_i = block_dim.x * block_idx.x + thread_idx.x
     local_i = thread_idx.x
-    if global_i < a_size:
-        shared_a[local_i] = a[global_i]
-
-    if global_i < b_size:
-        shared_b[local_i] = b[global_i]
-
-    barrier()
-
-    # Note: this is unsafe as it enforces no guard so could access `shared_a` beyond its bounds
-    # local_sum = Scalar[dtype](0)
-    # for j in range(CONV):
-    #     if local_i + j < SIZE:
-    #         local_sum += shared_a[local_i + j] * shared_b[j]
-
-    # if global_i < a_size:
-    #     out[global_i] = local_sum
-
-    # Safe and correct:
-    if global_i < a_size:
-        local_sum = Scalar[dtype](0)
-        for j in range(CONV):
-            # Bonus: do we need this check for this specific example with fixed SIZE, CONV
-            if local_i + j < SIZE:
-                local_sum += shared_a[local_i + j] * shared_b[j]
-
-        out[global_i] = local_sum
+    # FILL ME IN (roughly 11 lines)
 
 
 fn conv_1d_block_boundary(
@@ -90,28 +66,7 @@ fn conv_1d_block_boundary(
     ]()
     global_i = block_dim.x * block_idx.x + thread_idx.x
     local_i = thread_idx.x
-    if global_i < a_size:
-        shared_a[local_i] = a[global_i]
-
-    # second: load elements needed for convolution at block boundary
-    if local_i < CONV - 1:
-        # indices from next block
-        next_idx = global_i + TPB
-        if next_idx < a_size:
-            shared_a[TPB + local_i] = a[next_idx]
-
-    if local_i < b_size:
-        shared_b[local_i] = b[local_i]
-
-    barrier()
-
-    if global_i < a_size:
-        local_sum = Scalar[dtype](0)
-        for j in range(CONV):
-            if local_i + j < TPB + CONV - 1:
-                local_sum += shared_a[local_i + j] * shared_b[j]
-
-        out[global_i] = local_sum
+    # FILL ME IN (roughly 15 lines)
 
 
 def main():

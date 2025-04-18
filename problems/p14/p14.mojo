@@ -62,6 +62,7 @@ fn single_block_matmul(
     local_j = thread_idx.y
     # FILL ME IN (roughly 6 lines)
 
+
 ########################################################
 # Block Layout (each block is 3x3 threads):
 # [B00][B01][B02]
