@@ -5,6 +5,7 @@ from gpu.memory import AddressSpace
 from sys import sizeof
 from testing import assert_equal
 
+# ANCHOR: dot_product
 alias TPB = 8
 alias SIZE = 8
 alias BLOCKS_PER_GRID = (1, 1)
@@ -26,6 +27,9 @@ fn dot_product(
     global_i = block_dim.x * block_idx.x + thread_idx.x
     local_i = thread_idx.x
     # FILL ME IN (roughly 11 lines)
+
+
+# ANCHOR_END: dot_product
 
 
 def main():

@@ -7,11 +7,14 @@
 - [Puzzle 2: Zip](./puzzle_02/puzzle_02.md)
 - [Puzzle 3: Guards](./puzzle_03/puzzle_03.md)
 - [Puzzle 4: Map 2D](./puzzle_04/puzzle_04.md)
+    - [Introduction to `LayoutTensor`](./puzzle_04/introduction_layout_tensor.md)
+    - [Puzzle 4: Map 2D with `LayoutTensor`](./puzzle_04/puzzle_04_layout_tensor.md)
 - [Puzzle 5: Broadcast](./puzzle_05/puzzle_05.md)
-
+    - [Puzzle 5: Broadcast with `LayoutTensor`](./puzzle_05/puzzle_05_layout_tensor.md)
 # Part II: Block-Level Operations
 - [Puzzle 6: Blocks](./puzzle_06/puzzle_06.md)
 - [Puzzle 7: Blocks 2D](./puzzle_07/puzzle_07.md)
+    - [Puzzle 7: Blocks 2D with LayoutTensor](./puzzle_07/puzzle_07_layout_tensor.md)
 
 # Part III: Shared Memory
 - [Puzzle 8: Shared Memory](./puzzle_08/puzzle_08.md)

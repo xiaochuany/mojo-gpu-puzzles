@@ -12,6 +12,7 @@ alias THREADS_PER_BLOCK = (TPB, 1)
 alias dtype = DType.float32
 
 
+# ANCHOR: pooling_solution
 fn pooling(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
@@ -33,7 +34,7 @@ fn pooling(
     # for i in range(a.shape[0]):
     #        out[i] = a[max(i - 2, 0) : i + 1].sum()
 
-    # which is
+    # which is equivalent to:
     out[0] = shared[0]
     out[1] = shared[0] + shared[1]
     # out[2] = shared[0] + shared[1] + shared[2]
@@ -43,17 +44,8 @@ fn pooling(
     if 1 < global_i < size:
         out[global_i] = shared[local_i - 2] + shared[local_i - 1] + shared[local_i]
 
-    # or more general
-    # if global_i < size:
-    #     local_sum = Scalar[dtype](0)
-    #     if global_i == 0:
-    #         local_sum = shared[0]
-    #     elif global_i == 1:
-    #         local_sum = shared[0] + shared[1]
-    #     else:
-    #         local_sum = shared[local_i - 2] + shared[local_i - 1] + shared[local_i]
 
-    #     out[global_i] = local_sum
+# ANCHOR_END: pooling_solution
 
 
 def main():

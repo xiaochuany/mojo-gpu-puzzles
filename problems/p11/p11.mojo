@@ -2,28 +2,20 @@ from memory import UnsafePointer, stack_allocation
 from gpu import thread_idx, block_idx, block_dim, barrier
 from gpu.host import DeviceContext
 from gpu.memory import AddressSpace
-from sys import sizeof
+from sys import sizeof, argv
 from testing import assert_equal
 
+# ANCHOR: conv_1d_simple
 alias MAX_CONV = 4
 alias TPB = 8
 alias TPB_MAX_CONV = TPB + MAX_CONV
-# test 1
 alias SIZE = 6
 alias CONV = 3
 alias BLOCKS_PER_GRID = (1, 1)
 alias THREADS_PER_BLOCK = (TPB, 1)
-
-# comment out above and uncomment below for test #2
-# alias SIZE = 15
-# alias CONV = 4
-# alias BLOCKS_PER_GRID = (2, 1)
-# alias THREADS_PER_BLOCK = (TPB, 1)
-
 alias dtype = DType.float32
 
 
-# this is good enough to pass test 1 but why it doesn't work for test 2
 fn conv_1d_simple(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
@@ -31,19 +23,19 @@ fn conv_1d_simple(
     a_size: Int,
     b_size: Int,
 ):
-    shared_a = stack_allocation[
-        SIZE * sizeof[dtype](),
-        Scalar[dtype],
-        address_space = AddressSpace.SHARED,
-    ]()
-    shared_b = stack_allocation[
-        CONV * sizeof[dtype](),
-        Scalar[dtype],
-        address_space = AddressSpace.SHARED,
-    ]()
     global_i = block_dim.x * block_idx.x + thread_idx.x
     local_i = thread_idx.x
-    # FILL ME IN (roughly 11 lines)
+    # FILL ME IN (roughly 12 lines)
+
+
+# ANCHOR_END: conv_1d_simple
+
+
+# ANCHOR: conv_1d_block_boundary
+alias SIZE_2 = 15
+alias CONV_2 = 4
+alias BLOCKS_PER_GRID_2 = (2, 1)
+alias THREADS_PER_BLOCK_2 = (TPB, 1)
 
 
 fn conv_1d_block_boundary(
@@ -53,20 +45,12 @@ fn conv_1d_block_boundary(
     a_size: Int,
     b_size: Int,
 ):
-    # first: need to account for padding
-    shared_a = stack_allocation[
-        (TPB + CONV - 1) * sizeof[dtype](),
-        Scalar[dtype],
-        address_space = AddressSpace.SHARED,
-    ]()
-    shared_b = stack_allocation[
-        CONV * sizeof[dtype](),
-        Scalar[dtype],
-        address_space = AddressSpace.SHARED,
-    ]()
     global_i = block_dim.x * block_idx.x + thread_idx.x
     local_i = thread_idx.x
-    # FILL ME IN (roughly 15 lines)
+    # FILL ME IN (roughly 17 lines)
+
+
+# ANCHOR_END: conv_1d_block_boundary
 
 
 def main():
@@ -82,15 +66,28 @@ def main():
             for i in range(CONV):
                 b_host[i] = i
 
-        ctx.enqueue_function[conv_1d_simple](
-            out.unsafe_ptr(),
-            a.unsafe_ptr(),
-            b.unsafe_ptr(),
-            SIZE,
-            CONV,
-            grid_dim=BLOCKS_PER_GRID,
-            block_dim=THREADS_PER_BLOCK,
-        )
+        if argv()[1] == "--simple":
+            ctx.enqueue_function[conv_1d_simple](
+                out.unsafe_ptr(),
+                a.unsafe_ptr(),
+                b.unsafe_ptr(),
+                SIZE,
+                CONV,
+                grid_dim=BLOCKS_PER_GRID,
+                block_dim=THREADS_PER_BLOCK,
+            )
+        elif argv()[1] == "--block-boundary":
+            ctx.enqueue_function[conv_1d_block_boundary](
+                out.unsafe_ptr(),
+                a.unsafe_ptr(),
+                b.unsafe_ptr(),
+                SIZE,
+                CONV,
+                grid_dim=BLOCKS_PER_GRID_2,
+                block_dim=THREADS_PER_BLOCK_2,
+            )
+        else:
+            raise Error("Invalid argument")
 
         expected = ctx.enqueue_create_host_buffer[dtype](SIZE).enqueue_fill(0)
 

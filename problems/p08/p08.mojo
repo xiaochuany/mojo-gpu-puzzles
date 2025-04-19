@@ -5,6 +5,7 @@ from gpu.memory import AddressSpace
 from sys import sizeof
 from testing import assert_equal
 
+# ANCHOR: add_10_shared
 alias TPB = 4
 alias SIZE = 8
 alias BLOCKS_PER_GRID = (2, 1)
@@ -33,6 +34,9 @@ fn add_10_shared(
     barrier()
 
     # FILL ME IN (roughly 2 lines)
+
+
+# ANCHOR_END: add_10_shared
 
 
 def main():

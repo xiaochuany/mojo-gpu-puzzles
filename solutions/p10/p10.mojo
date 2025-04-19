@@ -12,6 +12,7 @@ alias THREADS_PER_BLOCK = (SIZE, 1)
 alias dtype = DType.float32
 
 
+# ANCHOR: dot_product_solution
 fn dot_product(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
@@ -33,9 +34,12 @@ fn dot_product(
     # The following causes race condition: all threds writing to the same location
     # out[0] += shared[local_i]
 
-    # Instead can do parallel reduction in shared memory as opposed to global memory which has no guarantee on synchronization.
-    # Loops using global memory can cause thread divergence because fundamentally GPUs execute threads in warps (groups of 32 threads typically)
-    # and warps can be scheduled independently. However, shared memory does not have such issues as long as we use `barrier()`
+    # Instead can do parallel reduction in shared memory as opposed to
+    # global memory which has no guarantee on synchronization.
+    # Loops using global memory can cause thread divergence because
+    # fundamentally GPUs execute threads in warps (groups of 32 threads typically)
+    # and warps can be scheduled independently.
+    # However, shared memory does not have such issues as long as we use `barrier()`
     # correctly when we're in the same thread block.
     stride = TPB // 2
     while stride > 0:
@@ -48,6 +52,9 @@ fn dot_product(
     # only thread 0 writes the final result
     if local_i == 0:
         out[0] = shared[0]
+
+
+# ANCHOR_END: dot_product_solution
 
 
 def main():

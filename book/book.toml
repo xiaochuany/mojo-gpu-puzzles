@@ -3,7 +3,7 @@ authors = ["Modular <hello@modular.com>"]
 language = "en"
 multilingual = false
 src = "src"
-title = "Mojo GPU Puzzles"
+title = "Mojo 🔥 GPU Puzzles"
 
 [output.html]
 additional-css = ["theme/css/custom.css"]

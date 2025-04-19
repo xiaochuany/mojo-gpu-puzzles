@@ -78,37 +78,3 @@ This solution:
 
 </div>
 </details>
-
-
-Now solve the same the puzzle with `LayoutTensor` as input and output.
-
-## Code to Complete
-
-```mojo
-{{#include ../../../problems/p07/p07_layout_tensor.mojo:add_10_blocks_2d_layout_tensor}}
-```
-<a href="../../../problems/p07/p07.mojo" class="filename">View full file: problems/p07/p07.mojo</a>
-
-
-## Running the Code
-
-To test your solution, run the following command in your terminal:
-
-```bash
-magic run p07_layout_tensor
-```
-
-Your output will look like this if the puzzle isn't solved yet:
-```txt
-out: HostBuffer([0.0, 0.0, 0.0, ... , 0.0])
-expected: HostBuffer([11.0, 11.0, 11.0, ... , 11.0])
-```
-
-## Solution
-
-<details>
-<summary>Click to see the solution</summary>
-
-```mojo
-{{#include ../../../solutions/p07/p07_layout_tensor.mojo:add_10_blocks_2d_layout_tensor_solution}}
-```
