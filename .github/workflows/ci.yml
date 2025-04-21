@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.png'
+      - '**/*.jpg'
+      - '**/*.jpeg'
+      - '**/*.gif'
+      - 'LICENSE'
+      - 'book/**'
+
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.png'
+      - '**/*.jpg'
+      - '**/*.jpeg'
+      - '**/*.gif'
+      - 'LICENSE'
+      - 'book/**'
+
+jobs:
+  test:
+    name: Run GPU Tests
+    runs-on: [modular-runners, a100]
+    timeout-minutes: 300
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Magic CLI
+        run: |
+          curl -ssL https://magic.modular.com/ | bash
+          . $HOME/.bashrc
+          echo "$HOME/.modular/bin" >> $GITHUB_PATH
+          export PATH="$HOME/.modular/bin:$PATH"
+
+      - name: Run solution tests
+        shell: bash
+        run: |
+            source /root/.bashrc
+            $HOME/.modular/bin/magic run tests
