@@ -4,6 +4,7 @@ Implement a kernel that multiplies square matrices \\(a\\) and \\(transpose(a)\\
 using tiled matrix multiplication with shared memory. This version handles matrices larger than a single thread block by processing tiles.
 
 <div class="solution-tips">
+
 Update your [shared memory code](./shared_memory.md) to compute a partial dot-product and iteratively move the part you copied into shared memory. You should be able to do the hard case in 6 global reads.
 </div>
 
