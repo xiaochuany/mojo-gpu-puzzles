@@ -3,39 +3,36 @@
 Implement a kernel that sums together the last 3 positions of vector `a` and stores it in vector `out`.
 You have 1 thread per position. You only need 1 global read and 1 global write per thread.
 
-In psuedocode
+In pseudocode:
 
-```txt
+```python
 for i in range(a.shape[0]):
     out[i] = a[max(i - 2, 0) : i + 1].sum()
 ```
 
-## Visual Representation
-
 ![Pooling visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_43_1.svg)
 
-## Key Concepts
+## Key concepts
 
 In this puzzle, you'll learn about:
-- Implementing pooling operations using shared memory
-- Accessing adjacent elements in shared memory
-- Managing thread synchronization for dependent operations
+- Using shared memory for sliding window operations
+- Handling boundary conditions in pooling
+- Coordinating thread access to neighboring elements
 
-The key insight is understanding how to efficiently implement a sliding window operation using shared memory, where each thread's output depends on multiple input values.
+The key insight is understanding how to efficiently access a window of elements using shared memory, with special handling for the first elements in the sequence.
 
-For example, with:
-- Array size: 8 elements
-- Threads per block: 8
-- Number of blocks: 1
-- Shared memory size: 8 elements
-- Window size: 3 elements
+Configuration:
+- Array size: \\(\\text{SIZE} = 8\\) elements
+- Threads per block: \\(\\text{TPB} = 8\\)
+- Window size: \\(3\\) elements
+- Shared memory: \\(\\text{TPB}\\) elements
 
-- **Pooling Operation**: Summing multiple adjacent elements
-- **Shared Memory Access**: Reading neighboring elements efficiently
-- **Thread Synchronization**: Ensuring data is loaded before pooling
-- **Sliding Window**: Managing boundary conditions for window operations
+- **Window access**: Each output depends on up to 3 previous elements
+- **Edge handling**: First two positions need special treatment
+- **Memory pattern**: One shared memory load per thread
+- **Thread sync**: Coordination before window operations
 
-## Code to Complete
+## Code to complete
 
 ```mojo
 {{#include ../../../problems/p09/p09.mojo:pooling}}
@@ -47,15 +44,14 @@ For example, with:
 
 <div class="solution-tips">
 
-1. Load data into shared memory and call barrier()
-2. For position i, sum elements [i-2, i-1, i] if they exist
-3. Be careful with boundary conditions (first two elements)
-4. Write the result back to global memory only if index is valid
-
+1. Load data and call `barrier()`
+2. Special cases: `out[0] = shared[0]`, `out[1] = shared[0] + shared[1]`
+3. General case: `if 1 < global_i < size`
+4. Sum three elements: `shared[local_i - 2] + shared[local_i - 1] + shared[local_i]`
 </div>
 </details>
 
-## Running the Code
+## Running the code
 
 To test your solution, run the following command in your terminal:
 
@@ -81,11 +77,9 @@ expected: HostBuffer([0.0, 1.0, 3.0, 6.0, 9.0, 12.0, 15.0, 18.0])
 <div class="solution-explanation">
 
 This solution:
-- Loads each element into shared memory
-- Synchronizes threads using barrier()
-- Computes the sum of last 3 elements for each position
-- Handles edge cases for first two elements
-- Writes result back to global memory
-
+- Loads input into shared memory and synchronizes
+- Handles first two elements as special cases
+- For remaining elements, sums previous three values
+- Uses shared memory for efficient neighbor access
 </div>
 </details>

@@ -1,30 +1,25 @@
 # Puzzle 1: Map
 
 GPU programming is all about parallelism. In this puzzle, each thread will process a single element of the input array independently.
-Implement a "kernel" (GPU function) that adds 10 to each position of vector `a` and stores it in vector `out`. You have 1 thread per position.
-
-## Visual Representation
+Implement a kernel that adds \\(10\\) to each position of vector \\(a\\) and stores it in vector \\(out\\). You have 1 thread per position.
 
 ![Map operation visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_14_1.svg)
 
-## Key Concepts
+## Key concepts
 
 In this puzzle, you'll learn about:
-
 - Basic GPU kernel structure
-- Mapping thread indices to data indices
-- Parallel execution of independent operations
+- Thread indexing with `thread_idx.x`
+- Simple parallel operations
 
-The key insight is that each thread (identified by `thread_idx.x`) should process one element of the input array.
+The key insight is that each thread \\(i\\) computes: \\[out[i] = a[i] + 10\\]
 
-- **Parallelism**: Each thread executes the same instruction on different data
-- **Thread Indexing**: Using `thread_idx.x` to identify which data element to process
-- **Memory Access**: Reading from and writing to GPU memory using pointers
-- **Data Independence**: Each element can be processed without knowledge of others
+- **Parallelism**: Each thread executes independently
+- **Thread indexing**: Access element at position \\(i = \\text{thread\_idx.x}\\)
+- **Memory access**: Read from \\(a[i]\\) and write to \\(out[i]\\)
+- **Data independence**: Each output depends only on its corresponding input
 
-The mapping pattern is one of the most fundamental GPU operations and forms the basis for many more complex algorithms.
-
-## Code to Complete
+## Code to complete
 
 ```mojo
 {{#include ../../../problems/p01/p01.mojo:add_10}}
@@ -36,13 +31,13 @@ The mapping pattern is one of the most fundamental GPU operations and forms the 
 
 <div class="solution-tips">
 
-1. Each thread processes a single element independently, which is the fundamental concept of parallel processing on GPUs.
-2. In Mojo, we can get the value of an initialized [UnsafePointer](https://docs.modular.com/mojo/stdlib/memory/unsafe_pointer/UnsafePointer/) at `index` via `a[index]`.
-
+1. Store `thread_idx.x` in `local_i`
+2. Add 10 to `a[local_i]`
+3. Store result in `out[local_i]`
 </div>
 </details>
 
-## Running the Code
+## Running the code
 
 To test your solution, run the following command in your terminal:
 
@@ -66,11 +61,10 @@ expected: HostBuffer([10.0, 11.0, 12.0, 13.0])
 ```
 
 <div class="solution-explanation">
+
 This solution:
-
-- Uses `local_i` (thread index) to access the correct element
-- Adds 10 to the value
-
+- Gets thread index with `local_i = thread_idx.x`
+- Adds 10 to input value: `out[local_i] = a[local_i] + 10.0`
 </div>
 </details>
 

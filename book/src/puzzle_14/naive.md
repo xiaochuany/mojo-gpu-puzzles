@@ -1,43 +1,34 @@
-# Naive Matrix Multiplication
+# Naive matrix multiplication
 
 Implement a kernel that multiplies square matrices `a` and `b` and stores the result in `out`.
 This is the most straightforward implementation where each thread computes one element of the output matrix.
 
-## Visual Representation
-
 ![Matrix Multiply visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_67_1.svg)
 
-## Key Concepts
+## Key concepts
 
 In this puzzle, you'll learn about:
-- Basic matrix multiplication on GPU
-- One-to-one thread to output mapping
-- Row and column access patterns
+- 2D thread organization for matrix operations
 - Global memory access patterns
+- Matrix indexing in row-major layout
+- Thread-to-output element mapping
 
-The key insight is that each thread computes a single dot product between a row of matrix \\(A\\) and a column of matrix \\(B\\). For position \\((i,j)\\) in the output matrix:
+The key insight is understanding how to map 2D thread indices to matrix elements and compute dot products in parallel.
 
-\\[
-C_{ij} = \sum_{k=0}^{n-1} A_{ik} \cdot B_{kj}
-\\]
+Configuration:
+- Matrix size: \\(\\text{SIZE} \\times \\text{SIZE} = 2 \\times 2\\)
+- Threads per block: \\(\\text{TPB} \\times \\text{TPB} = 3 \\times 3\\)
+- Grid dimensions: \\(1 \\times 1\\)
 
-Where:
-- \\(C_{ij}\\) is the output element at position \\((i,j)\\)
-- \\(A_{ik}\\) is element at row \\(i\\), column \\(k\\) of matrix \\(A\\)
-- \\(B_{kj}\\) is element at row \\(k\\), column \\(j\\) of matrix \\(B\\)
-- \\(n\\) is the matrix dimension (SIZE)
+For position \\((i,j)\\) in the output matrix:
+\\[ C_{ij} = \sum_{k=0}^{\\text{SIZE}-1} A_{ik} \\cdot B_{kj} \\]
 
-In memory (row-major layout):
-- \\(A_{ik} = a[i \cdot \text{size} + k]\\)
-- \\(B_{kj} = b[k + j \cdot \text{size}]\\)
-- \\(C_{ij} = \text{out}[i \cdot \text{size} + j]\\)
+Memory layout (row-major):
+- Matrix \\(A\\): \\(A_{ik} = a[i \\cdot \\text{SIZE} + k]\\)
+- Matrix \\(B\\): \\(B_{kj} = b[k + j \\cdot \\text{SIZE}]\\)
+- Output \\(C\\): \\(C_{ij} = \\text{out}[i \\cdot \\text{SIZE} + j]\\)
 
-- **Thread Mapping**: Each thread \\(t_{ij}\\) computes one output element \\(c_{ij}\\)
-- **Memory Access**: Direct access to global memory
-- **Dot Product**: Computing row-column products and sums
-- **Matrix Layout**: Understanding row-major storage
-
-## Code to Complete
+## Code to complete
 
 ```mojo
 {{#include ../../../problems/p14/p14.mojo:naive_matmul}}
@@ -49,19 +40,14 @@ In memory (row-major layout):
 
 <div class="solution-tips">
 
-1. Calculate global thread indices for output position (i,j)
-2. Check if thread indices are within matrix bounds
-3. Compute dot product:
-   - Initialize accumulator \\(c_{ij} = 0\\)
-   - For \\(k = 0\\) to \\(\text{size}-1\\):
-     - Access \\(a_{ik} = a[i \cdot \text{size} + k]\\)
-     - Access \\(b_{kj} = b[k + j \cdot \text{size}]\\)
-     - Accumulate \\(c_{ij} += a_{ik} \cdot b_{kj}\\)
-4. Store result \\(\text{out}[i \cdot \text{size} + j] = c_{ij}\\)
+1. Calculate `global_i` and `global_j` from thread indices
+2. Check if indices are within `size`
+3. Accumulate products in a local variable
+4. Write final sum to correct output position
 </div>
 </details>
 
-## Running the Code
+## Running the code
 
 To test your solution, run the following command in your terminal:
 
@@ -86,14 +72,26 @@ expected: HostBuffer([1.0, 3.0, 3.0, 13.0])
 
 <div class="solution-explanation">
 
-This solution:
-- Computes global thread indices for output position \\((i,j)\\)
-- Checks if thread is within matrix bounds \\(i,j < \text{size}\\)
-- Initializes accumulator \\(c_{ij} = 0\\)
-- Iterates over \\(k \in [0, \text{size})\\) to compute dot product:
-  - Accesses row elements: \\(a_{ik} = a[i \cdot \text{size} + k]\\)
-  - Accesses column elements: \\(b_{kj} = b[k + j \cdot \text{size}]\\)
-  - Accumulates \\(c_{ij} += a_{ik} \cdot b_{kj}\\)
-- Stores final sum in output matrix
+This solution implements matrix multiplication by:
+
+1. Thread mapping:
+   - Each thread identified by \\((\\text{global}_i, \\text{global}_j)\\)
+   - Computed from block and thread indices
+
+2. Bounds checking:
+   ```mojo
+   if global_i < size and global_j < size:
+   ```
+
+3. Dot product computation:
+   - Initialize accumulator: `total = 0`
+   - For each \\(k\\) in range \\(\\text{SIZE}\\):
+     - Access \\(A\\): `a[global_i * size + k]`
+     - Access \\(B\\): `b[k + global_j * size]`
+     - Accumulate product
+
+4. Result storage:
+   - Write to output at correct position in row-major order
+   - Uses same indexing as input matrices
 </div>
 </details>

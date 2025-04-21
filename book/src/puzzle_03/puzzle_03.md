@@ -1,27 +1,26 @@
 # Puzzle 3: Guards
 
-Implement a kernel that adds 10 to each position of vector `a` and stores it in vector `out`.
-**You have more threads than positions.**
+Implement a kernel that adds \\(10\\) to each position of vector \\(a\\) and stores it in vector \\(out\\).
 
-## Visual Representation
+**Note**: You have more threads than positions.
 
 ![Guards visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_21_1.svg)
 
-## Key Concepts
+## Key concepts
 
 In this puzzle, you'll learn about:
-- Using guards to handle thread/data size mismatches
+- Handling thread/data size mismatches
 - Preventing out-of-bounds memory access
-- Conditional execution in GPU kernels
+- Using conditional execution in GPU kernels
 
-The key insight is that you need to check if a thread's index is within the valid range of the data array before performing any operations.
+The key insight is that each thread \\(i\\) must check: \\[\\text{if}\\ i < \\text{size}: out[i] = a[i] + 10\\]
 
-- **Thread Safety**: Guards prevent threads from accessing invalid memory
-- **Conditional Execution**: Only threads with valid indices perform the operation
-- **Memory Protection**: Avoiding out-of-bounds access is crucial for GPU programming
-- **Data Boundaries**: Handling cases where thread count exceeds data size
+- **Thread safety**: Only threads where \\(i < \\text{size}\\) should execute
+- **Guard condition**: Check `local_i < size` before accessing memory
+- **Memory bounds**: Prevent access when \\(i \geq \\text{size}\\)
+- **Thread count**: Handle \\(\\text{THREADS\_PER\_BLOCK} > \\text{size}\\)
 
-## Code to Complete
+## Code to complete
 
 ```mojo
 {{#include ../../../problems/p03/p03.mojo:add_10_guard}}
@@ -33,14 +32,13 @@ The key insight is that you need to check if a thread's index is within the vali
 
 <div class="solution-tips">
 
-1. Check if `local_i` is less than `size` before performing any operations
-2. Only threads with valid indices should modify the output array
-3. Use an if-statement to implement the guard condition
-
+1. Store `thread_idx.x` in `local_i`
+2. Add guard: `if local_i < size`
+3. Inside guard: `out[local_i] = a[local_i] + 10.0`
 </div>
 </details>
 
-## Running the Code
+## Running the code
 
 To test your solution, run the following command in your terminal:
 
@@ -49,7 +47,6 @@ magic run p03
 ```
 
 Your output will look like this if the puzzle isn't solved yet:
-
 ```txt
 out: HostBuffer([0.0, 0.0, 0.0, 0.0])
 expected: HostBuffer([10.0, 11.0, 12.0, 13.0])
@@ -67,10 +64,8 @@ expected: HostBuffer([10.0, 11.0, 12.0, 13.0])
 <div class="solution-explanation">
 
 This solution:
-
-- Checks if the thread index is within valid range
-- Only processes array elements for valid indices
-- Adds 10 to the value when the guard condition is met
-
+- Gets thread index with `local_i = thread_idx.x`
+- Guards against out-of-bounds access with `if local_i < size`
+- Inside guard: adds 10 to input value
 </div>
 </details>

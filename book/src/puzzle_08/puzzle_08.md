@@ -3,33 +3,31 @@
 Implement a kernel that adds 10 to each position of `a` and stores it in `out`.
 You have fewer threads per block than the size of `a`.
 
-## Visual Representation
-
 ![Shared memory visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_39_1.svg)
 
-## Key Concepts
+## Key concepts
 
 In this puzzle, you'll learn about:
-- Using shared memory within a thread block
+- Using shared memory within thread blocks
 - Synchronizing threads with barriers
-- The importance of thread synchronization in shared memory operations
+- Managing block-local data storage
 
-The key insight is understanding how to use shared memory for temporary storage within a block and ensuring proper synchronization between threads.
+The key insight is understanding how shared memory provides fast, block-local storage that all threads in a block can access, requiring careful coordination between threads.
 
-For example, with:
-- Array size: 8 elements
-- Threads per block: 4
-- Number of blocks: 2
-- Shared memory size: 4 elements per block
+Configuration:
+- Array size: \\(\\text{SIZE} = 8\\) elements
+- Threads per block: \\(\\text{TPB} = 4\\)
+- Number of blocks: \\(2\\)
+- Shared memory: \\(\\text{TPB}\\) elements per block
 
-- **Shared Memory**: Fast, block-local storage shared between threads
-- **Barriers**: Synchronization points where all threads must wait
-- **Memory Loading**: Copying from global to shared memory
-- **Thread Synchronization**: Ensuring memory operations complete before proceeding
+- **Shared memory**: Fast storage shared by threads in a block
+- **Thread sync**: Coordination using `barrier()`
+- **Memory scope**: Shared memory only visible within block
+- **Access pattern**: Local vs global indexing
 
 > **Warning**: Each block can only have a *constant* amount of shared memory that threads in that block can read and write to. This needs to be a literal python constant, not a variable. After writing to shared memory you need to call [barrier](https://docs.modular.com/mojo/stdlib/gpu/sync/barrier/) to ensure that threads do not cross.
 
-## Code to Complete
+## Code to complete
 
 ```mojo
 {{#include ../../../problems/p08/p08.mojo:add_10_shared}}
@@ -41,14 +39,14 @@ For example, with:
 
 <div class="solution-tips">
 
-1. Data is already loaded into shared memory for you
-2. After the barrier, use `shared[local_i]` to access the data
-3. Write the result back to global memory using `global_i`
-4. Remember to check if `global_i < size` before writing
+1. Wait for shared memory load with `barrier()`
+2. Use `local_i` to access shared memory: `shared[local_i]`
+3. Use `global_i` for output: `out[global_i]`
+4. Add guard: `if global_i < size`
 </div>
 </details>
 
-## Running the Code
+## Running the code
 
 To test your solution, run the following command in your terminal:
 
@@ -74,10 +72,9 @@ expected: HostBuffer([11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0])
 <div class="solution-explanation">
 
 This solution:
-- Uses shared memory already loaded with input data
-- Waits for all threads at the barrier
-- Adds 10 to the value in shared memory
-- Writes the result back to global memory when index is valid
-
+- Waits for shared memory load with `barrier()`
+- Guards against out-of-bounds with `if global_i < size`
+- Reads from shared memory using `shared[local_i]`
+- Writes result to global memory at `out[global_i]`
 </div>
 </details>

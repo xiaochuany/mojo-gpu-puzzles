@@ -3,26 +3,23 @@
 Implement a kernel that adds 10 to each position of vector `a` and stores it in `out`.
 **You have fewer threads per block than the size of `a`.**
 
-## Visual Representation
-
 ![Blocks visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_31_1.svg)
 
-## Key Concepts
+## Key concepts
 
 In this puzzle, you'll learn about:
-- Working with multiple blocks of threads
-- Computing global thread indices
-- Understanding the block/thread hierarchy in GPU programming
+- Processing data larger than thread block size
+- Coordinating multiple blocks of threads
+- Computing global thread positions
 
-The key insight is understanding how to compute the global thread index using the block index, and ensuring that this index doesn't exceed the data size.
+The key insight is understanding how blocks of threads work together to process data that's larger than a single block's capacity, while maintaining correct element-to-thread mapping.
 
-- **Thread Blocks**: Groups of threads that execute together
-- **Block Index**: Using `block_idx` to identify which block is executing
-- **Global Thread ID**: Computing unique thread identifiers across all blocks
-- **Thread Hierarchy**: Understanding how blocks and threads work together
-- **Scaling**: Processing large datasets with limited threads per block
+- **Thread blocks**: Groups of \\(\\text{THREADS\_PER\_BLOCK} = 4\\) threads
+- **Block grid**: \\(\\text{BLOCKS\_PER\_GRID} = 3\\) blocks total
+- **Data size**: Processing \\(\\text{SIZE} = 9\\) elements
+- **Thread mapping**: Each thread processes one element across blocks
 
-## Code to Complete
+## Code to complete
 
 ```mojo
 {{#include ../../../problems/p06/p06.mojo:add_10_blocks}}
@@ -34,14 +31,13 @@ The key insight is understanding how to compute the global thread index using th
 
 <div class="solution-tips">
 
-1. We have 9 elements to process. Each block as 4 threads and we have 3 blocks so total of 12 threads (more than the size of our array)
-2. Check if the global index is within the valid range
-3. Only threads with valid global indices should modify the output array
-
+1. Calculate global index: `global_i = block_dim.x * block_idx.x + thread_idx.x`
+2. Add guard: `if global_i < size`
+3. Inside guard: `out[global_i] = a[global_i] + 10.0`
 </div>
 </details>
 
-## Running the Code
+## Running the code
 
 To test your solution, run the following command in your terminal:
 
@@ -67,9 +63,8 @@ expected: HostBuffer([10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0])
 <div class="solution-explanation">
 
 This solution:
-- Calculates the global thread index using block and thread indices
-- Checks if the global index is within the array bounds
-- Adds 10 to the value when the guard condition is met
-
+- Computes global thread index from block and thread indices
+- Guards against out-of-bounds with `if global_i < size`
+- Inside guard: adds 10 to input value at global index
 </div>
 </details>

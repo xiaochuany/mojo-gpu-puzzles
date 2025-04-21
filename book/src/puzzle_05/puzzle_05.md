@@ -2,25 +2,23 @@
 
 Implement a kernel that broadcast adds vector `a` and vector `b` and stores it in 2D matrix `out`. You have more threads than positions.
 
-## Visual Representation
-
 ![Broadcast visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_27_1.svg)
 
-## Key Concepts
+## Key concepts
 
 In this puzzle, you'll learn about:
-- Broadcasting operations across dimensions
-- Processing 1D data with 2D thread configurations
-- Coordinate conversion between thread and data indices
+- Broadcasting 1D vectors across different dimensions
+- Using 2D thread indices for broadcast operations
+- Handling boundary conditions in broadcast patterns
 
-The key insight is understanding how to map 2D thread coordinates to 1D memory indices for the operation, while also ensuring proper boundary checking.
+The key insight is understanding how to map elements from two 1D vectors to create a 2D output matrix through broadcasting, while handling thread bounds correctly.
 
-- **Broadcasting**: Understanding how to apply operations across different dimensions
-- **Dimension Mapping**: Converting between 2D thread space and 1D data space
-- **Thread Organization**: Efficiently using 2D thread blocks for 1D operations
-- **Boundary Handling**: Managing thread indices that exceed data dimensions
+- **Broadcasting**: Each element of \\(a\\) combines with each element of \\(b\\)
+- **Thread mapping**: 2D thread grid \\((3 \times 3)\\) for \\(2 \times 2\\) output
+- **Vector access**: Different access patterns for \\(a\\) and \\(b\\)
+- **Bounds checking**: Guard against threads outside matrix dimensions
 
-## Code to Complete
+## Code to complete
 
 ```mojo
 {{#include ../../../problems/p05/p05.mojo:broadcast_add}}
@@ -32,14 +30,13 @@ The key insight is understanding how to map 2D thread coordinates to 1D memory i
 
 <div class="solution-tips">
 
-1. For row-major matrix, convert 2D thread indices to a 1D index using: `index = local_j * size + local_i`
-2. Check if the calculated index is within the valid range
-3. Add corresponding elements from `a` and `b` only for valid indices
-
+1. Get 2D indices: `local_i = thread_idx.x`, `local_j = thread_idx.y`
+2. Add guard: `if local_i < size and local_j < size`
+3. Inside guard: `out[local_j * size + local_i] = a[local_i] + b[local_j]`
 </div>
 </details>
 
-## Running the Code
+## Running the code
 
 To test your solution, run the following command in your terminal:
 
@@ -65,9 +62,8 @@ expected: HostBuffer([0.0, 1.0, 1.0, 2.0])
 <div class="solution-explanation">
 
 This solution:
-- Converts 2D thread coordinates to a 1D memory index
-- Checks if the index is within the valid range
-- Performs element-wise addition of `a` and `b` for valid indices
-
+- Gets 2D thread indices with `local_i = thread_idx.x`, `local_j = thread_idx.y`
+- Guards against out-of-bounds with `if local_i < size and local_j < size`
+- Broadcasts by adding `a[local_i]` and `b[local_j]` into the output matrix
 </div>
 </details>

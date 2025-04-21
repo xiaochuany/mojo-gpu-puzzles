@@ -1,27 +1,25 @@
 # Puzzle 4: Map 2D
 
-Implement a kernel that adds 10 to each position of 2D square matrix `a` and stores it in 2D square matrix `out`.
+Implement a kernel that adds \\(10\\) to each position of 2D square matrix \\(a\\) and stores it in 2D square matrix \\(out\\).
 **You have more threads than positions**.
-
-## Visual Representation
 
 ![Map 2D visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_24_1.svg)
 
-## Key Concepts
+## Key concepts
 
 In this puzzle, you'll learn about:
-- Working with 2D thread configurations
-- Mapping 2D thread indices to 1D memory
-- Implementing boundary checks in multiple dimensions
+- Working with 2D thread indices (`thread_idx.x`, `thread_idx.y`)
+- Converting 2D coordinates to 1D memory indices
+- Handling boundary checks in two dimensions
 
-The key insight is understanding how to convert 2D coordinates to a 1D memory index using row-major ordering, and ensuring that your thread indices are within the bounds of the 2D data.
+The key insight is understanding how to map from 2D thread coordinates \\((i,j)\\) to elements in a row-major matrix of size \\(n \times n\\), while ensuring thread indices are within bounds.
 
-- **2D Threading**: Using x and y thread indices for 2D data
-- **Memory Layout**: Converting 2D coordinates to 1D memory addresses
-- **Boundary Checks**: Ensuring threads stay within valid 2D array bounds
-- **Row-Major Order**: Understanding how 2D data is stored in linear memory
+- **2D indexing**: Each thread has a unique \\((i,j)\\) position
+- **Memory layout**: Row-major ordering maps 2D to 1D memory
+- **Guard condition**: Need bounds checking in both dimensions
+- **Thread bounds**: More threads \\((3 \times 3)\\) than matrix elements \\((2 \times 2)\\)
 
-## Code to Complete
+## Code to complete
 
 ```mojo
 {{#include ../../../problems/p04/p04.mojo:add_10_2d}}
@@ -33,14 +31,13 @@ The key insight is understanding how to convert 2D coordinates to a 1D memory in
 
 <div class="solution-tips">
 
-1. For a row-major matrix, calculate the 1D index from 2D coordinates using: `index = local_j * size + local_i`
-2. Check if both `local_i` and `local_j` are less than `size`
-3. Only threads within the 2D bounds should modify the output array
-
+1. Get 2D indices: `local_i = thread_idx.x`, `local_j = thread_idx.y`
+2. Add guard: `if local_i < size and local_j < size`
+3. Inside guard: `out[local_j * size + local_i] = a[local_j * size + local_i] + 10.0`
 </div>
 </details>
 
-## Running the Code
+## Running the code
 
 To test your solution, run the following command in your terminal:
 
@@ -66,10 +63,9 @@ expected: HostBuffer([10.0, 11.0, 12.0, 13.0])
 <div class="solution-explanation">
 
 This solution:
-- Calculates the 1D memory index from 2D thread coordinates using: `index = local_j * size + local_i`
-- Checks if both coordinates are within the array bounds
-- Adds 10 to the value when the guard conditions are met
-
+- Gets 2D thread indices with `local_i = thread_idx.x`, `local_j = thread_idx.y`
+- Guards against out-of-bounds with `if local_i < size and local_j < size`
+- Inside guard: adds 10 to input value using row-major indexing
 </div>
 </details>
 

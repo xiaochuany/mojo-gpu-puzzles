@@ -3,31 +3,29 @@
 Implement a kernel that adds 10 to each position of matrix `a` and stores it in `out`.
 You have fewer threads per block than the size of `a` in both directions.
 
-## Visual Representation
-
 ![Blocks 2D visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_34_1.svg)
 
-## Key Concepts
+## Key concepts
 
 In this puzzle, you'll learn about:
-- Working with 2D block configurations
-- Computing global thread indices in multiple dimensions
-- Mapping 2D thread/block indices to memory locations
+- Working with 2D block and thread arrangements
+- Handling matrix data larger than block size
+- Converting between 2D and linear memory access
 
-The key insight is understanding how to compute global thread indices in a 2D grid, convert them to a linear memory index, and ensure that these indices don't exceed the data size in either dimension.
+The key insight is understanding how to coordinate multiple blocks of threads to process a 2D matrix that's larger than a single block's dimensions.
 
-For example, with:
-- Matrix size: 5×5 elements
-- Threads per block: 3×3
-- Number of blocks: 2×2
-- Total threads: 36 (more than needed 25)
+Configuration:
+- Matrix size: \\(5 \times 5\\) elements
+- Threads per block: \\(3 \times 3\\)
+- Number of blocks: \\(2 \times 2\\)
+- Total threads: \\(36\\) for \\(25\\) elements
 
-- **2D Block Grid**: Understanding how blocks are arranged in 2D
-- **Global Indices**: Computing global (x,y) positions from block and thread indices
-- **Linear Memory**: Converting 2D indices to linear memory addresses
-- **Boundary Checks**: Handling edge cases in both dimensions
+- **2D blocks**: Each block processes a \\(3 \times 3\\) region
+- **Grid layout**: Blocks arranged in \\(2 \times 2\\) grid
+- **Memory pattern**: Row-major storage for 2D data
+- **Coverage**: Ensuring all matrix elements are processed
 
-## Code to Complete
+## Code to complete
 
 ```mojo
 {{#include ../../../problems/p07/p07.mojo:add_10_blocks_2d}}
@@ -39,13 +37,13 @@ For example, with:
 
 <div class="solution-tips">
 
-1. Check if both global indices are within the matrix bounds
-2. Convert 2D indices to linear memory index for row-major matrix: `index = global_j * size + global_i`
-3. Only threads with valid indices should modify the output array
+1. Calculate global indices: `global_i = block_dim.x * block_idx.x + thread_idx.x`
+2. Add guard: `if global_i < size and global_j < size`
+3. Inside guard: `out[global_j * size + global_i] = a[global_j * size + global_i] + 10.0`
 </div>
 </details>
 
-## Running the Code
+## Running the code
 
 To test your solution, run the following command in your terminal:
 
@@ -71,10 +69,8 @@ expected: HostBuffer([11.0, 11.0, 11.0, ... , 11.0])
 <div class="solution-explanation">
 
 This solution:
-- Calculates global thread indices for both dimensions using block and thread indices
-- Checks if both global indices are within the matrix bounds
-- Converts 2D indices to linear memory index for accessing the arrays
-- Adds 10 to the value when all guard conditions are met
-
+- Computes global indices with `block_dim * block_idx + thread_idx`
+- Guards against out-of-bounds with `if global_i < size and global_j < size`
+- Uses row-major indexing to access and update matrix elements
 </div>
 </details>

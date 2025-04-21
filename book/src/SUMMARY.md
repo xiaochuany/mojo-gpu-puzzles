@@ -1,13 +1,15 @@
 # Summary
 
 - [Introduction](./introduction.md)
+- [Mojo 🔥: The Best Way to Program GPUs]()
+- [Learning Resources]()
 
 # Part I: Fundamentals
 - [Puzzle 1: Map](./puzzle_01/puzzle_01.md)
 - [Puzzle 2: Zip](./puzzle_02/puzzle_02.md)
 - [Puzzle 3: Guards](./puzzle_03/puzzle_03.md)
 - [Puzzle 4: Map 2D](./puzzle_04/puzzle_04.md)
-    - [Introduction to LayoutTensor](./puzzle_04/introduction_layout_tensor.md)
+    - [📚 Learn about LayoutTensor](./puzzle_04/introduction_layout_tensor.md)
     - [LayoutTensor Version](./puzzle_04/puzzle_04_layout_tensor.md)
 - [Puzzle 5: Broadcast](./puzzle_05/puzzle_05.md)
     - [LayoutTensor Version](./puzzle_05/puzzle_05_layout_tensor.md)
@@ -18,22 +20,28 @@
     - [LayoutTensor Version](./puzzle_07/puzzle_07_layout_tensor.md)
 
 # Part III: Shared Memory
+- [📚 Learn about GPU Memory]()
 - [Puzzle 8: Shared Memory](./puzzle_08/puzzle_08.md)
 
 # Part IV: Common GPU Algorithms
 - [Puzzle 9: Pooling](./puzzle_09/puzzle_09.md)
 - [Puzzle 10: Dot Product](./puzzle_10/puzzle_10.md)
 - [Puzzle 11: 1D Convolution](./puzzle_11/puzzle_11.md)
+  - [Simple Version](./puzzle_11/simple.md)
+  - [Complete Version](./puzzle_11/complete.md)
 - [Puzzle 12: Prefix Sum](./puzzle_12/puzzle_12.md)
+  - [Simple Version](./puzzle_12/simple.md)
+  - [Complete Version](./puzzle_12/complete.md)
 - [Puzzle 13: Axis Sum](./puzzle_13/puzzle_13.md)
     - [LayoutTensor Version]()
 - [Puzzle 14: Matrix Multiply](./puzzle_14/puzzle_14.md)
-    - [Naive Version: Global Memory](./puzzle_14/naive.md)
-    - [Shared Memory](./puzzle_14/shared_memory.md)
-    - [Tiled](./puzzle_14/tiled.md)
-    - [Tiled LayoutTensor]()
+    - [Naive Version with Global Memory](./puzzle_14/naive.md)
+    - [📚 Learn about Roofling Model]()
+    - [Shared Memory Version](./puzzle_14/shared_memory.md)
+    - [Tiled Version](./puzzle_14/tiled.md)
+    - [Tiling with LayoutTensor]()
 
-# Part V: MAX Graph Custom Ops
+# Part V: Interfacing with Python: MAX Graph Custom Ops
 - [Puzzle 15: 1D Convolution Op]()
 - [Puzzle 16: Color Inversion Op]()
 - [Puzzle 17: TopK Sampling Op]()
@@ -41,8 +49,72 @@
 - [Puzzle 19: Softmax Op]()
 - [Puzzle 20: Attention Op]()
 
-# Part VI: Advanced
+# Part VI: Advanced GPU Algorithms
 - [Puzzle 21: 3D Average Pooling]()
-- [Puzzle 21: Multi-Head Self-Attention]()
+  - [📚 Learn about 3D Memory Layout]()
+  - [Basic Version]()
+  - [LayoutTensor Version]()
 - [Puzzle 22: 3D Convolution]()
+  - [📚 Learn about 3D Convolution]()
+  - [Basic Version]()
+  - [Optimized Version]()
 - [Puzzle 23: 3D Tensor Multiplication]()
+  - [📚 Learn about Tensor Operations]()
+  - [Basic Version]()
+  - [LayoutTensor Version]()
+- [Puzzle 24: Multi-Head Self-Attention]()
+  - [📚 Learn about Attention Mechanisms]()
+  - [Basic Version]()
+  - [Optimized Version]()
+
+# Part VII: Performance Optimization Puzzles
+- [Puzzle 25: Memory Coalescing]()
+  - [📚 Learn about Memory Access Patterns]()
+  - [Basic Version]()
+  - [Optimized Version]()
+- [Puzzle 26: Bank Conflicts]()
+  - [📚 Learn about Shared Memory Banks]()
+  - [Version 1: With Conflicts]()
+  - [Version 2: Conflict-Free]()
+- [Puzzle 27: Warp-Level Optimization]()
+  - [📚 Learn about Warp Primitives]()
+  - [Version 1: Shared Memory Reduction]()
+  - [Version 2: Warp Shuffle Reduction]()
+
+# Part VIII: Real-world Application Puzzles
+- [Puzzle 28: Image Processing Pipeline]()
+  - [📚 Learn about Kernel Fusion]()
+  - [Version 1: Separate Kernels]()
+  - [Version 2: Fused Pipeline]()
+- [Puzzle 29: Neural Network Layers]()
+  - [📚 Learn about Layer Fusion]()
+  - [Version 1: Basic Implementation]()
+  - [Version 2: Optimized Implementation]()
+- [Puzzle 30: Multi-Level Tiling]()
+  - [📚 Learn about Cache Hierarchies]()
+  - [Version 1: Single-Level MatMul]()
+  - [Version 2: Multi-Level MatMul]()
+
+# Part IX: Debug & Profile Puzzles
+- [Puzzle 31: Race Condition Detective]()
+  - [📚 Learn about Race Conditions]()
+  - [Version 1: Find the Bug]()
+  - [Version 2: Fix the Bug]()
+- [Puzzle 32: Memory Optimization]()
+  - [📚 Learn about Memory Management]()
+  - [Version 1: Memory Leaks]()
+  - [Version 2: Memory Planning]()
+
+# Part X: Modern GPU Features
+- [Puzzle 33: Dynamic Parallelism]()
+  - [📚 Learn about Nested Parallelism]()
+  - [Version 1: Flat Implementation]()
+  - [Version 2: Nested Launch]()
+- [Puzzle 34: Tensor Core Programming]()
+  - [📚 Learn about Tensor Cores]()
+  - [Version 1: Regular MatMul]()
+  - [Version 2: Tensor Core MatMul]()
+- [Puzzle 35: Multi-GPU Programming]()
+  - [📚 Learn about Device Communication]()
+  - [Version 1: Single GPU]()
+  - [Version 2: Multi-GPU]()

@@ -1,10 +1,9 @@
-# Puzzle 13: Axis Sum
+# Puzzle 13: Axis sum
 
-Implement a kernel that computes a sum over each column of `a` and stores it in `out`.
+Implement a kernel that computes a sum over each row of `a` and stores it in `out`.
 
 In pseudocode:
-
-```txt
+```python
 # For a matrix of size (BATCH × SIZE)
 for batch in range(BATCH):  # each row
     sum = 0
@@ -19,27 +18,29 @@ TODO: this image is wrong and is transposed
 
 ![Axis Sum visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_64_1.svg)
 
-## Key Concepts
+## Key concepts
 
 In this puzzle, you'll learn about:
+- Parallel reduction along matrix dimensions
+- Using block coordinates for data partitioning
+- Efficient shared memory reduction patterns
 
-- Computing reductions along specific dimensions (axes)
-- Using multiple thread blocks to process different parts of data
-- Mapping thread blocks to specific data columns/regions
+The key insight is understanding how to map thread blocks to matrix rows and perform efficient parallel reduction within each block.
 
-The key insight is organizing your computation to have separate thread blocks handle different columns of the input array, then using shared memory within each block to compute the sum efficiently.
+Configuration:
+- Matrix dimensions: \\(\\text{BATCH} \\times \\text{SIZE} = 4 \\times 6\\)
+- Threads per block: \\(\\text{TPB} = 8\\)
+- Grid dimensions: \\(1 \\times \\text{BATCH}\\)
+- Shared memory: \\(\\text{TPB}\\) elements per block
 
-For example, with:
+Matrix layout in row-major order:
 
-- Matrix size: 4×6 elements (BATCH × SIZE)
-- Threads per block: 8×1
-- Number of blocks: 1×4 (one block per row)
-- Shared memory: 8 elements per block
-
-- **Column-wise Reduction**: Computing sums along columns
-- **Block Organization**: Using block.y to select columns
-- **Shared Memory**: Using block-local storage for partial sums
-- **Thread Coordination**: Ensuring efficient column-wise summation
+```txt
+Row 0: [0, 1, 2, 3, 4, 5]       → Block(0,0)
+Row 1: [6, 7, 8, 9, 10, 11]     → Block(0,1)
+Row 2: [12, 13, 14, 15, 16, 17] → Block(0,2)
+Row 3: [18, 19, 20, 21, 22, 23] → Block(0,3)
+```
 
 ## Code to Complete
 
@@ -53,17 +54,10 @@ For example, with:
 
 <div class="solution-tips">
 
-1. Use `block_idx.y` to determine which column you're processing
-2. Calculate the starting index in the column:
-   - `column_start = batch * size`
-   - `global_index = column_start + global_i`
-3. Load column elements into shared memory:
-   - Only load if `global_i < size`
-   - Use `local_i` for shared memory access
-4. Synchronize threads using `barrier()`
-5. Compute the column sum:
-   - First thread accumulates all values in shared memory
-   - Store result in `out[batch]`
+1. Use `batch = block_idx.y` to select row
+2. Load elements: `cache[local_i] = a[batch * size + local_i]`
+3. Perform parallel reduction with halving stride
+4. Thread 0 writes final sum to `out[batch]`
 </div>
 </details>
 
@@ -92,23 +86,26 @@ expected: HostBuffer([15.0, 51.0, 87.0, 123.0])
 
 <div class="solution-explanation">
 
-This solution:
-- Uses `block_idx.y` (batch) to select which row of the matrix to process
-- Loads elements from the row into shared memory using `cache[local_i] = a[batch * size + local_i]`
-- Performs parallel reduction in shared memory:
-  - Uses stride-halving approach (TPB/2, TPB/4, TPB/8, ...)
-  - Each thread adds elements that are `stride` apart
-  - Synchronizes between reduction steps with `barrier()`
-- Thread 0 writes the final sum to `out[batch]`
+This solution implements a parallel row sum using:
 
-The matrix layout is:
-```txt
-Block(0,0): handles Row 0: [0,1,2,3,4,5]
-Block(0,1): handles Row 1: [6,7,8,9,10,11]
-Block(0,2): handles Row 2: [12,13,14,15,16,17]
-Block(0,3): handles Row 3: [18,19,20,21,22,23]
-```
+1. Block mapping:
+   - Each block handles one row: `batch = block_idx.y`
+   - Threads within block share row elements
 
-Note: While we call it "axis sum", we're actually summing rows of the matrix (when viewed in row-major order), not columns as previously described.
+2. Data loading:
+   ```txt
+   Block(0,0): [T0,T1,T2,T3,T4,T5,T6,T7] → Row 0: [0,1,2,3,4,5]
+   Block(0,1): [T0,T1,T2,T3,T4,T5,T6,T7] → Row 1: [6,7,8,9,10,11]
+   Block(0,2): [T0,T1,T2,T3,T4,T5,T6,T7] → Row 2: [12,13,14,15,16,17]
+   Block(0,3): [T0,T1,T2,T3,T4,T5,T6,T7] → Row 3: [18,19,20,21,22,23]
+   ```
+
+3. Parallel reduction:
+   - Uses stride-halving approach
+   - Synchronizes with `barrier()`
+   - Handles size bounds correctly
+
+4. Final output:
+   - Thread 0 writes row sum to `out[batch]`
 </div>
 </details>

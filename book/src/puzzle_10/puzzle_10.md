@@ -1,36 +1,35 @@
-# Puzzle 10: Dot Product
+# Puzzle 10: Dot product
 
 Implement a kernel that computes the dot-product of vector `a` and vector `b` and stores it in `out`.
 You have 1 thread per position. You only need 2 global reads and 1 global write per thread.
 
-## Visual Representation
-
 ![Dot product visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_47_1.svg)
 
-## Key Concepts
+## Key concepts
 
 In this puzzle, you'll learn about:
-- Implementing **reduction** operations (like dot product)
-- Using shared memory for thread collaboration
-- Understanding parallel reduction patterns
+- Implementing parallel reduction operations
+- Using shared memory for intermediate results
+- Coordinating threads for collective operations
 
-The key insight is understanding how to compute partial results in parallel, then combine them efficiently using shared memory and synchronization to produce a final result.
+The key insight is understanding how to efficiently combine multiple values into a single result using parallel computation and shared memory.
 
-For example, with:
-- Array size: 8 elements
-- Threads per block: 8
-- Number of blocks: 1
-- Shared memory size: 8 elements
+Configuration:
+- Vector size: \\(\\text{SIZE} = 8\\) elements
+- Threads per block: \\(\\text{TPB} = 8\\)
+- Number of blocks: \\(1\\)
+- Output size: \\(1\\) element
+- Shared memory: \\(\\text{TPB}\\) elements
 
-- **Dot Product**: Computing element-wise multiplication and sum
-- **Shared Memory**: Using block-local storage for partial results
-- **Thread Synchronization**: Coordinating threads for reduction
-- **Global Result**: Combining partial results into final output
+- **Element access**: Each thread reads corresponding elements from `a` and `b`
+- **Partial results**: Computing and storing intermediate values
+- **Thread coordination**: Synchronizing before combining results
+- **Final reduction**: Converting partial results to scalar output
 
 *Note: For this problem, you don't need to worry about number of shared reads. We will
 handle that challenge later.*
 
-## Code to Complete
+## Code to complete
 
 ```mojo
 {{#include ../../../problems/p10/p10.mojo:dot_product}}
@@ -42,16 +41,14 @@ handle that challenge later.*
 
 <div class="solution-tips">
 
-1. Load values from `a` and `b` and multiply them
-2. Store the product in shared memory
-3. Call `barrier()` to synchronize threads
-4. Only thread 0 should compute the final sum
-5. Write the final result to global memory only once
-
+1. Store `a[global_i] * b[global_i]` in `shared[local_i]`
+2. Call `barrier()` to synchronize
+3. Use thread 0 to sum all products in shared memory
+4. Write final sum to `out[0]`
 </div>
 </details>
 
-## Running the Code
+## Running the code
 
 To test your solution, run the following command in your terminal:
 
@@ -77,11 +74,9 @@ expected: HostBuffer([140.0])
 <div class="solution-explanation">
 
 This solution:
-- Loads corresponding elements from vectors `a` and `b`
 - Computes element-wise products into shared memory
-- Synchronizes threads using `barrier()`
+- Synchronizes all threads with `barrier()`
 - Uses thread 0 to sum all products
-- Writes final dot product to global memory
-
+- Writes final dot product result to `out[0]`
 </div>
 </details>

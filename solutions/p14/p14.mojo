@@ -73,21 +73,6 @@ alias SIZE_TILED = 8
 alias BLOCKS_PER_GRID_TILED = (3, 3)  # each block convers 3x3 elements
 alias THREADS_PER_BLOCK_TILED = (TPB, TPB)
 
-# Block Layout (each block is 3x3 threads):
-# [B00][B01][B02]
-# [B10][B11][B12]
-# [B20][B21][B22]
-
-# Each Block's Thread Layout (3x3):
-# [T00 T01 T02]
-# [T10 T11 T12]
-# [T20 T21 T22]
-
-
-# Update your prev code to compute a partial dot-product and
-# iteratively move the part you copied into shared memory.
-# You should be able to do the hard case in 6 global reads.
-
 
 # ANCHOR: matmul_tiled_solution
 fn matmul_tiled(

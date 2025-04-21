@@ -1,29 +1,25 @@
 # Puzzle 2: Zip
 
-Implement a kernel that adds together each position of vector `a` and vector `b` and stores it in `out`.
+Implement a kernel that adds together each position of vector \\(a\\) and vector \\(b\\) and stores it in \\(out\\).
 You have 1 thread per position.
-
-## Visual Representation
 
 ![Zip operation visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_17_1.svg)
 
-## Key Concepts
+## Key concepts
 
 In this puzzle, you'll learn about:
 - Processing multiple input arrays in parallel
 - Element-wise operations with multiple inputs
-- Maintaining thread-to-data mapping across arrays
+- Thread-to-data mapping across arrays
 
-The key insight is that each thread should read one element from each input array, add them together, and write the result to the output array.
+The key insight is that each thread \\(i\\) computes: \\[out[i] = a[i] + b[i]\\]
 
-- **Parallelism**: Each thread processes corresponding elements from both arrays
-- **Thread Indexing**: Using `thread_idx.x` to access matching positions in both arrays
-- **Memory Access**: Reading from multiple input arrays and writing to output array
-- **Data Independence**: Each position can be processed without knowledge of others
+- **Parallelism**: Each thread adds elements from both arrays at position \\(i\\)
+- **Thread indexing**: Access elements at position \\(i = \\text{thread\_idx.x}\\)
+- **Memory access**: Read from \\(a[i]\\) and \\(b[i]\\), write to \\(out[i]\\)
+- **Data independence**: Each output depends only on corresponding inputs
 
-The zip pattern is a fundamental GPU operation for combining multiple arrays element-wise.
-
-## Code to Complete
+## Code to complete
 
 ```mojo
 {{#include ../../../problems/p02/p02.mojo:add}}
@@ -35,13 +31,13 @@ The zip pattern is a fundamental GPU operation for combining multiple arrays ele
 
 <div class="solution-tips">
 
-1. Each thread needs to access the same position in both input arrays
-2. Use the same thread index (`local_i`) to read from both arrays
-
+1. Store `thread_idx.x` in `local_i`
+2. Add `a[local_i]` and `b[local_i]`
+3. Store result in `out[local_i]`
 </div>
 </details>
 
-## Running the Code
+## Running the code
 
 To test your solution, run the following command in your terminal:
 
@@ -67,10 +63,7 @@ expected: HostBuffer([0.0, 2.0, 4.0, 6.0])
 <div class="solution-explanation">
 
 This solution:
-
-- Uses `local_i` (thread index) to access corresponding elements in both arrays
-- Adds the values from arrays `a` and `b`
-- Stores the result in the output array
-
+- Gets thread index with `local_i = thread_idx.x`
+- Adds values from both arrays: `out[local_i] = a[local_i] + b[local_i]`
 </div>
 </details>
