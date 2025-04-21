@@ -1,6 +1,6 @@
 # Naive matrix multiplication
 
-Implement a kernel that multiplies square matrices `a` and `b` and stores the result in `out`.
+Implement a kernel that multiplies square matrices \\(a\\) and \\(transpose(a)\\) and stores the result in \\(out\\).
 This is the most straightforward implementation where each thread computes one element of the output matrix.
 
 ![Matrix Multiply visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_67_1.svg)

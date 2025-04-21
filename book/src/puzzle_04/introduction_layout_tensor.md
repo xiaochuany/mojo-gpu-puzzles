@@ -4,7 +4,7 @@ TODO: link to docs when the content is ready!
 
 [LayoutTensor](https://docs.modular.com/mojo/stdlib/layout/layout_tensor/LayoutTensor/) provides a powerful abstraction for multi-dimensional data with precise control over memory organization. It supports various memory layouts (row-major, column-major, tiled), hardware-specific optimizations, and efficient parallel access patterns.
 
-Given a `LayoutTensor` instance `a`
+Given a `LayoutTensor` instance \\(a\\)
 
 ```mojo
 from gpu.host import DeviceContext

@@ -1,6 +1,6 @@
 # Puzzle 13: Axis sum
 
-Implement a kernel that computes a sum over each row of `a` and stores it in `out`.
+Implement a kernel that computes a sum over each row of \\(a\\) and stores it in \\(out\\).
 
 In pseudocode:
 ```python

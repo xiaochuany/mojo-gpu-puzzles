@@ -1,6 +1,6 @@
 # Puzzle 5: Broadcast
 
-Implement a kernel that broadcast adds vector `a` and vector `b` and stores it in 2D matrix `out`. You have more threads than positions.
+Implement a kernel that broadcast adds vector \\(a\\) and vector \\(b\\) and stores it in 2D matrix \\(out\\). You have more threads than positions.
 
 ![Broadcast visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_27_1.svg)
 

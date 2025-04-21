@@ -1,6 +1,6 @@
 # Puzzle 9: Pooling
 
-Implement a kernel that sums together the last 3 positions of vector `a` and stores it in vector `out`.
+Implement a kernel that sums together the last 3 positions of vector \\(a\\) and stores it in vector \\(out\\).
 You have 1 thread per position. You only need 1 global read and 1 global write per thread.
 
 In pseudocode:

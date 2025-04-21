@@ -1,7 +1,7 @@
 # Puzzle 7: Blocks 2D
 
-Implement a kernel that adds 10 to each position of matrix `a` and stores it in `out`.
-You have fewer threads per block than the size of `a` in both directions.
+Implement a kernel that adds \\(10\\) to each position of matrix \\(a\\) and stores it in \\(out\\).
+You have fewer threads per block than the size of \\(a\\) in both directions.
 
 ![Blocks 2D visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_34_1.svg)
 

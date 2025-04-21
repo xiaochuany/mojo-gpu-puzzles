@@ -1,7 +1,7 @@
 # Puzzle 6: Blocks
 
-Implement a kernel that adds 10 to each position of vector `a` and stores it in `out`.
-**You have fewer threads per block than the size of `a`.**
+Implement a kernel that adds \\(10\\) to each position of vector \\(a\\) and stores it in \\(out\\).
+**You have fewer threads per block than the size of \\(a\\).**
 
 ![Blocks visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_31_1.svg)
 

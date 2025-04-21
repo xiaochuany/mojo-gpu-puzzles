@@ -1,6 +1,6 @@
 # Puzzle 10: Dot product
 
-Implement a kernel that computes the dot-product of vector `a` and vector `b` and stores it in `out`.
+Implement a kernel that computes the dot-product of vector \\(a\\) and vector \\(b\\) and stores it in \\(out\\).
 You have 1 thread per position. You only need 2 global reads and 1 global write per thread.
 
 ![Dot product visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_47_1.svg)

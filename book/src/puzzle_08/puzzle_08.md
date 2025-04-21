@@ -1,7 +1,7 @@
 # Puzzle 8: Shared
 
-Implement a kernel that adds 10 to each position of `a` and stores it in `out`.
-You have fewer threads per block than the size of `a`.
+Implement a kernel that adds \\(10\\) to each position of \\(a\\) and stores it in \\(out\\).
+You have fewer threads per block than the size of \\(a\\).
 
 ![Shared memory visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_39_1.svg)
 
