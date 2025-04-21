@@ -17,6 +17,7 @@ git-repository-url = "https://github.com/modularml/mojo-gpu-puzzles"
 mathjax-support = true
 theme-switcher = true
 no-theme-selection = false
+draft = true
 
 [output.html.print]
 enable = true
