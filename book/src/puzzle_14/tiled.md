@@ -3,12 +3,8 @@
 Implement a kernel that multiplies square matrices `a` and `b` and stores the result in `out`, using tiled matrix multiplication with shared memory. This version handles matrices larger than a single thread block by processing tiles.
 
 <div class="solution-tips">
-
-Update your [shared memory code](./shared_memory.md) to compute a partial dot-product and iteratively move the part you
-copied into shared memory. You should be able to do the hard case in 6 global reads.
+Update your [shared memory code](./shared_memory.md) to compute a partial dot-product and iteratively move the part you copied into shared memory. You should be able to do the hard case in 6 global reads.
 </div>
-
-![Matrix Multiply Tiled](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_70_1.svg)
 
 ## Key concepts
 
@@ -18,13 +14,13 @@ In this puzzle, you'll learn about:
 - Managing shared memory efficiently
 - Handling matrix boundaries
 
-The key insight is understanding how to break down large matrix operations into smaller, manageable pieces that fit in shared memory.
+The key insight is understanding how to break down matrix operations into tiles that can be processed efficiently in shared memory while maintaining correct synchronization.
 
 Configuration:
-- Matrix size: \\(\\text{SIZE} = 8\\) elements
-- Threads per block: \\(\\text{TPB} \\times \\text{TPB} = 3 \\times 3\\)
-- Grid dimensions: \\(3 \\times 3\\) blocks
-- Shared memory: Two \\(\\text{TPB} \\times \\text{TPB}\\) arrays per block
+- Matrix size: \(SIZE\_TILED = 8\) elements
+- Threads per block: \(TPB \times TPB = 3 \times 3\)
+- Grid dimensions: \(3 \times 3\) blocks
+- Shared memory: Two \(TPB \times TPB\) arrays per block
 
 Block layout:
 ```txt
@@ -46,12 +42,21 @@ Grid (3×3 blocks):        Each block (3×3 threads):
 
 <div class="solution-tips">
 
-1. Calculate elements per block: `size / BLOCKS_PER_GRID`
-2. Clear shared memory before loading tiles
+1. Calculate global thread positions from block and thread indices
+2. Clear shared memory before loading new tiles
 3. Load tiles with proper bounds checking
-4. Accumulate partial results across tiles
+4. Accumulate results across tiles with proper synchronization
 </div>
 </details>
+
+## Solution
+
+<details>
+<summary>Click to see the solution</summary>
+
+```mojo
+{{#include ../../../solutions/p14/p14.mojo:matmul_tiled_solution}}
+```
 
 ## Running the code
 
@@ -63,56 +68,48 @@ magic run p14 --tiled
 
 Your output will look like this if the puzzle isn't solved yet:
 ```txt
-out: HostBuffer([0.0, 0.0, 0.0, 0.0])
-expected: HostBuffer([1.0, 3.0, 3.0, 13.0])
-```
-
-## Solution
-
-<details>
-<summary>Click to see the solution</summary>
-
-```mojo
-{{#include ../../../solutions/p14/p14.mojo:matmul_tiled_solution}}
+out: HostBuffer([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+expected: HostBuffer([140.0, 364.0, 588.0, 812.0, 1036.0, 1260.0, 1484.0, 1708.0, 364.0, 1100.0, 1836.0, 2572.0, 3308.0, 4044.0, 4780.0, 5516.0, 588.0, 1836.0, 3084.0, 4332.0, 5580.0, 6828.0, 8076.0, 9324.0, 812.0, 2572.0, 4332.0, 6092.0, 7852.0, 9612.0, 11372.0, 13132.0, 1036.0, 3308.0, 5580.0, 7852.0, 10124.0, 12396.0, 14668.0, 16940.0, 1260.0, 4044.0, 6828.0, 9612.0, 12396.0, 15180.0, 17964.0, 20748.0, 1484.0, 4780.0, 8076.0, 11372.0, 14668.0, 17964.0, 21260.0, 24556.0, 1708.0, 5516.0, 9324.0, 13132.0, 16940.0, 20748.0, 24556.0, 28364.0])
 ```
 
 <div class="solution-explanation">
 
-This solution implements tiled matrix multiplication in four phases:
+The solution implements tiled matrix multiplication by breaking down the computation into manageable chunks:
 
-1. Tile coordination:
+1. Thread organization:
    ```mojo
-   elt_per_tiled_block_x = (size + BLOCKS_PER_GRID[0] - 1) // BLOCKS_PER_GRID[0]
-   tile_i = elt_per_tiled_block_x * block_idx.x + thread_idx.x
+   global_row = block_idx.x * TPB + thread_idx.x
+   global_col = block_idx.y * TPB + thread_idx.y
    ```
+   Each thread knows its global position in the output matrix.
 
 2. Shared memory management:
-   - Allocate two TPB×TPB buffers
-   - Clear buffers before each tile: `a_shared[local_i * TPB + local_j] = 0`
-   - Synchronize with `barrier()`
+   - Two TPB×TPB buffers (`a_shared` and `b_shared`)
+   - Clear buffers before each tile load
+   - Use barriers to ensure memory coherency
 
-3. Tile processing loop:
+3. Tile processing:
    ```mojo
    for tile in range((size + TPB - 1) // TPB):
    ```
-   - Load tile data with bounds checking
-   - Compute partial results
-   - Synchronize between operations
+   - Load a tile from matrix A and corresponding elements from B
+   - Compute partial dot products within the tile
+   - Accumulate results in local variable
 
-4. Result accumulation:
-   - Track running sum in `tile_sum`
-   - Handle boundary conditions
-   - Write final result to global memory
+4. Memory access pattern:
+   - Matrix A: `global_row * size + (tile * TPB + local_col)`
+   - Matrix B: `(tile * TPB + local_row) + global_col * size`
+   - Shared memory: `local_row * TPB + local_col`
 
-Key features:
-- Handles arbitrary matrix sizes
-- Processes matrix in TPB×TPB tiles
-- Maintains proper synchronization
-- Checks bounds at matrix edges
+Key optimizations:
+- Minimizes global memory accesses
+- Uses shared memory for frequently accessed data
+- Proper synchronization between load and compute phases
+- Handles matrix boundaries correctly
 </div>
 </details>
 
-## Block and Tile Layout Example
+## Block and tile layout
 
 ```txt
 Matrix Layout (8×8 with 3×3 blocks):

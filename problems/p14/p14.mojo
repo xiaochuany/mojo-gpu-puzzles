@@ -5,8 +5,6 @@ from gpu.memory import AddressSpace
 from sys import sizeof, argv
 from testing import assert_equal
 
-
-# ANCHOR: naive_matmul
 alias TPB = 3
 alias SIZE = 2
 alias BLOCKS_PER_GRID = (1, 1)
@@ -14,6 +12,7 @@ alias THREADS_PER_BLOCK = (TPB, TPB)
 alias dtype = DType.float32
 
 
+# ANCHOR: naive_matmul
 fn naive_matmul(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
@@ -46,7 +45,7 @@ fn single_block_matmul(
 
 # ANCHOR: matmul_tiled
 alias SIZE_TILED = 8
-alias BLOCKS_PER_GRID_TILED = (3, 3)  # each block convers 3x3 elements
+alias BLOCKS_PER_GRID_TILED = (3, 3)  # each block convers 3x3 elements and 3=ceil(8/3)
 alias THREADS_PER_BLOCK_TILED = (TPB, TPB)
 
 
@@ -56,7 +55,7 @@ fn matmul_tiled(
     b: UnsafePointer[Scalar[dtype]],
     size: Int,
 ):
-    # FILL ME IN (roughly 23 lines)
+    # FILL ME IN (roughly 22 lines)
     ...
 
 
@@ -65,31 +64,31 @@ fn matmul_tiled(
 
 def main():
     with DeviceContext() as ctx:
-        out = ctx.enqueue_create_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
-        inp1 = ctx.enqueue_create_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
-        inp2 = ctx.enqueue_create_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
-        expected = ctx.enqueue_create_host_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
+        size = SIZE_TILED if argv()[1] == "--tiled" else SIZE
+        out = ctx.enqueue_create_buffer[dtype](size * size).enqueue_fill(0)
+        inp1 = ctx.enqueue_create_buffer[dtype](size * size).enqueue_fill(0)
+        inp2 = ctx.enqueue_create_buffer[dtype](size * size).enqueue_fill(0)
+        expected = ctx.enqueue_create_host_buffer[dtype](size * size).enqueue_fill(0)
         with inp1.map_to_host() as inp1_host, inp2.map_to_host() as inp2_host:
-            for row in range(SIZE):
-                for col in range(SIZE):
+            for row in range(size):
+                for col in range(size):
                     # row major: placing elements row by row
-                    inp1_host[row * SIZE + col] = row * SIZE + col
-                    # column major: placing elements column by column to make `transpose(inp1)`
-                    # bonus: which one is more efficient? whether to store `inp2` colum-major
-                    # as below or row-major and then transpose when doing the naive matmul
-                    inp2_host[row + col * SIZE] = row + col * SIZE
+                    inp1_host[row * size + col] = row * size + col
+                    # also row major for inp2 (not column major)
+                    inp2_host[row * size + col] = row * size + col
 
             # inp1 @ inp2.T
-            for i in range(SIZE):
-                for j in range(SIZE):
-                    for k in range(SIZE):
-                        expected[i * SIZE + j] += inp1_host[i * SIZE + k] * inp2_host[k + j * SIZE]
+            for i in range(size):
+                for j in range(size):
+                    for k in range(size):
+                        expected[i * size + j] += inp1_host[i * size + k] * inp2_host[k + j * size]
+
         if argv()[1] == "--naive":
             ctx.enqueue_function[naive_matmul](
                 out.unsafe_ptr(),
                 inp1.unsafe_ptr(),
                 inp2.unsafe_ptr(),
-                SIZE,
+                size,
                 grid_dim=BLOCKS_PER_GRID,
                 block_dim=THREADS_PER_BLOCK,
             )
@@ -98,7 +97,7 @@ def main():
                 out.unsafe_ptr(),
                 inp1.unsafe_ptr(),
                 inp2.unsafe_ptr(),
-                SIZE,
+                size,
                 grid_dim=BLOCKS_PER_GRID,
                 block_dim=THREADS_PER_BLOCK,
             )
@@ -107,7 +106,7 @@ def main():
                 out.unsafe_ptr(),
                 inp1.unsafe_ptr(),
                 inp2.unsafe_ptr(),
-                SIZE,
+                size,
                 grid_dim=BLOCKS_PER_GRID_TILED,
                 block_dim=THREADS_PER_BLOCK_TILED,
             )
@@ -119,6 +118,6 @@ def main():
         with out.map_to_host() as out_host:
             print("out:", out_host)
             print("expected:", expected)
-            for i in range(SIZE):
-                for j in range(SIZE):
-                    assert_equal(out_host[i * SIZE + j], expected[i * SIZE + j])
+            for col in range(size):
+                for row in range(size):
+                    assert_equal(out_host[col * size + row], expected[col * size + row])

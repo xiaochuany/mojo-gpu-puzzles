@@ -92,41 +92,38 @@ fn matmul_tiled(
         address_space = AddressSpace.SHARED,
     ]()
 
-    elt_per_tiled_block_x = (size + BLOCKS_PER_GRID[0] - 1) // BLOCKS_PER_GRID[0]
-    elt_per_tiled_block_y = (size + BLOCKS_PER_GRID[1] - 1) // BLOCKS_PER_GRID[1]
-    tile_i = elt_per_tiled_block_x * block_idx.x + thread_idx.x
-    tile_j = elt_per_tiled_block_y * block_idx.y + thread_idx.y
-    local_i = thread_idx.x
-    local_j = thread_idx.y
-    tile_sum = Scalar[dtype](0)
+    global_row = block_idx.x * TPB + thread_idx.x
+    global_col = block_idx.y * TPB + thread_idx.y
+    local_row = thread_idx.x
+    local_col = thread_idx.y
+    acc = Scalar[dtype](0)
+
     for tile in range((size + TPB - 1) // TPB):
-        # clear shared memory
-        if local_i < TPB and local_j < TPB:
-            a_shared[local_i * TPB + local_j] = 0
-            b_shared[local_i * TPB + local_j] = 0
+        if local_row < TPB and local_col < TPB:
+            a_shared[local_row * TPB + local_col] = 0
+            b_shared[local_row * TPB + local_col] = 0
 
         barrier()
 
-        # load tile a
-        if tile_i < size and (tile * TPB + local_j) < size:
-            a_shared[local_i * TPB + local_j] = a[tile_i * size + (tile * TPB + local_j)]
+        # Load tile of A
+        if global_row < size and (tile * TPB + local_col) < size:
+            a_shared[local_row * TPB + local_col] = a[global_row * size + (tile * TPB + local_col)]
 
-        # load tile b
-        if (tile * TPB + local_i) < size and tile_j < size:
-            b_shared[local_i * TPB + local_j] = b[(tile * TPB + local_i) + tile_j * size]
-
-        barrier()
-
-        # compute partial (tiled) dot product for this tile
-        if tile_i < size and tile_j < size:
-            tile_size = min(TPB, size - tile * TPB)
-            for k in range(tile_size):
-                tile_sum += a_shared[local_i * TPB + k] * b_shared[k * TPB + local_j]
+        # Load tile of B (transposed access)
+        if (tile * TPB + local_row) < size and global_col < size:
+            b_shared[local_row * TPB + local_col] = b[(tile * TPB + local_row) + global_col * size]
 
         barrier()
 
-    if tile_i < size and tile_j < size:
-        out[tile_i * size + tile_j] = tile_sum
+        # Compute partial dot product
+        if global_row < size and global_col < size:
+            for k in range(min(TPB, size - tile * TPB)):
+                acc += a_shared[local_row * TPB + k] * b_shared[k * TPB + local_col]
+
+        barrier()
+
+    if global_row < size and global_col < size:
+        out[global_row * size + global_col] = acc
 
 
 # ANCHOR_END: matmul_tiled_solution
@@ -134,31 +131,31 @@ fn matmul_tiled(
 
 def main():
     with DeviceContext() as ctx:
-        out = ctx.enqueue_create_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
-        inp1 = ctx.enqueue_create_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
-        inp2 = ctx.enqueue_create_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
-        expected = ctx.enqueue_create_host_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
+        size = SIZE_TILED if argv()[1] == "--tiled" else SIZE
+        out = ctx.enqueue_create_buffer[dtype](size * size).enqueue_fill(0)
+        inp1 = ctx.enqueue_create_buffer[dtype](size * size).enqueue_fill(0)
+        inp2 = ctx.enqueue_create_buffer[dtype](size * size).enqueue_fill(0)
+        expected = ctx.enqueue_create_host_buffer[dtype](size * size).enqueue_fill(0)
         with inp1.map_to_host() as inp1_host, inp2.map_to_host() as inp2_host:
-            for row in range(SIZE):
-                for col in range(SIZE):
+            for row in range(size):
+                for col in range(size):
                     # row major: placing elements row by row
-                    inp1_host[row * SIZE + col] = row * SIZE + col
-                    # column major: placing elements column by column to make `transpose(inp1)`
-                    # bonus: which one is more efficient? whether to store `inp2` colum-major
-                    # as below or row-major and then transpose when doing the naive matmul
-                    inp2_host[row + col * SIZE] = row + col * SIZE
+                    inp1_host[row * size + col] = row * size + col
+                    # also row major for inp2 (not column major)
+                    inp2_host[row * size + col] = row * size + col
 
             # inp1 @ inp2.T
-            for i in range(SIZE):
-                for j in range(SIZE):
-                    for k in range(SIZE):
-                        expected[i * SIZE + j] += inp1_host[i * SIZE + k] * inp2_host[k + j * SIZE]
+            for i in range(size):
+                for j in range(size):
+                    for k in range(size):
+                        expected[i * size + j] += inp1_host[i * size + k] * inp2_host[k + j * size]
+
         if argv()[1] == "--naive":
             ctx.enqueue_function[naive_matmul](
                 out.unsafe_ptr(),
                 inp1.unsafe_ptr(),
                 inp2.unsafe_ptr(),
-                SIZE,
+                size,
                 grid_dim=BLOCKS_PER_GRID,
                 block_dim=THREADS_PER_BLOCK,
             )
@@ -167,7 +164,7 @@ def main():
                 out.unsafe_ptr(),
                 inp1.unsafe_ptr(),
                 inp2.unsafe_ptr(),
-                SIZE,
+                size,
                 grid_dim=BLOCKS_PER_GRID,
                 block_dim=THREADS_PER_BLOCK,
             )
@@ -176,7 +173,7 @@ def main():
                 out.unsafe_ptr(),
                 inp1.unsafe_ptr(),
                 inp2.unsafe_ptr(),
-                SIZE,
+                size,
                 grid_dim=BLOCKS_PER_GRID_TILED,
                 block_dim=THREADS_PER_BLOCK_TILED,
             )
@@ -188,6 +185,6 @@ def main():
         with out.map_to_host() as out_host:
             print("out:", out_host)
             print("expected:", expected)
-            for i in range(SIZE):
-                for j in range(SIZE):
-                    assert_equal(out_host[i * SIZE + j], expected[i * SIZE + j])
+            for col in range(size):
+                for row in range(size):
+                    assert_equal(out_host[col * size + row], expected[col * size + row])
