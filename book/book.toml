@@ -39,7 +39,7 @@ enable = false
 mode = "katex"
 
 [build]
-build-dir = "book"
+build-dir = "html"
 create-missing = true
 extra-files = ["logo"]
 
