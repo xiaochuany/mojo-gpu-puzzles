@@ -1,60 +1,48 @@
-"""
-This is actual prefix sum and not the one mentioned in the original GPU-puzzles
-https://github.com/srush/GPU-Puzzles?tab=readme-ov-file#puzzle-12---prefix-sum
-"""
-
 from memory import UnsafePointer, stack_allocation
 from gpu import thread_idx, block_idx, block_dim, barrier
 from gpu.host import DeviceContext
 from gpu.memory import AddressSpace
-from sys import sizeof
+from sys import sizeof, argv
 from math import log2
 from testing import assert_equal
 
 alias TPB = 8
-# test 1
 alias SIZE = 8
 alias BLOCKS_PER_GRID = (1, 1)
 alias THREADS_PER_BLOCK = (TPB, 1)
-
-# test 2
-# alias SIZE = 15
-# alias BLOCKS_PER_GRID = (2, 1)
-# alias THREADS_PER_BLOCK = (TPB, 1)
-
 alias dtype = DType.float32
 
 
-# this only works when there's a single block
+# ANCHOR: prefix_sum_simple
 fn prefix_sum_simple(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
     size: Int,
 ):
-    shared = stack_allocation[
-        TPB * sizeof[dtype](),
-        Scalar[dtype],
-        address_space = AddressSpace.SHARED,
-    ]()
     global_i = block_dim.x * block_idx.x + thread_idx.x
     local_i = thread_idx.x
-    # FILL ME IN (roughly 11 lines)
+    # FILL ME IN (roughly 12 lines)
 
 
-# Covers test 1 and 2
+# ANCHOR_END: prefix_sum_simple
+
+# ANCHOR: prefix_sum_complete
+alias SIZE_2 = 15
+alias BLOCKS_PER_GRID_2 = (2, 1)
+alias THREADS_PER_BLOCK_2 = (TPB, 1)
+
+
 fn prefix_sum(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
     size: Int,
 ):
-    shared = stack_allocation[
-        TPB * sizeof[dtype](),
-        Scalar[dtype],
-        address_space = AddressSpace.SHARED,
-    ]()
     global_i = block_dim.x * block_idx.x + thread_idx.x
     local_i = thread_idx.x
-    # FILL ME IN (roughly 18 lines)
+    # FILL ME IN (roughly 19 lines)
+
+
+# ANCHOR_END: prefix_sum_complete
 
 
 def main():
@@ -65,13 +53,24 @@ def main():
             for i in range(SIZE):
                 a_host[i] = i
 
-        ctx.enqueue_function[prefix_sum_simple](
-            out.unsafe_ptr(),
-            a.unsafe_ptr(),
-            SIZE,
-            grid_dim=BLOCKS_PER_GRID,
-            block_dim=THREADS_PER_BLOCK,
-        )
+        if argv()[1] == "--simple":
+            ctx.enqueue_function[prefix_sum_simple](
+                out.unsafe_ptr(),
+                a.unsafe_ptr(),
+                SIZE,
+                grid_dim=BLOCKS_PER_GRID,
+                block_dim=THREADS_PER_BLOCK,
+            )
+        elif argv()[1] == "--complete":
+            ctx.enqueue_function[prefix_sum](
+                out.unsafe_ptr(),
+                a.unsafe_ptr(),
+                SIZE,
+                grid_dim=BLOCKS_PER_GRID_2,
+                block_dim=THREADS_PER_BLOCK_2,
+            )
+        else:
+            raise Error("Invalid argument")
 
         expected = ctx.enqueue_create_host_buffer[dtype](SIZE).enqueue_fill(0)
 

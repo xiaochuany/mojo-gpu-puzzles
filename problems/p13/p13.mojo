@@ -12,11 +12,8 @@ alias BLOCKS_PER_GRID = (1, BATCH)
 alias THREADS_PER_BLOCK = (TPB, 1)
 alias dtype = DType.float32
 
-# TODO: second solution with layout tensor
-# alias out_layout = Layout.row_major(BATCH, 1)
-# alias inp_layout = Layout.row_major(BATCH, SIZE)
 
-
+# ANCHOR: axis_sum
 fn axis_sum(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
@@ -31,6 +28,9 @@ fn axis_sum(
     local_i = thread_idx.x
     batch = block_idx.y
     # FILL ME IN (roughly 12 lines)
+
+
+# ANCHOR_END: axis_sum
 
 
 def main():

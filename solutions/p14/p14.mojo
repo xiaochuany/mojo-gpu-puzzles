@@ -2,27 +2,17 @@ from memory import UnsafePointer, stack_allocation
 from gpu import thread_idx, block_idx, block_dim, barrier
 from gpu.host import DeviceContext
 from gpu.memory import AddressSpace
-from sys import sizeof
+from sys import sizeof, argv
 from testing import assert_equal
 
-# TODO: second solution with layout tensor
-
 alias TPB = 3
-
-# Test 1
 alias SIZE = 2
 alias BLOCKS_PER_GRID = (1, 1)
 alias THREADS_PER_BLOCK = (TPB, TPB)
-
-# TODO: make into two puzzles gradual
-# Test 2
-# alias SIZE = 8
-# alias BLOCKS_PER_GRID = (3, 3)  # each block convers 3x3 elements
-# alias THREADS_PER_BLOCK = (TPB, TPB)
-
 alias dtype = DType.float32
 
 
+# ANCHOR: naive_matmul_solution
 fn naive_matmul(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
@@ -40,6 +30,10 @@ fn naive_matmul(
         out[global_i * size + global_j] = total
 
 
+# ANCHOR_END: naive_matmul_solution
+
+
+# ANCHOR: single_block_matmul_solution
 fn single_block_matmul(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
@@ -72,6 +66,13 @@ fn single_block_matmul(
         out[local_i * size + local_j] += a_shared[local_i * size + k] * b_shared[k + local_j * size]
 
 
+# ANCHOR_END: single_block_matmul_solution
+
+
+alias SIZE_TILED = 8
+alias BLOCKS_PER_GRID_TILED = (3, 3)  # each block convers 3x3 elements
+alias THREADS_PER_BLOCK_TILED = (TPB, TPB)
+
 # Block Layout (each block is 3x3 threads):
 # [B00][B01][B02]
 # [B10][B11][B12]
@@ -83,10 +84,12 @@ fn single_block_matmul(
 # [T20 T21 T22]
 
 
-# Instruction:
 # Update your prev code to compute a partial dot-product and
 # iteratively move the part you copied into shared memory.
 # You should be able to do the hard case in 6 global reads.
+
+
+# ANCHOR: matmul_tiled_solution
 fn matmul_tiled(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
@@ -141,6 +144,9 @@ fn matmul_tiled(
         out[tile_i * size + tile_j] = tile_sum
 
 
+# ANCHOR_END: matmul_tiled_solution
+
+
 def main():
     with DeviceContext() as ctx:
         out = ctx.enqueue_create_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
@@ -162,33 +168,35 @@ def main():
                 for j in range(SIZE):
                     for k in range(SIZE):
                         expected[i * SIZE + j] += inp1_host[i * SIZE + k] * inp2_host[k + j * SIZE]
-
-        # ctx.enqueue_function[naive_matmul](
-        #     out.unsafe_ptr(),
-        #     inp1.unsafe_ptr(),
-        #     inp2.unsafe_ptr(),
-        #     SIZE,
-        #     grid_dim=BLOCKS_PER_GRID,
-        #     block_dim=THREADS_PER_BLOCK,
-        # )
-
-        ctx.enqueue_function[single_block_matmul](
-            out.unsafe_ptr(),
-            inp1.unsafe_ptr(),
-            inp2.unsafe_ptr(),
-            SIZE,
-            grid_dim=BLOCKS_PER_GRID,
-            block_dim=THREADS_PER_BLOCK,
-        )
-
-        # ctx.enqueue_function[matmul_tiled](
-        #     out.unsafe_ptr(),
-        #     inp1.unsafe_ptr(),
-        #     inp2.unsafe_ptr(),
-        #     SIZE,
-        #     grid_dim=BLOCKS_PER_GRID,
-        #     block_dim=THREADS_PER_BLOCK,
-        # )
+        if argv()[1] == "--naive":
+            ctx.enqueue_function[naive_matmul](
+                out.unsafe_ptr(),
+                inp1.unsafe_ptr(),
+                inp2.unsafe_ptr(),
+                SIZE,
+                grid_dim=BLOCKS_PER_GRID,
+                block_dim=THREADS_PER_BLOCK,
+            )
+        elif argv()[1] == "--single-block":
+            ctx.enqueue_function[single_block_matmul](
+                out.unsafe_ptr(),
+                inp1.unsafe_ptr(),
+                inp2.unsafe_ptr(),
+                SIZE,
+                grid_dim=BLOCKS_PER_GRID,
+                block_dim=THREADS_PER_BLOCK,
+            )
+        elif argv()[1] == "--tiled":
+            ctx.enqueue_function[matmul_tiled](
+                out.unsafe_ptr(),
+                inp1.unsafe_ptr(),
+                inp2.unsafe_ptr(),
+                SIZE,
+                grid_dim=BLOCKS_PER_GRID_TILED,
+                block_dim=THREADS_PER_BLOCK_TILED,
+            )
+        else:
+            raise Error("Invalid argument")
 
         ctx.synchronize()
 

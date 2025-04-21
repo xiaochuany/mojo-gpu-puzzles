@@ -2,24 +2,15 @@ from memory import UnsafePointer, stack_allocation
 from gpu import thread_idx, block_idx, block_dim, barrier
 from gpu.host import DeviceContext
 from gpu.memory import AddressSpace
-from sys import sizeof
+from sys import sizeof, argv
 from testing import assert_equal
 
-# TODO: second solution with layout tensor
 
+# ANCHOR: naive_matmul
 alias TPB = 3
-
-# Test 1
 alias SIZE = 2
 alias BLOCKS_PER_GRID = (1, 1)
 alias THREADS_PER_BLOCK = (TPB, TPB)
-
-# TODO: make into two puzzles gradual
-# Test 2
-# alias SIZE = 8
-# alias BLOCKS_PER_GRID = (3, 3)  # each block convers 3x3 elements
-# alias THREADS_PER_BLOCK = (TPB, TPB)
-
 alias dtype = DType.float32
 
 
@@ -31,78 +22,60 @@ fn naive_matmul(
 ):
     global_i = block_dim.x * block_idx.x + thread_idx.x
     global_j = block_dim.y * block_idx.y + thread_idx.y
-
-    if global_i < size and global_j < size:
-        total = Scalar[dtype](0)
-        for k in range(size):
-            total += a[global_i * size + k] * b[k + global_j * size]
-
-        out[global_i * size + global_j] = total
+    # FILL ME IN (roughly 5 lines)
 
 
+# ANCHOR_END: naive_matmul
+
+
+# ANCHOR: single_block_matmul
 fn single_block_matmul(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
     b: UnsafePointer[Scalar[dtype]],
     size: Int,
 ):
-    a_shared = stack_allocation[
-        TPB * TPB * sizeof[dtype](),
-        Scalar[dtype],
-        address_space = AddressSpace.SHARED,
-    ]()
-    b_shared = stack_allocation[
-        TPB * TPB * sizeof[dtype](),
-        Scalar[dtype],
-        address_space = AddressSpace.SHARED,
-    ]()
     global_i = block_dim.x * block_idx.x + thread_idx.x
     global_j = block_dim.y * block_idx.y + thread_idx.y
     local_i = thread_idx.x
     local_j = thread_idx.y
-    # FILL ME IN (roughly 6 lines)
+    # FILL ME IN (roughly 8 lines)
 
 
-########################################################
+# ANCHOR_END: single_block_matmul
+
+# ANCHOR: matmul_tiled
+alias SIZE_TILED = 8
+alias BLOCKS_PER_GRID_TILED = (3, 3)  # each block convers 3x3 elements
+alias THREADS_PER_BLOCK_TILED = (TPB, TPB)
+
 # Block Layout (each block is 3x3 threads):
 # [B00][B01][B02]
 # [B10][B11][B12]
 # [B20][B21][B22]
-########################################################
+
 # Each Block's Thread Layout (3x3):
 # [T00 T01 T02]
 # [T10 T11 T12]
 # [T20 T21 T22]
 
 
-# Instruction:
 # Update your prev code to compute a partial dot-product and
 # iteratively move the part you copied into shared memory.
 # You should be able to do the hard case in 6 global reads.
+
+
 fn matmul_tiled(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
     b: UnsafePointer[Scalar[dtype]],
     size: Int,
 ):
-    a_shared = stack_allocation[
-        TPB * TPB * sizeof[dtype](),
-        Scalar[dtype],
-        address_space = AddressSpace.SHARED,
-    ]()
-    b_shared = stack_allocation[
-        TPB * TPB * sizeof[dtype](),
-        Scalar[dtype],
-        address_space = AddressSpace.SHARED,
-    ]()
+    # FILL ME IN (roughly 23 lines)
+    ...
 
-    elt_per_tiled_block_x = (size + BLOCKS_PER_GRID[0] - 1) // BLOCKS_PER_GRID[0]
-    elt_per_tiled_block_y = (size + BLOCKS_PER_GRID[1] - 1) // BLOCKS_PER_GRID[1]
-    tile_i = elt_per_tiled_block_x * block_idx.x + thread_idx.x
-    tile_j = elt_per_tiled_block_y * block_idx.y + thread_idx.y
-    local_i = thread_idx.x
-    local_j = thread_idx.y
-    # FILL ME IN (roughly 18 lines)
+
+# ANCHOR_END: matmul_tiled
 
 
 def main():
@@ -126,33 +99,35 @@ def main():
                 for j in range(SIZE):
                     for k in range(SIZE):
                         expected[i * SIZE + j] += inp1_host[i * SIZE + k] * inp2_host[k + j * SIZE]
-
-        # ctx.enqueue_function[naive_matmul](
-        #     out.unsafe_ptr(),
-        #     inp1.unsafe_ptr(),
-        #     inp2.unsafe_ptr(),
-        #     SIZE,
-        #     grid_dim=BLOCKS_PER_GRID,
-        #     block_dim=THREADS_PER_BLOCK,
-        # )
-
-        ctx.enqueue_function[single_block_matmul](
-            out.unsafe_ptr(),
-            inp1.unsafe_ptr(),
-            inp2.unsafe_ptr(),
-            SIZE,
-            grid_dim=BLOCKS_PER_GRID,
-            block_dim=THREADS_PER_BLOCK,
-        )
-
-        # ctx.enqueue_function[matmul_tiled](
-        #     out.unsafe_ptr(),
-        #     inp1.unsafe_ptr(),
-        #     inp2.unsafe_ptr(),
-        #     SIZE,
-        #     grid_dim=BLOCKS_PER_GRID,
-        #     block_dim=THREADS_PER_BLOCK,
-        # )
+        if argv()[1] == "--naive":
+            ctx.enqueue_function[naive_matmul](
+                out.unsafe_ptr(),
+                inp1.unsafe_ptr(),
+                inp2.unsafe_ptr(),
+                SIZE,
+                grid_dim=BLOCKS_PER_GRID,
+                block_dim=THREADS_PER_BLOCK,
+            )
+        elif argv()[1] == "--single-block":
+            ctx.enqueue_function[single_block_matmul](
+                out.unsafe_ptr(),
+                inp1.unsafe_ptr(),
+                inp2.unsafe_ptr(),
+                SIZE,
+                grid_dim=BLOCKS_PER_GRID,
+                block_dim=THREADS_PER_BLOCK,
+            )
+        elif argv()[1] == "--tiled":
+            ctx.enqueue_function[matmul_tiled](
+                out.unsafe_ptr(),
+                inp1.unsafe_ptr(),
+                inp2.unsafe_ptr(),
+                SIZE,
+                grid_dim=BLOCKS_PER_GRID_TILED,
+                block_dim=THREADS_PER_BLOCK_TILED,
+            )
+        else:
+            raise Error("Invalid argument")
 
         ctx.synchronize()
 
