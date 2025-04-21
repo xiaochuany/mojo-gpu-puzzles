@@ -24,7 +24,7 @@ The key insight is that each thread \\(i\\) computes: \\[out[i] = a[i] + 10\\]
 ```mojo
 {{#include ../../../problems/p01/p01.mojo:add_10}}
 ```
-<a href="../../../problems/p01/p01.mojo" class="filename">View full file: problems/p01/p01.mojo</a>
+<a href="{{#include ../_includes/repo_url.md}}/blob/main/problems/p01/p01.mojo" class="filename">View full file: problems/p01/p01.mojo</a>
 
 <details>
 <summary><strong>Tips</strong></summary>

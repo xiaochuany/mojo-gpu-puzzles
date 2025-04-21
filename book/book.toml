@@ -51,3 +51,6 @@ index = false
 # Enables use of {{#include file.md}} to include other files
 renderers = ["html"]
 some-attribute = "value"
+
+[preprocessor.variables]
+repo_url = "https://github.com/modularml/mojo-gpu-puzzles"

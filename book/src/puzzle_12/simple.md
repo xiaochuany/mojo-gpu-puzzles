@@ -19,7 +19,7 @@ Configuration:
 ```mojo
 {{#include ../../../problems/p12/p12.mojo:prefix_sum_simple}}
 ```
-<a href="../../../problems/p12/p12.mojo" class="filename">View full file: problems/p12/p12.mojo</a>
+<a href="{{#include ../_includes/repo_url.md}}/blob/main/problems/p12/p12.mojo" class="filename">View full file: problems/p12/p12.mojo</a>
 
 <details>
 <summary><strong>Tips</strong></summary>

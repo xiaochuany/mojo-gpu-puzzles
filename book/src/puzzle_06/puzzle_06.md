@@ -24,7 +24,7 @@ The key insight is understanding how blocks of threads work together to process 
 ```mojo
 {{#include ../../../problems/p06/p06.mojo:add_10_blocks}}
 ```
-<a href="../../../problems/p06/p06.mojo" class="filename">View full file: problems/p06/p06.mojo</a>
+<a href="{{#include ../_includes/repo_url.md}}/blob/main/problems/p06/p06.mojo" class="filename">View full file: problems/p06/p06.mojo</a>
 
 <details>
 <summary><strong>Tips</strong></summary>

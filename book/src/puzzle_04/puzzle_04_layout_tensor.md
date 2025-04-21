@@ -21,7 +21,7 @@ The key insight is that `LayoutTensor` provides a natural 2D indexing interface,
 ```mojo
 {{#include ../../../problems/p04/p04_layout_tensor.mojo:add_10_2d_layout_tensor}}
 ```
-<a href="../../../problems/p04/p04_layout_tensor.mojo" class="filename">View full file: problems/p04/p04_layout_tensor.mojo</a>
+<a href="{{#include ../_includes/repo_url.md}}/blob/main/problems/p04/p04_layout_tensor.mojo" class="filename">View full file: problems/p04/p04_layout_tensor.mojo</a>
 
 <details>
 <summary><strong>Tips</strong></summary>

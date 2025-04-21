@@ -25,7 +25,7 @@ The key insight is that each thread \\(i\\) must check: \\[\\text{if}\\ i < \\te
 ```mojo
 {{#include ../../../problems/p03/p03.mojo:add_10_guard}}
 ```
-<a href="../../../problems/p03/p03.mojo" class="filename">View full file: problems/p03/p03.mojo</a>
+<a href="{{#include ../_includes/repo_url.md}}/blob/main/problems/p03/p03.mojo" class="filename">View full file: problems/p03/p03.mojo</a>
 
 <details>
 <summary><strong>Tips</strong></summary>

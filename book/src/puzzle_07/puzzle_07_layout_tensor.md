@@ -27,7 +27,7 @@ Configuration:
 ```mojo
 {{#include ../../../problems/p07/p07_layout_tensor.mojo:add_10_blocks_2d_layout_tensor}}
 ```
-<a href="../../../problems/p07/p07_layout_tensor.mojo" class="filename">View full file: problems/p07/p07_layout_tensor.mojo</a>
+<a href="{{#include ../_includes/repo_url.md}}/blob/main/problems/p07/p07_layout_tensor.mojo" class="filename">View full file: problems/p07/p07_layout_tensor.mojo</a>
 
 <details>
 <summary><strong>Tips</strong></summary>

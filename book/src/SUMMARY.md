@@ -41,7 +41,7 @@
     - [Tiled Version](./puzzle_14/tiled.md)
     - [Tiling with LayoutTensor]()
 
-# Part V: Interfacing with Python: MAX Graph Custom Ops
+# Part V: Interfacing with Python via MAX Graph Custom Ops
 - [Puzzle 15: 1D Convolution Op]()
 - [Puzzle 16: Color Inversion Op]()
 - [Puzzle 17: TopK Sampling Op]()

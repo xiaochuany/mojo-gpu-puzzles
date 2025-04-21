@@ -23,7 +23,7 @@ The key insight is understanding how to map elements from two 1D vectors to crea
 ```mojo
 {{#include ../../../problems/p05/p05.mojo:broadcast_add}}
 ```
-<a href="../../../problems/p05/p05.mojo" class="filename">View full file: problems/p05/p05.mojo</a>
+<a href="{{#include ../_includes/repo_url.md}}/blob/main/problems/p05/p05.mojo" class="filename">View full file: problems/p05/p05.mojo</a>
 
 <details>
 <summary><strong>Tips</strong></summary>

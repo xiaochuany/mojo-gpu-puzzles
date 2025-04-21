@@ -21,7 +21,7 @@ The key insight is that `LayoutTensor` allows natural broadcasting through diffe
 ```mojo
 {{#include ../../../problems/p05/p05_layout_tensor.mojo:broadcast_add_layout_tensor}}
 ```
-<a href="../../../problems/p05/p05_layout_tensor.mojo" class="filename">View full file: problems/p05/p05_layout_tensor.mojo</a>
+<a href="{{#include ../_includes/repo_url.md}}/blob/main/problems/p05/p05_layout_tensor.mojo" class="filename">View full file: problems/p05/p05_layout_tensor.mojo</a>
 
 <details>
 <summary><strong>Tips</strong></summary>

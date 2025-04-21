@@ -39,7 +39,7 @@ Grid (3×3 blocks):        Each block (3×3 threads):
 ```mojo
 {{#include ../../../problems/p14/p14.mojo:matmul_tiled}}
 ```
-<a href="../../../problems/p14/p14.mojo" class="filename">View full file: problems/p14/p14.mojo</a>
+<a href="{{#include ../_includes/repo_url.md}}/blob/main/problems/p14/p14.mojo" class="filename">View full file: problems/p14/p14.mojo</a>
 
 <details>
 <summary><strong>Tips</strong></summary>

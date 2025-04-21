@@ -30,7 +30,7 @@ Configuration:
 ```mojo
 {{#include ../../../problems/p07/p07.mojo:add_10_blocks_2d}}
 ```
-<a href="../../../problems/p07/p07.mojo" class="filename">View full file: problems/p07/p07.mojo</a>
+<a href="{{#include ../_includes/repo_url.md}}/blob/main/problems/p07/p07.mojo" class="filename">View full file: problems/p07/p07.mojo</a>
 
 <details>
 <summary><strong>Tips</strong></summary>

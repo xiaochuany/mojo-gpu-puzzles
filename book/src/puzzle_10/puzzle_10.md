@@ -34,7 +34,7 @@ handle that challenge later.*
 ```mojo
 {{#include ../../../problems/p10/p10.mojo:dot_product}}
 ```
-<a href="../../../problems/p10/p10.mojo" class="filename">View full file: problems/p10/p10.mojo</a>
+<a href="{{#include ../_includes/repo_url.md}}/blob/main/problems/p10/p10.mojo" class="filename">View full file: problems/p10/p10.mojo</a>
 
 <details>
 <summary><strong>Tips</strong></summary>

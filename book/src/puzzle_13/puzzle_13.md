@@ -47,7 +47,7 @@ Row 3: [18, 19, 20, 21, 22, 23] → Block(0,3)
 ```mojo
 {{#include ../../../problems/p13/p13.mojo:axis_sum}}
 ```
-<a href="../../../problems/p13/p13.mojo" class="filename">View full file: problems/p13/p13.mojo</a>
+<a href="{{#include ../_includes/repo_url.md}}/blob/main/problems/p13/p13.mojo" class="filename">View full file: problems/p13/p13.mojo</a>
 
 <details>
 <summary><strong>Tips</strong></summary>

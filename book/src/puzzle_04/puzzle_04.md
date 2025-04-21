@@ -24,7 +24,7 @@ The key insight is understanding how to map from 2D thread coordinates \\((i,j)\
 ```mojo
 {{#include ../../../problems/p04/p04.mojo:add_10_2d}}
 ```
-<a href="../../../problems/p04/p04.mojo" class="filename">View full file: problems/p04/p04.mojo</a>
+<a href="{{#include ../_includes/repo_url.md}}/blob/main/problems/p04/p04.mojo" class="filename">View full file: problems/p04/p04.mojo</a>
 
 <details>
 <summary><strong>Tips</strong></summary>

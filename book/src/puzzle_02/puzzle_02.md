@@ -24,7 +24,7 @@ The key insight is that each thread \\(i\\) computes: \\[out[i] = a[i] + b[i]\\]
 ```mojo
 {{#include ../../../problems/p02/p02.mojo:add}}
 ```
-<a href="../../../problems/p02/p02.mojo" class="filename">View full file: problems/p02/p02.mojo</a>
+<a href="{{#include ../_includes/repo_url.md}}/blob/main/problems/p02/p02.mojo" class="filename">View full file: problems/p02/p02.mojo</a>
 
 <details>
 <summary><strong>Tips</strong></summary>

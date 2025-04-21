@@ -33,7 +33,7 @@ Memory layout (row-major):
 ```mojo
 {{#include ../../../problems/p14/p14.mojo:naive_matmul}}
 ```
-<a href="../../../problems/p14/p14.mojo" class="filename">View full file: problems/p14/p14.mojo</a>
+<a href="{{#include ../_includes/repo_url.md}}/blob/main/problems/p14/p14.mojo" class="filename">View full file: problems/p14/p14.mojo</a>
 
 <details>
 <summary><strong>Tips</strong></summary>

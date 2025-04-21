@@ -30,7 +30,7 @@ Configuration:
 ```mojo
 {{#include ../../../problems/p11/p11.mojo:conv_1d_simple}}
 ```
-<a href="../../../problems/p11/p11.mojo" class="filename">View full file: problems/p11/p11.mojo</a>
+<a href="{{#include ../_includes/repo_url.md}}/blob/main/problems/p11/p11.mojo" class="filename">View full file: problems/p11/p11.mojo</a>
 
 <details>
 <summary><strong>Tips</strong></summary>
