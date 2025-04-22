@@ -1,20 +1,23 @@
 /* Modular-inspired mdbook theme */
 
 :root {
-  --sidebar-width: 300px;
+  --sidebar-width: 240px;
+  --sidebar-fg: var(--modular-text);
   --page-padding: 15px;
   --content-max-width: 900px;
   --menu-bar-height: 50px;
   --modular-blue: #08a5e1;
   --modular-dark-blue: #016b93;
   --modular-bg: #ffffff;
-  --modular-text: #2c3e50;
+  --modular-text: #020c13;
   --modular-heading: #1a202c;
   --modular-code-bg: #f8f9fa;
-  --modular-border: #e2e8f0;
+  --modular-border: #e5e9ef;
   --modular-header-height: 60px;
   --modular-nav-bg: #f8fafc;
-  --modular-sidebar-active: #edf2f7;
+  --modular-sidebar-active: #e1e6fb;
+  --modular-text-inactive: #9a9eaa;
+  --modular-menu-border: #637bff;
 }
 
 /* Dark theme variables */
@@ -22,32 +25,14 @@
   --modular-blue: #33c9ff;
   --modular-dark-blue: #5bd0ff;
   --modular-bg: #0f1419;
-  --modular-text: #c5c5c5;
+  --modular-text: #ffffff;
   --modular-heading: #e6e6e6;
   --modular-code-bg: #191f26;
-  --modular-border: #2d3748;
+  --modular-border: #353d42;
   --modular-nav-bg: #141920;
-  --modular-sidebar-active: #1c2531;
-}
-
-.navy {
-  --modular-blue: #39c4ff;
-  --modular-dark-blue: #5bd0ff;
-  --modular-bg: #161923;
-  --modular-text: #bcbdd0;
-  --modular-heading: #ffffff;
-  --modular-code-bg: #1c1e2d;
-  --modular-border: #2c3043;
-}
-
-.coal {
-  --modular-blue: #33c9ff;
-  --modular-dark-blue: #5bd0ff;
-  --modular-bg: #141617;
-  --modular-text: #98a3ad;
-  --modular-heading: #e2e4e5;
-  --modular-code-bg: #191b1c;
-  --modular-border: #363a3e;
+  --modular-sidebar-active: #262c30;
+  --modular-text-inactive: #9a9eaa;
+  --modular-menu-border: #9199c7;
 }
 
 /* Custom Modular Header */
@@ -125,13 +110,50 @@ html {
   padding: 32px 48px;
   max-width: var(--content-max-width);
   margin: 0 auto;
+  color: var(--modular-text);
 }
 
 /* Adjust sidebar position */
 .sidebar {
-  background-color: var(--modular-nav-bg);
+  font-size: 14px;
+  background-color: var(--modular-bg);
+  color: var(--modular-text);
   border-right: 1px solid var(--modular-border);
-  padding-top: 20px;
+  padding: 16px;
+  li {
+    padding: 4px 0 4px 8px;
+    border-left: 1px solid transparent;
+    color: var(--modular-text);
+    > div {
+      color: var(--modular-text-inactive);
+    }
+    &.chapter-item {
+      margin-top: 4px;
+    }
+  }
+
+  li:has(> a) {
+    border-radius: 0 2px 2px 0;
+    transition: background 0.2s cubic-bezier(0.08, 0.52, 0.52, 1);
+
+    &:hover,
+    &:has(a.active) {
+      background-color: var(--modular-sidebar-active);
+      border-left: 1px solid var(--modular-menu-border);
+    }
+    a:hover,
+    a:active,
+    a.active {
+      color: var(--modular-text);
+    }
+  }
+  .section {
+    padding-inline-start: 0;
+    > li {
+      margin-left: -8px;
+      padding-left: 16px;
+    }
+  }
 }
 
 .sidebar h2 {
@@ -141,30 +163,6 @@ html {
   color: #64748b;
   padding: 0 24px;
   margin: 8px 0;
-}
-
-.sidebar ul li a {
-  color: var(--modular-text);
-  font-size: 0.875rem;
-  padding: 8px 24px;
-  border-radius: 0;
-}
-
-.sidebar ul li a:hover {
-  background-color: var(--modular-sidebar-active);
-}
-
-.sidebar ul li a.active {
-  background-color: var(--modular-sidebar-active);
-  color: var(--modular-blue);
-  font-weight: 500;
-}
-
-/* Specific for dark themes */
-.ayu .sidebar,
-.navy .sidebar,
-.coal .sidebar {
-  background-color: var(--modular-bg);
 }
 
 /* Chapter content */
