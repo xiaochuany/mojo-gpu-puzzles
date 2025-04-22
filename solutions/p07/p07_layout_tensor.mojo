@@ -32,12 +32,18 @@ fn add_10_blocks_2d[
 def main():
     with DeviceContext() as ctx:
         out_buf = ctx.enqueue_create_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
-        out_tensor = LayoutTensor[dtype, out_layout, MutableAnyOrigin](out_buf.unsafe_ptr())
+        out_tensor = LayoutTensor[dtype, out_layout, MutableAnyOrigin](
+            out_buf.unsafe_ptr()
+        )
 
-        expected_buf = ctx.enqueue_create_host_buffer[dtype](SIZE * SIZE).enqueue_fill(1)
+        expected_buf = ctx.enqueue_create_host_buffer[dtype](
+            SIZE * SIZE
+        ).enqueue_fill(1)
 
         a = ctx.enqueue_create_buffer[dtype](SIZE * SIZE).enqueue_fill(1)
-        a_tensor = LayoutTensor[dtype, a_layout, MutableAnyOrigin](a.unsafe_ptr())
+        a_tensor = LayoutTensor[dtype, a_layout, MutableAnyOrigin](
+            a.unsafe_ptr()
+        )
 
         ctx.enqueue_function[add_10_blocks_2d[out_layout, a_layout]](
             out_tensor,
@@ -59,9 +65,13 @@ def main():
         with out_buf.map_to_host() as out_buf_host:
             print(
                 "out:",
-                LayoutTensor[dtype, out_layout, MutableAnyOrigin](out_buf_host.unsafe_ptr()),
+                LayoutTensor[dtype, out_layout, MutableAnyOrigin](
+                    out_buf_host.unsafe_ptr()
+                ),
             )
             print("expected:", expected_tensor)
             for i in range(SIZE):
                 for j in range(SIZE):
-                    assert_equal(out_buf_host[i * SIZE + j], expected_buf[i * SIZE + j])
+                    assert_equal(
+                        out_buf_host[i * SIZE + j], expected_buf[i * SIZE + j]
+                    )

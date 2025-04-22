@@ -30,7 +30,9 @@ def main():
         out_tensor = LayoutTensor[mut=True, dtype, layout](out_buf.unsafe_ptr())
         print("out shape:", out_tensor.shape[0](), "x", out_tensor.shape[1]())
 
-        expected = ctx.enqueue_create_host_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
+        expected = ctx.enqueue_create_host_buffer[dtype](
+            SIZE * SIZE
+        ).enqueue_fill(0)
 
         a = ctx.enqueue_create_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
         with a.map_to_host() as a_host:

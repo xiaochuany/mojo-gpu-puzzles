@@ -63,7 +63,9 @@ fn single_block_matmul(
     barrier()
 
     for k in range(size):
-        out[local_i * size + local_j] += a_shared[local_i * size + k] * b_shared[k + local_j * size]
+        out[local_i * size + local_j] += (
+            a_shared[local_i * size + k] * b_shared[k + local_j * size]
+        )
 
 
 # ANCHOR_END: single_block_matmul_solution
@@ -107,18 +109,25 @@ fn matmul_tiled(
 
         # Load tile of A
         if global_row < size and (tile * TPB + local_col) < size:
-            a_shared[local_row * TPB + local_col] = a[global_row * size + (tile * TPB + local_col)]
+            a_shared[local_row * TPB + local_col] = a[
+                global_row * size + (tile * TPB + local_col)
+            ]
 
         # Load tile of B (transposed access)
         if (tile * TPB + local_row) < size and global_col < size:
-            b_shared[local_row * TPB + local_col] = b[(tile * TPB + local_row) + global_col * size]
+            b_shared[local_row * TPB + local_col] = b[
+                (tile * TPB + local_row) + global_col * size
+            ]
 
         barrier()
 
         # Compute partial dot product
         if global_row < size and global_col < size:
             for k in range(min(TPB, size - tile * TPB)):
-                acc += a_shared[local_row * TPB + k] * b_shared[k * TPB + local_col]
+                acc += (
+                    a_shared[local_row * TPB + k]
+                    * b_shared[k * TPB + local_col]
+                )
 
         barrier()
 
@@ -135,7 +144,9 @@ def main():
         out = ctx.enqueue_create_buffer[dtype](size * size).enqueue_fill(0)
         inp1 = ctx.enqueue_create_buffer[dtype](size * size).enqueue_fill(0)
         inp2 = ctx.enqueue_create_buffer[dtype](size * size).enqueue_fill(0)
-        expected = ctx.enqueue_create_host_buffer[dtype](size * size).enqueue_fill(0)
+        expected = ctx.enqueue_create_host_buffer[dtype](
+            size * size
+        ).enqueue_fill(0)
         with inp1.map_to_host() as inp1_host, inp2.map_to_host() as inp2_host:
             for row in range(size):
                 for col in range(size):
@@ -148,7 +159,9 @@ def main():
             for i in range(size):
                 for j in range(size):
                     for k in range(size):
-                        expected[i * size + j] += inp1_host[i * size + k] * inp2_host[k + j * size]
+                        expected[i * size + j] += (
+                            inp1_host[i * size + k] * inp2_host[k + j * size]
+                        )
 
         if argv()[1] == "--naive":
             ctx.enqueue_function[naive_matmul](
@@ -187,4 +200,6 @@ def main():
             print("expected:", expected)
             for col in range(size):
                 for row in range(size):
-                    assert_equal(out_host[col * size + row], expected[col * size + row])
+                    assert_equal(
+                        out_host[col * size + row], expected[col * size + row]
+                    )

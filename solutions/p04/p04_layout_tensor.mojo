@@ -28,10 +28,14 @@ fn add_10_2d(
 def main():
     with DeviceContext() as ctx:
         out_buf = ctx.enqueue_create_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
-        out_tensor = LayoutTensor[mut=True, dtype, layout](out_buf.unsafe_ptr()).reshape[layout]()
+        out_tensor = LayoutTensor[mut=True, dtype, layout](
+            out_buf.unsafe_ptr()
+        ).reshape[layout]()
         print("out shape:", out_tensor.shape[0](), "x", out_tensor.shape[1]())
 
-        expected = ctx.enqueue_create_host_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
+        expected = ctx.enqueue_create_host_buffer[dtype](
+            SIZE * SIZE
+        ).enqueue_fill(0)
 
         a = ctx.enqueue_create_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
         with a.map_to_host() as a_host:
@@ -39,7 +43,9 @@ def main():
                 a_host[i] = i
                 expected[i] = a_host[i] + 10
 
-        a_tensor = LayoutTensor[mut=True, dtype, layout](a.unsafe_ptr()).reshape[layout]()
+        a_tensor = LayoutTensor[mut=True, dtype, layout](
+            a.unsafe_ptr()
+        ).reshape[layout]()
 
         ctx.enqueue_function[add_10_2d](
             out_tensor,

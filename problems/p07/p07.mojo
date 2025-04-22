@@ -26,7 +26,9 @@ fn add_10_blocks_2d(
 def main():
     with DeviceContext() as ctx:
         out = ctx.enqueue_create_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
-        expected = ctx.enqueue_create_host_buffer[dtype](SIZE * SIZE).enqueue_fill(1)
+        expected = ctx.enqueue_create_host_buffer[dtype](
+            SIZE * SIZE
+        ).enqueue_fill(1)
         a = ctx.enqueue_create_buffer[dtype](SIZE * SIZE).enqueue_fill(1)
         ctx.enqueue_function[add_10_blocks_2d](
             out.unsafe_ptr(),

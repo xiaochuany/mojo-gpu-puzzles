@@ -6,7 +6,7 @@ platforms = ["linux-64"]
 version = "0.0.0"
 
 [tasks]
-format = "mojo format -l 100 problems solutions"
+format = "mojo format problems solutions"
 tests = { cmd = "bash solutions/run.sh" }
 book = { cmd = "cd book && mdbook build && mdbook serve --open"}
 clean = { cmd = "cd book && mdbook clean"}
@@ -28,15 +28,19 @@ p06 = "mojo problems/p06/p06.mojo"
 p07 = "mojo problems/p07/p07.mojo"
 p07_layout_tensor = "mojo problems/p07/p07_layout_tensor.mojo"
 
-
 p08 = "mojo problems/p08/p08.mojo"
-p09 = "mojo problems/p09/p09.mojo"
-p10 = "mojo problems/p10/p10.mojo"
-p11 = "mojo problems/p11/p11.mojo"
-p12 = "mojo problems/p12/p12.mojo"
-p13 = "mojo problems/p13/p13.mojo"
-p14 = "mojo problems/p14/p14.mojo"
 
+p09 = "mojo problems/p09/p09.mojo"
+
+p10 = "mojo problems/p10/p10.mojo"
+
+p11 = "mojo problems/p11/p11.mojo"
+
+p12 = "mojo problems/p12/p12.mojo"
+
+p13 = "mojo problems/p13/p13.mojo"
+
+p14 = "mojo problems/p14/p14.mojo"
 
 [dependencies]
 max = "*"

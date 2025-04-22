@@ -32,11 +32,17 @@ fn broadcast_add[
 def main():
     with DeviceContext() as ctx:
         out_buf = ctx.enqueue_create_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
-        out_tensor = LayoutTensor[mut=True, dtype, out_layout](out_buf.unsafe_ptr())
+        out_tensor = LayoutTensor[mut=True, dtype, out_layout](
+            out_buf.unsafe_ptr()
+        )
         print("out shape:", out_tensor.shape[0](), "x", out_tensor.shape[1]())
 
-        expected_buf = ctx.enqueue_create_host_buffer[dtype](SIZE * SIZE).enqueue_fill(0)
-        expected_tensor = LayoutTensor[mut=True, dtype, out_layout](expected_buf.unsafe_ptr())
+        expected_buf = ctx.enqueue_create_host_buffer[dtype](
+            SIZE * SIZE
+        ).enqueue_fill(0)
+        expected_tensor = LayoutTensor[mut=True, dtype, out_layout](
+            expected_buf.unsafe_ptr()
+        )
 
         a = ctx.enqueue_create_buffer[dtype](SIZE).enqueue_fill(0)
         b = ctx.enqueue_create_buffer[dtype](SIZE).enqueue_fill(0)
@@ -68,4 +74,6 @@ def main():
             print("expected:", expected_buf)
             for i in range(SIZE):
                 for j in range(SIZE):
-                    assert_equal(out_buf_host[i * SIZE + j], expected_buf[i * SIZE + j])
+                    assert_equal(
+                        out_buf_host[i * SIZE + j], expected_buf[i * SIZE + j]
+                    )

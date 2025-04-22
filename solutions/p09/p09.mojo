@@ -42,7 +42,9 @@ fn pooling(
 
     # can keep the first 2 and use:
     if 1 < global_i < size:
-        out[global_i] = shared[local_i - 2] + shared[local_i - 1] + shared[local_i]
+        out[global_i] = (
+            shared[local_i - 2] + shared[local_i - 1] + shared[local_i]
+        )
 
 
 # ANCHOR_END: pooling_solution

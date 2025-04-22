@@ -45,7 +45,10 @@ fn single_block_matmul(
 
 # ANCHOR: matmul_tiled
 alias SIZE_TILED = 8
-alias BLOCKS_PER_GRID_TILED = (3, 3)  # each block convers 3x3 elements and 3=ceil(8/3)
+alias BLOCKS_PER_GRID_TILED = (
+    3,
+    3,
+)  # each block convers 3x3 elements and 3=ceil(8/3)
 alias THREADS_PER_BLOCK_TILED = (TPB, TPB)
 
 
@@ -68,7 +71,9 @@ def main():
         out = ctx.enqueue_create_buffer[dtype](size * size).enqueue_fill(0)
         inp1 = ctx.enqueue_create_buffer[dtype](size * size).enqueue_fill(0)
         inp2 = ctx.enqueue_create_buffer[dtype](size * size).enqueue_fill(0)
-        expected = ctx.enqueue_create_host_buffer[dtype](size * size).enqueue_fill(0)
+        expected = ctx.enqueue_create_host_buffer[dtype](
+            size * size
+        ).enqueue_fill(0)
         with inp1.map_to_host() as inp1_host, inp2.map_to_host() as inp2_host:
             for row in range(size):
                 for col in range(size):
@@ -81,7 +86,9 @@ def main():
             for i in range(size):
                 for j in range(size):
                     for k in range(size):
-                        expected[i * size + j] += inp1_host[i * size + k] * inp2_host[k + j * size]
+                        expected[i * size + j] += (
+                            inp1_host[i * size + k] * inp2_host[k + j * size]
+                        )
 
         if argv()[1] == "--naive":
             ctx.enqueue_function[naive_matmul](
@@ -120,4 +127,6 @@ def main():
             print("expected:", expected)
             for col in range(size):
                 for row in range(size):
-                    assert_equal(out_host[col * size + row], expected[col * size + row])
+                    assert_equal(
+                        out_host[col * size + row], expected[col * size + row]
+                    )
