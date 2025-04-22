@@ -115,6 +115,9 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <!-- populated by js -->
+            <div class="menu-title-wrapper">
+                <h1 class="menu-title">{{ book_title }}</h1>
+            </div>
             <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
             <noscript>
                 <iframe class="sidebar-iframe-outer" src="{{ path_to_root }}toc.html"></iframe>
@@ -147,8 +150,6 @@
                         </button>
                         {{/if}}
                     </div>
-
-                    <h1 class="menu-title">{{ book_title }}</h1>
 
                     <div class="right-buttons">
                         {{#if print_enable}}
