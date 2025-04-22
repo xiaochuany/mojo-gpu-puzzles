@@ -73,10 +73,67 @@ expected: HostBuffer([140.0])
 
 <div class="solution-explanation">
 
-This solution:
-- Computes element-wise products into shared memory
-- Synchronizes all threads with `barrier()`
-- Uses thread 0 to sum all products
-- Writes final dot product result to `out[0]`
+The parallel reduction algorithm for dot product works as follows:
+
+### Initial State
+Each thread multiplies corresponding elements from vectors \\(a\\) and \\(b\\):
+```txt
+Threads:     T0   T1   T2   T3   T4   T5   T6   T7
+a:          [0    1    2    3    4    5    6    7]
+b:          [0    1    2    3    4    5    6    7]
+shared:     [0    1    4    9    16   25   36   49]
+             ↑    ↑    ↑    ↑    ↑    ↑    ↑    ↑
+            T0   T1   T2   T3   T4   T5   T6   T7
+```
+
+### Parallel Reduction Steps
+
+#### Step 1: stride = \\(\\text{TPB} / 2 = 4\\)
+Active threads: \\(T_0, T_1, T_2, T_3\\)
+```txt
+Before:     [0    1    4    9    16   25   36   49]
+Add:         +16  +25  +36  +49
+             |    |    |    |
+Result:     [16   26   40   58   16   25   36   49]
+             ↑    ↑    ↑    ↑
+            T0   T1   T2   T3
+```
+
+#### Step 2: stride = \\(\\text{TPB} / 4 = 2\\)
+Active threads: \\(T_0, T_1\\)
+```txt
+Before:     [16   26   40   58   16   25   36   49]
+Add:         +40  +58
+             |    |
+Result:     [56   84   40   58   16   25   36   49]
+             ↑    ↑
+            T0   T1
+```
+
+#### Step 3: stride = \\(\\text{TPB} / 8 = 1\\)
+Active thread: \\(T_0\\)
+```txt
+Before:     [56   84   40   58   16   25   36   49]
+Add:         +84
+             |
+Result:     [140  84   40   58   16   25   36   49]
+             ↑
+            T0
+```
+
+### Final Write
+Only thread \\(T_0\\) writes the final result:
+```txt
+Thread T0: out[0] = 140
+```
+
+Key Implementation Details:
+1. Uses `shared` memory for fast intermediate results
+2. Halves the stride in each step: \\(4 \\rightarrow 2 \\rightarrow 1\\)
+3. Calls `barrier()` between steps for synchronization
+4. Only active threads where `local_i < stride` perform additions
+5. Final result is sum of all element-wise products: \\(\sum_{i=0}^{7} a[i] \cdot b[i] = 140\\)
+
+This parallel reduction approach reduces the time complexity from \\(O(n)\\) to \\(O(\log n)\\) by performing additions in parallel.
 </div>
 </details>

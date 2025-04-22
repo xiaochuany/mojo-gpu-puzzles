@@ -76,7 +76,7 @@ The parallel (inclusive) prefix-sum algorithm works as follows:
 ```txt
 Threads:      T0   T1   T2   T3   T4   T5   T6   T7
 Input array:  [0    1    2    3    4    5    6    7]
-shared[]:     [0    1    2    3    4    5    6    7]
+shared:       [0    1    2    3    4    5    6    7]
                ↑    ↑    ↑    ↑    ↑    ↑    ↑    ↑
               T0   T1   T2   T3   T4   T5   T6   T7
 ```
