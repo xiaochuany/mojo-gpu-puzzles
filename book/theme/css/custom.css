@@ -118,6 +118,7 @@
 html {
   scroll-padding-top: var(--modular-header-height);
   font-family: "Inter", sans-serif;
+  font-feature-settings: "dlig" 1, "cv05" 1, "ss03" 1, "ss07" 1, "ss08" 1, "ss01" 0;
 }
 
 .content {
