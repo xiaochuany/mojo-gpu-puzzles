@@ -28,6 +28,7 @@
   --modular-menu-border: var(--links);
   --mono-font: "Roboto Mono";
   --arrow-caret: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 24 24"><path fill="%23020c13" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg>');
+  --copy-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"  width="18px" height="18px" viewBox="0 0 24 24"><path fill="%23262c30" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg>');
 }
 
 /* Dark theme variables */
@@ -45,9 +46,9 @@
   --modular-border: #353d42;
   --modular-nav-bg: #141920;
   --modular-sidebar-active: #262c30;
-  --modular-text-inactive: #9a9eaa;
   --modular-menu-border: #9199c7;
   --arrow-caret: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 24 24"><path fill="%23ffffff" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg>');
+  --copy-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"  width="18px" height="18px" viewBox="0 0 24 24"><path fill="%23d4dae4" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg>');
 }
 
 /* Custom Modular Header */
@@ -274,6 +275,26 @@ pre code {
 
 [id^="MathJax"] {
   font-size: 0.96em;
+}
+
+pre > .buttons {
+  visibility: visible;
+  opacity: 1;
+  button.clip-button {
+    border: 1px solid transparent;
+    background-color: transparent;
+    opacity: 0.6;
+    &:hover {
+      border: 1px solid var(--modular-border);
+      opacity: 1;
+    }
+    &::before {
+      content: none;
+    }
+    &::after {
+      content: var(--copy-icon);
+    }
+  }
 }
 
 /* Tables */
@@ -763,7 +784,7 @@ pre code.hljs {
 
 /* Add a subtle indicator that there's more content */
 .content::after {
-  content: "";
+  content: none;
   display: block;
   height: 40px;
   margin-top: 20px;
