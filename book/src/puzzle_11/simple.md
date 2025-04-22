@@ -11,7 +11,7 @@ In this puzzle, you'll learn about:
 
 The key insight is understanding how to efficiently access overlapping elements while maintaining correct boundary conditions.
 
-## Part 1: Simple case
+## Simple case
 
 Configuration:
 - Input array size: \\(\\text{SIZE} = 6\\) elements
@@ -57,3 +57,23 @@ Your output will look like this if the puzzle isn't solved yet:
 out: HostBuffer([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 expected: HostBuffer([5.0, 8.0, 11.0, 14.0, 5.0, 0.0])
 ```
+
+## Solution
+
+<details>
+<summary>Click to see the solution</summary>
+
+```mojo
+{{#include ../../../solutions/p11/p11.mojo:conv_1d_simple_solution}}
+```
+
+<div class="solution-explanation">
+
+This solution:
+- Allocates shared memory for input array and convolution kernel
+- Loads input data and kernel into shared memory
+- Synchronizes threads with barrier() after loading
+- Computes the convolution sum with boundary checking
+- Each thread handles its own position in the output array
+</div>
+</details>
