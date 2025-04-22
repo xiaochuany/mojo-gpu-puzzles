@@ -61,114 +61,121 @@ expected: HostBuffer([0.0, 1.0, 3.0, 6.0, 10.0, 15.0, 21.0, 28.0])
 The parallel (inclusive) prefix-sum algorithm works as follows:
 
 ### Setup & Configuration
-- TPB (Threads Per Block) = 8
-- SIZE (Array Size) = 8
-- BLOCKS = 1
+- \\(\\text{TPB}\\) (Threads Per Block) = 8
+- \\(\\text{SIZE}\\) (Array Size) = 8
+- \\(\\text{BLOCKS}\\) = 1
 
 ### Thread Mapping
-
-- `thread_idx.x`: `[0   1   2   3   4   5   6   7]  (local_i)`
-- `block_idx.x`:  `[0   0   0   0   0   0   0   0]`
-- `global_i`:     `[0   1   2   3   4   5   6   7]  (block_idx.x * TPB + thread_idx.x)`
+- `thread_idx.x`: \\([0, 1, 2, 3, 4, 5, 6, 7]\\) (`local_i`)
+- `block_idx.x`: \\([0, 0, 0, 0, 0, 0, 0, 0]\\)
+- `global_i`: \\([0, 1, 2, 3, 4, 5, 6, 7]\\) (`block_idx.x * TPB + thread_idx.x`)
 
 ### Initial Load to Shared Memory
-
 ```txt
-Threads:      T0   T1   T2   T3   T4   T5   T6   T7
+Threads:      T₀   T₁   T₂   T₃   T₄   T₅   T₆   T₇
 Input array:  [0    1    2    3    4    5    6    7]
-shared:       [0    1    2    3    4    5    6    7]
+shared[]:     [0    1    2    3    4    5    6    7]
                ↑    ↑    ↑    ↑    ↑    ↑    ↑    ↑
-              T0   T1   T2   T3   T4   T5   T6   T7
+              T₀   T₁   T₂   T₃   T₄   T₅   T₆   T₇
 ```
 
 ### Offset = 1: First Parallel Step
-
-Active threads: `T1 T2 T3 T4 T5 T6 T7` (where `local_i >= 1`)
-
+Active threads: \\(T_1 \ldots T_7\\) (where `local_i ≥ 1`)
 ```txt
 Before:      [0    1    2    3    4    5    6    7]
 Add:              +0   +1   +2   +3   +4   +5   +6
                    |    |    |    |    |    |    |
 Result:      [0    1    3    6    7    9    11   13]
                    ↑    ↑    ↑    ↑    ↑    ↑    ↑
-                  T1   T2   T3   T4   T5   T6   T7
+                  T₁   T₂   T₃   T₄   T₅   T₆   T₇
 ```
 
 ### Offset = 2: Second Parallel Step
-
-Active threads: `T2 T3 T4 T5 T6 T7` (where `local_i >= 2`)
-
+Active threads: \\(T_2 \ldots T_7\\) (where `local_i ≥ 2`)
 ```txt
 Before:      [0    1    3    6    7    9    11   13]
 Add:                   +0   +1   +3   +6   +7   +9
                         |    |    |    |    |    |
 Result:      [0    1    3    7    10   15   18   22]
                         ↑    ↑    ↑    ↑    ↑    ↑
-                       T2   T3   T4   T5   T6   T7
+                       T₂   T₃   T₄   T₅   T₆   T₇
 ```
 
 ### Offset = 4: Third Parallel Step
-
-Active threads: `T4 T5 T6 T7` (where `local_i >= 4`)
-
+Active threads: \\(T_4 \ldots T_7\\) (where `local_i ≥ 4`)
 ```txt
 Before:      [0    1    3    7    10   15   18   22]
 Add:                              +0   +1   +3   +7
                                   |    |    |    |
 Result:      [0    1    3    7    10   16   21   28]
                                   ↑    ↑    ↑    ↑
-                                  T4   T5   T6   T7
+                                  T₄   T₅   T₆   T₇
 ```
 
 ### Final Write to Output
-
 ```txt
-Threads:      T0   T1   T2   T3   T4   T5   T6   T7
+Threads:      T₀   T₁   T₂   T₃   T₄   T₅   T₆   T₇
 global_i:     0    1    2    3    4    5    6    7
 out[]:       [0    1    3    7    10   16   21   28]
               ↑    ↑    ↑    ↑    ↑    ↑    ↑    ↑
-              T0   T1   T2   T3   T4   T5   T6   T7
+              T₀   T₁   T₂   T₃   T₄   T₅   T₆   T₇
 ```
 
 ### Thread-by-Thread Execution
 
-**T0 (`local_i=0`):**
-
+**\\(T_0\\) (`local_i=0`):**
 - Loads `shared[0] = 0`
 - Never adds (`local_i < offset` always)
 - Writes `out[0] = 0`
 
-**T1 (`local_i=1`):**
-
+**\\(T_1\\) (`local_i=1`):**
 - Loads `shared[1] = 1`
-- `offset=1`: adds `shared[0] = 1`
-- `offset=2,4`: no action (`local_i < offse`t`)
+- `offset=1`: adds `shared[0]` → 1
+- `offset=2,4`: no action (`local_i < offset`)
 - Writes `out[1] = 1`
 
-**T2 (`local_i=2`):**
-
+**\\(T_2\\) (`local_i=2`):**
 - Loads `shared[2] = 2`
-- `offset=1`: adds `shared[1] = 3`
-- `offset=2`: adds `shared[0] = 3`
+- `offset=1`: adds `shared[1]` → 3
+- `offset=2`: adds `shared[0]` → 3
 - `offset=4`: no action
 - Writes `out[2] = 3`
 
-**T3 (`local_i=3`):**
-
+**\\(T_3\\) (`local_i=3`):**
 - Loads `shared[3] = 3`
-- `offset=1`: adds `shared[2] = 6`
-- `offset=2`: adds `shared[1] = 7`
+- `offset=1`: adds `shared[2]` → 6
+- `offset=2`: adds `shared[1]` → 7
 - `offset=4`: no action
 - Writes `out[3] = 7`
 
-**T4 (`local_i=4`):**
-
+**\\(T_4\\) (`local_i=4`):**
 - Loads `shared[4] = 4`
-- `offset=1`: adds `shared[3] = 7`
-- `offset=2`: adds `shared[2] = 10`
-- `offset=4`: adds `shared[0] = 10`
+- `offset=1`: adds `shared[3]` → 7
+- `offset=2`: adds `shared[2]` → 10
+- `offset=4`: adds `shared[0]` → 10
 - Writes `out[4] = 10`
 
-The solution ensures correct synchronization between phases using `barrier()` and handles array bounds checking with `if global_i < size`.
+**\\(T_5\\) (`local_i=5`):**
+- Loads `shared[5] = 5`
+- `offset=1`: adds `shared[4]` → 9
+- `offset=2`: adds `shared[3]` → 15
+- `offset=4`: adds `shared[1]` → 16
+- Writes `out[5] = 16`
+
+**\\(T_6\\) (`local_i=6`):**
+- Loads `shared[6] = 6`
+- `offset=1`: adds `shared[5]` → 11
+- `offset=2`: adds `shared[4]` → 18
+- `offset=4`: adds `shared[2]` → 21
+- Writes `out[6] = 21`
+
+**\\(T_7\\) (`local_i=7`):**
+- Loads `shared[7] = 7`
+- `offset=1`: adds `shared[6]` → 13
+- `offset=2`: adds `shared[5]` → 22
+- `offset=4`: adds `shared[3]` → 28
+- Writes `out[7] = 28`
+
+The solution ensures correct synchronization between phases using `barrier()` and handles array bounds checking with `if global_i < size`. The final result produces the inclusive prefix sum where each element \\(i\\) contains \\(\sum_{j=0}^{i} a[j]\\).
 </div>
 </details>
