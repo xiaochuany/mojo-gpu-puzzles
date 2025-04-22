@@ -7,3 +7,5 @@
 magic.lock
 book/book
 book/html
+# misc
+*.DS_Store
