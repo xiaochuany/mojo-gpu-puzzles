@@ -2,7 +2,8 @@
 
 - [Introduction](./introduction.md)
 - [Mojo 🔥: The Best Way to Program GPUs]()
-- [Learning Resources]()
+- [How to Use These Learning Puzzles]()
+- [GPU Programming Resources]()
 
 # Part I: Fundamentals
 - [Puzzle 1: Map](./puzzle_01/puzzle_01.md)
