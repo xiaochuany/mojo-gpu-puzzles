@@ -793,7 +793,7 @@ pre code.hljs {
 
 /* Add a subtle indicator that there's more content */
 .content::after {
-  content: none;
+  content: "";
   display: block;
   height: 40px;
   margin-top: 20px;
@@ -810,6 +810,7 @@ pre code.hljs {
 
 details {
   position: relative;
+  margin-bottom: 40px;
   summary {
     padding-left: 24px;
   }
@@ -833,4 +834,8 @@ details {
       margin-bottom: 60px;
     }
   }
+}
+
+details:last-child {
+  margin-bottom: 60px;
 }
