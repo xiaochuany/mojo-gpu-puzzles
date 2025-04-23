@@ -6,13 +6,11 @@ src = "src"
 title = "Mojo 🔥 GPU Puzzles"
 
 [output.html]
-additional-css = ["theme/css/custom.css", "theme/css/highlight.css", "theme/excalidraw-assets/excalidraw-assets.css"]
+additional-css = ["theme/css/custom.css", "theme/css/highlight.css"]
 additional-js = [
     "theme/mojolang.js",
     "theme/mermaid.min.js",
-    "theme/mermaid-init.js",
-    "theme/excalidraw-assets/excalidraw-assets-dev.js",
-    "theme/excalidraw-assets/excalidraw-assets-prod.js"
+    "theme/mermaid-init.js"
 ]
 default-theme = "light"
 preferred-dark-theme = "ayu"
