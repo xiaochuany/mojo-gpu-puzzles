@@ -10,10 +10,11 @@ format = "mojo format problems solutions"
 
 tests = { cmd = "bash solutions/run.sh" }
 
-preprocessor = "cargo install mdbook mdbook-mermaid mdbook-kroki-preprocessor"
-build-book = { cmd = "cd book && mdbook build", depends-on = ["preprocessor"] }
+init = "cargo install cargo-binstall"
+preprocessors = { cmd = "cargo binstall mdbook mdbook-mermaid mdbook-kroki-preprocessor", depends-on = ["init"] }
+build-book = { cmd = "cd book && mdbook build", depends-on = ["preprocessors"] }
 book = { cmd = "cd book && mdbook serve --open", depends-on = ["build-book"] }
-clean = { cmd = "cd book && mdbook clean"}
+clean = { cmd = "cd book && mdbook clean", depends-on = ["preprocessors"] }
 
 p01 = "mojo problems/p01/p01.mojo"
 
@@ -50,4 +51,4 @@ p14 = "mojo problems/p14/p14.mojo"
 max = "*"
 bash = ">=5.2.21,<6"
 graphviz = ">=12.2.1,<13"
-rust = ">=1.86.0,<1.87"
+rust = ">=1.86.0,<1.87" # includes cargo
