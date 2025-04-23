@@ -25,8 +25,9 @@ jobs:
         shell: bash
         run: |
           . $HOME/.bashrc
+          magic run clean
           cd book
-          magic run mdbook build
+          magic run build-book
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4

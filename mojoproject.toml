@@ -11,7 +11,8 @@ format = "mojo format problems solutions"
 tests = { cmd = "bash solutions/run.sh" }
 
 preprocessor = "cargo install mdbook mdbook-mermaid mdbook-kroki-preprocessor"
-book = { cmd = "cd book && mdbook build && mdbook serve --open", depends-on = ["preprocessor"]}
+build-book = { cmd = "cd book && mdbook build", depends-on = ["preprocessor"] }
+book = { cmd = "cd book && mdbook serve --open", depends-on = ["build-book"] }
 clean = { cmd = "cd book && mdbook clean"}
 
 p01 = "mojo problems/p01/p01.mojo"
