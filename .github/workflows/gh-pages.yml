@@ -25,7 +25,6 @@ jobs:
         shell: bash
         run: |
           . $HOME/.bashrc
-          magic run clean
           cd book
           magic run build-book
 
