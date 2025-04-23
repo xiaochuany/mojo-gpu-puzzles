@@ -14,18 +14,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup mdBook
-        uses: peaceiris/actions-mdbook@v2
-        with:
-          mdbook-version: 'latest'
-
-      # - name: Link check
-      #   run: cargo install mdbook-linkcheck
+      - name: Install Magic CLI
+        run: |
+          curl -ssL https://magic.modular.com/ | bash
+          . $HOME/.bashrc
+          echo "$HOME/.modular/bin" >> $GITHUB_PATH
+          export PATH="$HOME/.modular/bin:$PATH"
 
       - name: Build
+        shell: bash
         run: |
+          source /root/.bashrc
           cd book
-          mdbook build
+          $HOME/.modular/bin/magic build
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
