@@ -8,7 +8,7 @@
   --links: var(--nebulaUltra);
   --inline-code-color: var(--modular-secondary-text);
   --page-padding: 15px;
-  --content-max-width: 900px;
+  --content-max-width: 1400px !important;
   --menu-bar-height: 50px;
   --modular-blue: #08a5e1;
   --modular-dark-blue: #016b93;
@@ -144,13 +144,16 @@ html {
   color: var(--sidebar-fg);
   border-right: 1px solid var(--modular-border);
   padding: 0 16px;
+
   li {
     padding: 4px 0 4px 8px;
     border-left: 1px solid transparent;
     color: var(--modular-text);
-    > div {
+
+    >div {
       color: var(--modular-text-inactive);
     }
+
     &.chapter-item {
       margin-top: 4px;
     }
@@ -165,15 +168,18 @@ html {
       background-color: var(--modular-sidebar-active);
       border-left: 1px solid var(--modular-menu-border);
     }
+
     a:hover,
     a:active,
     a.active {
       color: var(--modular-text);
     }
   }
+
   .section {
     padding-inline-start: 0;
-    > li {
+
+    >li {
       margin-left: -8px;
       padding-left: 16px;
     }
@@ -202,8 +208,10 @@ html {
     font-weight: 400;
     margin: 1em 0;
   }
+
   a {
     text-decoration: underline;
+
     &:hover {
       color: var(--modular-text);
     }
@@ -259,6 +267,7 @@ pre {
   padding: 1em;
   margin: 1em 0;
   overflow-x: auto;
+
   .tooltiptext {
     display: none;
   }
@@ -281,24 +290,29 @@ pre code {
   font-size: 0.96em;
 }
 
-pre > .buttons {
+pre>.buttons {
   visibility: visible;
   opacity: 1;
+
   button.clip-button {
     border: 1px solid transparent;
     background-color: transparent;
     opacity: 0.6;
+
     &:hover {
       border: 1px solid var(--modular-border);
       opacity: 1;
     }
+
     &::before {
       content: none;
     }
+
     &::after {
       content: var(--copy-icon);
     }
   }
+
   button.clip-button.tooltipped {
     &::after {
       content: var(--check-icon);
@@ -585,6 +599,7 @@ mark {
 
 /* Print styles */
 @media print {
+
   .sidebar,
   .menu-bar,
   .nav-chapters,
@@ -802,7 +817,7 @@ pre code.hljs {
 }
 
 /* Ensure the last section has good spacing */
-.content > :last-child {
+.content> :last-child {
   margin-bottom: 60px;
 }
 
@@ -811,12 +826,15 @@ pre code.hljs {
 details {
   position: relative;
   margin-bottom: 40px;
+
   summary {
     padding-left: 24px;
   }
+
   summary::marker {
     content: "";
   }
+
   summary::before {
     content: var(--arrow-caret);
     position: absolute;
@@ -826,10 +844,12 @@ details {
     transition: transform 0.2s ease;
     transform: rotate(90deg);
   }
+
   &:open {
     summary::before {
       transform: rotate(180deg);
     }
+
     &:last-child {
       margin-bottom: 60px;
     }
@@ -838,4 +858,67 @@ details {
 
 details:last-child {
   margin-bottom: 60px;
+}
+
+.mermaid {
+  width: 100% !important;
+  min-width: 800px !important;
+  max-width: none !important;
+  height: auto !important;
+}
+
+.mermaid svg {
+  min-width: 800px !important;
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
+}
+
+/* Ensure container doesn't restrict diagram size */
+.content {
+  max-width: none !important;
+  width: 95% !important;
+}
+
+/* Mermaid text sizing */
+.mermaid .label {
+  font-size: 20px !important;
+}
+
+.mermaid .cluster-label {
+  font-size: 24px !important;
+}
+
+.mermaid .edgeLabel {
+  font-size: 18px !important;
+}
+
+/* Specific mermaid container styles */
+.mermaid-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin: 2em 0;
+}
+
+/* Force mermaid container to be large */
+div.mermaid {
+  display: block !important;
+  width: 1200px !important;
+  /* Force minimum width */
+  margin: 0 auto !important;
+  transform-origin: left top;
+  transform: scale(1);
+}
+
+/* Ensure SVG fills container */
+div.mermaid svg {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 400px !important;
+}
+
+/* Override any mdBook content restrictions */
+main .content {
+  max-width: var(--content-max-width) !important;
+  padding: 0 2rem;
 }

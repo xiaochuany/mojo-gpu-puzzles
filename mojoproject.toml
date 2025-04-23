@@ -7,8 +7,11 @@ version = "0.0.0"
 
 [tasks]
 format = "mojo format problems solutions"
+
 tests = { cmd = "bash solutions/run.sh" }
-book = { cmd = "cd book && mdbook build && mdbook serve --open"}
+
+preprocessor = "cargo install mdbook mdbook-mermaid mdbook-kroki-preprocessor"
+book = { cmd = "cd book && mdbook build && mdbook serve --open", depends-on = ["preprocessor"]}
 clean = { cmd = "cd book && mdbook clean"}
 
 p01 = "mojo problems/p01/p01.mojo"
@@ -45,4 +48,5 @@ p14 = "mojo problems/p14/p14.mojo"
 [dependencies]
 max = "*"
 bash = ">=5.2.21,<6"
-mdbook = ">=0.4.48,<0.5"
+graphviz = ">=12.2.1,<13"
+rust = ">=1.86.0,<1.87"

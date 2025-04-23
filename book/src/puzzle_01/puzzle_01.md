@@ -3,7 +3,63 @@
 GPU programming is all about parallelism. In this puzzle, each thread will process a single element of the input array independently.
 Implement a kernel that adds \\(10\\) to each position of vector \\(a\\) and stores it in vector \\(out\\). You have 1 thread per position.
 
+original
+
 ![Map operation visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_14_1.svg)
+
+
+vs mermaid with a lot more
+
+```mermaid
+%%{init: {
+  'theme': 'neutral',
+  'flowchart': {
+    'diagramPadding': 20,
+    'nodeSpacing': 150,
+    'rankSpacing': 150,
+    'width': 2000,
+    'height': 1000
+  },
+  'themeVariables': {
+    'fontSize': '24px',
+    'fontFamily': 'arial'
+  }
+}}%%
+graph LR
+    classDef inputArray fill:#e1f5fe,stroke:#0288d1,stroke-width:3px,color:black
+    classDef threadBlock fill:#fff9c4,stroke:#fbc02d,stroke-width:3px,color:black,rx:10,ry:10
+    classDef outputArray fill:#e8f5e9,stroke:#4caf50,stroke-width:3px,color:black
+    classDef threadText font-weight:bold,font-family:monospace
+
+    subgraph Input["Input Array a"]
+        A0["a[0] = 0"] --- A1["a[1] = 1"] --- A2["a[2] = 2"] --- A3["a[3] = 3"]
+    end
+
+    subgraph ThreadBlock["GPU Thread Block (BLOCKS_PER_GRID=1, THREADS_PER_BLOCK=4)"]
+        T0["Thread 0<br><code>local_i = 0</code>"] ---
+        T1["Thread 1<br><code>local_i = 1</code>"] ---
+        T2["Thread 2<br><code>local_i = 2</code>"] ---
+        T3["Thread 3<br><code>local_i = 3</code>"]
+    end
+
+    subgraph Output["Output Array out"]
+        O0["out[0] = 10"] --- O1["out[1] = 11"] --- O2["out[2] = 12"] --- O3["out[3] = 13"]
+    end
+
+    A0 -. "Read a[local_i]" .-> T0
+    A1 -. "Read a[local_i]" .-> T1
+    A2 -. "Read a[local_i]" .-> T2
+    A3 -. "Read a[local_i]" .-> T3
+
+    T0 -- "<code>a[local_i] + 10</code>" --> O0
+    T1 -- "<code>a[local_i] + 10</code>" --> O1
+    T2 -- "<code>a[local_i] + 10</code>" --> O2
+    T3 -- "<code>a[local_i] + 10</code>" --> O3
+
+    class A0,A1,A2,A3 inputArray
+    class T0,T1,T2,T3 threadBlock
+    class O0,O1,O2,O3 outputArray
+```
 
 ## Key concepts
 
@@ -67,4 +123,6 @@ This solution:
 - Adds 10 to input value: `out[local_i] = a[local_i] + 10.0`
 </div>
 </details>
+
+
 
