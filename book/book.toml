@@ -10,7 +10,8 @@ additional-css = ["theme/css/custom.css", "theme/css/highlight.css"]
 additional-js = [
     "theme/mojolang.js",
     "theme/mermaid.min.js",
-    "theme/mermaid-init.js"
+    "theme/mermaid-init.js",
+    "theme/mermaid-zoom.js"
 ]
 default-theme = "light"
 preferred-dark-theme = "ayu"

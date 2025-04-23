@@ -10,6 +10,13 @@ original
 
 vs mermaid with a lot more
 
+<div class="mermaid-container">
+    <div class="zoom-controls">
+        <button onclick="zoomMermaid(1.2)" title="Zoom In">+</button>
+        <button onclick="zoomMermaid(0.8)" title="Zoom Out">-</button>
+        <button onclick="resetMermaidZoom()" title="Reset">Reset</button>
+    </div>
+
 ```mermaid
 %%{init: {
   'theme': 'neutral',
@@ -60,6 +67,8 @@ graph LR
     class T0,T1,T2,T3 threadBlock
     class O0,O1,O2,O3 outputArray
 ```
+
+</div>
 
 ## Key concepts
 
