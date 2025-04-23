@@ -14,6 +14,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Add Rust caching
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/mojoproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      # Add Modular caching
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.modular
+            ~/.cache/modular
+          key: ${{ runner.os }}-modular-${{ hashFiles('**/mojoproject.toml') }}
+
       - name: Install Magic CLI
         run: |
           curl -ssL https://magic.modular.com/ | bash
@@ -25,8 +46,11 @@ jobs:
         shell: bash
         run: |
           . $HOME/.bashrc
-          magic run clean
           cd book
+          # Only install preprocessors if not cached
+          if [ ! -f ~/.cargo/bin/mdbook ]; then
+            magic run preprocessors
+          fi
           magic run build-book
 
       - name: Deploy
