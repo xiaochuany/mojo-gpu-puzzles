@@ -2,9 +2,9 @@
 
 Implement a kernel that adds \\(10\\) to each position of vector \\(a\\) and stores it in vector \\(out\\).
 
-**Note**: You have more threads than positions.
+**Note**: _You have more threads than positions. This means you need to protect against out-of-bounds memory access._
 
-![Guards visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_21_1.svg)
+![Guard](./media/videos/720p30/puzzle_03_viz.gif)
 
 ## Key concepts
 
