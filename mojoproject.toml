@@ -24,11 +24,12 @@ p03 = "mojo problems/p03/p03.mojo"
 viz03 = "cd book/src/puzzle_03 && python puzzle_03_viz.py"
 
 p04 = "mojo problems/p04/p04.mojo"
-viz04 = "cd book/src/puzzle_04 && python puzzle_04_viz.py"
 p04_layout_tensor = "mojo problems/p04/p04_layout_tensor.mojo"
+viz04 = "cd book/src/puzzle_04 && python puzzle_04_viz.py"
 
 p05 = "mojo problems/p05/p05.mojo"
 p05_layout_tensor = "mojo problems/p05/p05_layout_tensor.mojo"
+viz05 = "cd book/src/puzzle_05 && python puzzle_05_viz.py"
 
 p06 = "mojo problems/p06/p06.mojo"
 
