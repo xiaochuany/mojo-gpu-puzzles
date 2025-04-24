@@ -102,15 +102,19 @@
         <script>
             let sidebar = null;
             const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
-            if (document.body.clientWidth >= 1080) {
-                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
-                sidebar = sidebar || 'visible';
-            } else {
-                sidebar = 'hidden';
-            }
-            sidebar_toggle.checked = sidebar === 'visible';
-            html.classList.remove('sidebar-visible');
-            html.classList.add("sidebar-" + sidebar);
+            sidebar_toggle.checked = window.innerWidth >= 1220;
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 1220) {
+                    try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                    sidebar_toggle.checked = true;
+                    sidebar = 'visible';
+                } else {
+                    sidebar = 'hidden';
+                }
+                sidebar_toggle.checked = sidebar === 'visible';
+                html.classList.remove('sidebar-visible');
+                html.classList.add("sidebar-" + sidebar);
+            })
         </script>
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <!-- populated by js -->
@@ -123,49 +127,83 @@
             </div>
         </nav>
 
-        <div id="page-wrapper" class="page-wrapper">
+        <!-- Toggle color mode directly with button click -->
+        <script>
+            document.addEventListener('click', function (event) {
+                if (!event.target.matches('.theme-toggle')) return;
+                event.preventDefault();
+                const prevTheme = theme;
+                html.classList.remove(theme);
+                const newTheme = prevTheme === 'ayu' ? 'light' : 'ayu'
+                html.classList.add(newTheme);
+                theme = newTheme
+            }, false);
+        </script>
 
-            <div class="page">
-                {{> header}}
-                <div id="menu-bar-hover-placeholder"></div>
-                <div id="menu-bar" class="menu-bar sticky">
-                    <div class="left-buttons">
+        <script>
+            document.addEventListener('click', function() {
+                if (!event.target.matches('.talk-to-us')) return;
+                window.open('https://www.modular.com/company/talk-to-us', '_blank');
+            });
+        </script>
+
+        <div class="page-header">
+            <div id="menu-bar" class="menu-bar">
+                <div class="left-buttons">
+                    <div class="logo-section">
+                        <a class="logo-link" href="https://modular.com"></a>
+                        <div class="slash">/</div>
+                        <a class="internal-link" ref="/">Puzzles</a>
                         <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
                             <i class="fa fa-bars"></i>
                         </label>
-                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
-                            <i class="fa fa-paint-brush"></i>
-                        </button>
+                    </div>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Dark</button></li>
                         </ul>
-                        {{#if search_enabled}}
-                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
-                            <i class="fa fa-search"></i>
-                        </button>
-                        {{/if}}
                     </div>
-                    <h1 class="menu-title">{{book_title}}</h1>
-                    <div class="right-buttons">
-                        {{#if print_enable}}
-                        <a href="{{ path_to_root }}print.html" title="Print this book" aria-label="Print this book">
-                            <i id="print-button" class="fa fa-print"></i>
-                        </a>
-                        {{/if}}
-                        {{#if git_repository_url}}
-                        <a href="{{git_repository_url}}" title="Git repository" aria-label="Git repository">
-                            <i id="git-repository-button" class="fa {{git_repository_icon}}"></i>
-                        </a>
-                        {{/if}}
-                        {{#if git_repository_edit_url}}
-                        <a href="{{git_repository_edit_url}}" title="Suggest an edit" aria-label="Suggest an edit">
-                            <i id="git-edit-button" class="fa fa-edit"></i>
-                        </a>
-                        {{/if}}
-
-                    </div>
+                <div class="menu-links">
+                    <li><a href="https://docs.modular.com/max/get-started/" target="_blank"><div>Product</div></a></li>
+                    <li><a href="https://www.modular.com/max/solutions/agent" target="_blank">Solutions</a></li>
+                    <li><a href="https://builds.modular.com/?category=featured" target="_blank">Resources</a></li>
+                    <li><a href="https://www.modular.com/company/about" target="_blank">Company</a></li>
+                    <li><a href="https://www.modular.com/pricing" target="_blank">Pricing</a></li>
+                    <li><a href="https://docs.modular.com" target="_blank">Docs</a></li>
+                    <li><a href="https://www.modular.com/blog" target="_blank">Blog</a></li>
                 </div>
+                <div class="right-buttons">
+                    {{#if search_enabled}}
+                    <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                        <i class="fa fa-search"></i>
+                    </button>
+                    {{/if}}
+                    <button id="theme-toggle" class="icon-button theme-toggle-btn" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="false" aria-expanded="false">
+                        <i class="theme-toggle"></i>
+                    </button>
+                    {{#if print_enable}}
+                    <a class="menu-btn" href="{{ path_to_root }}print.html" title="Print this book" aria-label="Print this book">
+                        <i id="print-button" class="fa fa-print"></i>
+                    </a>
+                    {{/if}}
+                    {{#if git_repository_url}}
+                    <a class="menu-btn" href="{{git_repository_url}}" title="Git repository" aria-label="Git repository">
+                        <i id="git-repository-button" class="fa {{git_repository_icon}}"></i>
+                    </a>
+                    {{/if}}
+                    {{#if git_repository_edit_url}}
+                    <a href="{{git_repository_edit_url}}" title="Suggest an edit" aria-label="Suggest an edit">
+                        <i id="git-edit-button" class="fa fa-edit"></i>
+                    </a>
+                    {{/if}}
+                    <button class="secondary-btn talk-to-us">Talk to Us</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-wrapper" class="page-wrapper">
+            <div class="page">
+                {{> header}}
 
                 {{#if search_enabled}}
                 <div id="search-wrapper" class="hidden">
