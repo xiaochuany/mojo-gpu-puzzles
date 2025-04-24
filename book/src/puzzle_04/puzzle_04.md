@@ -3,7 +3,7 @@
 Implement a kernel that adds \\(10\\) to each position of 2D square matrix \\(a\\) and stores it in 2D square matrix \\(out\\).
 **You have more threads than positions**.
 
-![Map 2D visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_24_1.svg)
+![2D Matrix Mapping](./media/videos/720p30/puzzle_04_viz.gif)
 
 ## Key concepts
 
@@ -68,4 +68,6 @@ This solution:
 - Inside guard: adds 10 to input value using row-major indexing
 </div>
 </details>
+
+
 
