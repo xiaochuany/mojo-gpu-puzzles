@@ -83,8 +83,6 @@ class Puzzle01Visualization(Scene):
         )
 
         arrows = VGroup()
-        data_flows = VGroup()
-
         for i in range(4):
             start = input_array[i].get_bottom() + DOWN * 0.2
             end = thread_block[i].get_top() + UP * 0.2
@@ -94,12 +92,10 @@ class Puzzle01Visualization(Scene):
             end = output_array[i].get_top() + UP * 0.2
             arrow2 = Arrow(start, end, buff=0.1, color=GREEN)
 
-            self.play(
-                Create(arrow1),
-                Create(arrow2),
-                run_time=0.5,
-            )
             arrows.add(arrow1, arrow2)
+
+        # Change Create to FadeIn for instant appearance
+        self.play(FadeIn(arrows), run_time=0.3)
 
         notes = VGroup(
             Text("• Each thread processes one array element independently", font_size=18),
