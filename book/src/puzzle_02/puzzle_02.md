@@ -3,7 +3,7 @@
 Implement a kernel that adds together each position of vector \\(a\\) and vector \\(b\\) and stores it in \\(out\\).
 You have 1 thread per position.
 
-![Zip operation visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_17_1.svg)
+![Zip](./media/videos/720p30/puzzle_02_viz.gif)
 
 ## Key concepts
 
