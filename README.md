@@ -15,7 +15,20 @@
 
     ```bash
     magic self-update
+
     ```
+
+> Need to have latex installed **only if** generating the GIFs.Note it can take a long time.
+```bash
+sudo apt update
+sudo apt install -y \
+texlive-full \
+dvipng \
+dvisvgm
+
+# Verify latex installation
+latex --version
+```
 
 2. Build the book and open [localhost:3000](localhost:3000)
 

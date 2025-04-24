@@ -47,10 +47,6 @@ jobs:
         run: |
           . $HOME/.bashrc
           cd book
-          # Only install preprocessors if not cached
-          if [ ! -f ~/.cargo/bin/mdbook ]; then
-            magic run preprocessors
-          fi
           magic run build-book
 
       - name: Deploy

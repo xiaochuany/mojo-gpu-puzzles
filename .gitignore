@@ -1,11 +1,17 @@
-
 # pixi environments
 .pixi
 *.egg-info
 # magic environments
 .magic
 magic.lock
-book/book
-book/html
 # misc
 *.DS_Store
+__pycache__
+
+# Book artifacts
+book/book
+book/html
+
+book/src/puzzle_*/media/images/
+book/src/puzzle_*/media/texts/
+book/src/puzzle_*/media/videos/*/partial_movie_files/

@@ -8,10 +8,7 @@ title = "Mojo 🔥 GPU Puzzles"
 [output.html]
 additional-css = ["theme/css/custom.css", "theme/css/highlight.css"]
 additional-js = [
-    "theme/mojolang.js",
-    "theme/mermaid.min.js",
-    "theme/mermaid-init.js",
-    "theme/mermaid-zoom.js"
+    "theme/mojolang.js"
 ]
 default-theme = "light"
 preferred-dark-theme = "ayu"
@@ -63,9 +60,3 @@ some-attribute = "value"
 
 [preprocessor.variables]
 repo_url = "https://github.com/modularml/mojo-gpu-puzzles"
-
-[preprocessor.mermaid]
-command = "mdbook-mermaid"
-
-[preprocessor.kroki-preprocessor]
-command = "mdbook-kroki-preprocessor"

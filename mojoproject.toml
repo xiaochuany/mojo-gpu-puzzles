@@ -10,19 +10,19 @@ format = "mojo format problems solutions"
 
 tests = { cmd = "bash solutions/run.sh" }
 
-init = "cargo install cargo-binstall"
-preprocessors = { cmd = "cargo binstall mdbook mdbook-mermaid mdbook-kroki-preprocessor", depends-on = ["init"] }
-build-book = { cmd = "cd book && mdbook build", depends-on = ["preprocessors"] }
+build-book = "cd book && mdbook build"
 book = { cmd = "cd book && mdbook serve --open", depends-on = ["build-book"] }
-clean = { cmd = "cd book && mdbook clean", depends-on = ["preprocessors"] }
+clean = { cmd = "cd book && mdbook clean" }
 
 p01 = "mojo problems/p01/p01.mojo"
+viz01 = "cd book/src/puzzle_01 && python puzzle_01_viz.py"
 
 p02 = "mojo problems/p02/p02.mojo"
 
 p03 = "mojo problems/p03/p03.mojo"
 
 p04 = "mojo problems/p04/p04.mojo"
+viz04 = "cd book/src/puzzle_04 && python puzzle_04_viz.py"
 p04_layout_tensor = "mojo problems/p04/p04_layout_tensor.mojo"
 
 p05 = "mojo problems/p05/p05.mojo"
@@ -50,5 +50,6 @@ p14 = "mojo problems/p14/p14.mojo"
 [dependencies]
 max = "*"
 bash = ">=5.2.21,<6"
-graphviz = ">=12.2.1,<13"
-rust = ">=1.86.0,<1.87" # includes cargo
+python = "==3.12"
+manim = ">=0.18.1,<0.19"
+mdbook = ">=0.4.48,<0.5"
