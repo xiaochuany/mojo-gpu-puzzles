@@ -3,7 +3,7 @@
 Implement a kernel that adds \\(10\\) to each position of vector \\(a\\) and stores it in \\(out\\).
 **You have fewer threads per block than the size of \\(a\\).**
 
-![Blocks visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_31_1.svg)
+![Blocks visualization](./media/videos/720p30/puzzle_06_viz.gif)
 
 ## Key concepts
 
@@ -14,7 +14,7 @@ In this puzzle, you'll learn about:
 
 The key insight is understanding how blocks of threads work together to process data that's larger than a single block's capacity, while maintaining correct element-to-thread mapping.
 
-- **Thread blocks**: Groups of \\(\\text{THREADS\_PER\_BLOCK} = 4\\) threads
+- **Thread blocks**: Groups of \\(\\text{THREADS\_PER\_BLOCK} = 4\\)  threads
 - **Block grid**: \\(\\text{BLOCKS\_PER\_GRID} = 3\\) blocks total
 - **Data size**: Processing \\(\\text{SIZE} = 9\\) elements
 - **Thread mapping**: Each thread processes one element across blocks
