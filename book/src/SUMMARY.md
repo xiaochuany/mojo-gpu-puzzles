@@ -17,7 +17,7 @@
 
 # Part II: Block-Level Operations
 - [Puzzle 6: Blocks](./puzzle_06/puzzle_06.md)
-- [Puzzle 7: Blocks 2D](./puzzle_07/puzzle_07.md)
+- [Puzzle 7: 2D Blocks](./puzzle_07/puzzle_07.md)
     - [LayoutTensor Version](./puzzle_07/puzzle_07_layout_tensor.md)
 
 # Part III: Shared Memory
