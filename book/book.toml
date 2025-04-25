@@ -59,5 +59,3 @@ index = false
 renderers = ["html"]
 some-attribute = "value"
 
-[preprocessor.variables]
-repo_url = "https://github.com/modularml/mojo-gpu-puzzles"

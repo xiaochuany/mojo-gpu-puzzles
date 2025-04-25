@@ -3,14 +3,7 @@
 Implement a kernel that sums together the last 3 positions of vector \\(a\\) and stores it in vector \\(out\\).
 You have 1 thread per position. You only need 1 global read and 1 global write per thread.
 
-In pseudocode:
-
-```python
-for i in range(a.shape[0]):
-    out[i] = a[max(i - 2, 0) : i + 1].sum()
-```
-
-![Pooling visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_43_1.svg)
+![Pooling visualization](./media/videos/720p30/puzzle_09_viz.gif)
 
 ## Key concepts
 
