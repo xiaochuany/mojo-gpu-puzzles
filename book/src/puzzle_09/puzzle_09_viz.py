@@ -60,8 +60,8 @@ class Puzzle09Visualization(Scene):
         # Barrier sync
         barrier_group = VGroup()
         barrier_line = DashedLine(
-            start=threads.get_left() + LEFT * 0.4,
-            end=threads.get_right() + RIGHT * 0.4,
+            start=threads.get_left() + LEFT * 0.6,
+            end=threads.get_right() + RIGHT * 0.6,
             color=RED_D,
             dash_length=0.15
         ).next_to(threads, DOWN, buff=0.3)
