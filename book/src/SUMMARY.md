@@ -6,26 +6,23 @@
 - [How to Use These Learning Puzzles]()
 - [GPU Programming Resources]()
 
-# Part I: Fundamentals
+# Part I: GPU Fundamentals
 - [Puzzle 1: Map](./puzzle_01/puzzle_01.md)
 - [Puzzle 2: Zip](./puzzle_02/puzzle_02.md)
 - [Puzzle 3: Guards](./puzzle_03/puzzle_03.md)
 - [Puzzle 4: 2D Map](./puzzle_04/puzzle_04.md)
     - [📚 Learn about LayoutTensor](./puzzle_04/introduction_layout_tensor.md)
-    - [LayoutTensor Version](./puzzle_04/puzzle_04_layout_tensor.md)
+    - [📐 LayoutTensor Version](./puzzle_04/puzzle_04_layout_tensor.md)
 - [Puzzle 5: Broadcast](./puzzle_05/puzzle_05.md)
-    - [LayoutTensor Version](./puzzle_05/puzzle_05_layout_tensor.md)
-
-# Part II: Block-Level Operations
+    - [📐 LayoutTensor Version](./puzzle_05/puzzle_05_layout_tensor.md)
 - [Puzzle 6: Blocks](./puzzle_06/puzzle_06.md)
 - [Puzzle 7: 2D Blocks](./puzzle_07/puzzle_07.md)
-    - [LayoutTensor Version](./puzzle_07/puzzle_07_layout_tensor.md)
-
-# Part III: Shared Memory
+    - [📐 LayoutTensor Version](./puzzle_07/puzzle_07_layout_tensor.md)
 - [📚 Learn about GPU Memory]()
 - [Puzzle 8: Shared Memory](./puzzle_08/puzzle_08.md)
+- [🎯 Bonus Challenges]()
 
-# Part IV: Common GPU Algorithms
+# Part II: GPU Algorithms
 - [Puzzle 9: Pooling](./puzzle_09/puzzle_09.md)
 - [Puzzle 10: Dot Product](./puzzle_10/puzzle_10.md)
 - [Puzzle 11: 1D Convolution](./puzzle_11/puzzle_11.md)
@@ -35,7 +32,6 @@
   - [Simple Version](./puzzle_12/simple.md)
   - [Complete Version](./puzzle_12/complete.md)
 - [Puzzle 13: Axis Sum](./puzzle_13/puzzle_13.md)
-    - [LayoutTensor Version]()
 - [Puzzle 14: Matrix Multiplication (MatMul)](./puzzle_14/puzzle_14.md)
     - [Naive Version with Global Memory](./puzzle_14/naive.md)
     - [📚 Learn about Roofline Model]()
@@ -43,14 +39,15 @@
     - [Tiled Version](./puzzle_14/tiled.md)
     - [Tiling with LayoutTensor]()
 
-# Part V: Interfacing with Python via MAX Graph Custom Ops
+# Part III: Interfacing with Python via MAX Graph Custom Ops
 - [Puzzle 15: 1D Convolution Op]()
 - [Puzzle 16: Color Inversion Op]()
 - [Puzzle 17: TopK Sampling Op]()
 - [Puzzle 18: Softmax Op]()
 - [Puzzle 19: Attention Op]()
+- [🎯 Bonus Challenges]()
 
-# Part VI: Advanced GPU Algorithms
+# Part IV: Advanced GPU Algorithms
 - [Puzzle 20: 2D Convolution Op]()
 - [Puzzle 21: 3D Average Pooling]()
   - [📚 Learn about 3D Memory Layout]()
@@ -69,7 +66,7 @@
   - [Basic Version]()
   - [Optimized Version]()
 
-# Part VII: Performance Optimization Puzzles
+# Part V: Performance Optimization Puzzles
 - [Puzzle 25: Memory Coalescing]()
   - [📚 Learn about Memory Access Patterns]()
   - [Basic Version]()
@@ -83,7 +80,7 @@
   - [Version 1: Shared Memory Reduction]()
   - [Version 2: Warp Shuffle Reduction]()
 
-# Part VIII: Real-world Application Puzzles
+# Part VI: Real-world Application Puzzles
 - [Puzzle 28: Image Processing Pipeline]()
   - [📚 Learn about Kernel Fusion]()
   - [Version 1: Separate Kernels]()
@@ -97,7 +94,7 @@
   - [Version 1: Single-Level MatMul]()
   - [Version 2: Multi-Level MatMul]()
 
-# Part IX: Debug & Profile Puzzles
+# Part VII: Debug & Profile Puzzles
 - [Puzzle 31: Race Condition Detective]()
   - [📚 Learn about Race Conditions]()
   - [Version 1: Find the Bug]()
@@ -107,7 +104,7 @@
   - [Version 1: Memory Leaks]()
   - [Version 2: Memory Planning]()
 
-# Part X: Modern GPU Features
+# Part VIII: Modern GPU Features
 - [Puzzle 33: Dynamic Parallelism]()
   - [📚 Learn about Nested Parallelism]()
   - [Version 1: Flat Implementation]()
