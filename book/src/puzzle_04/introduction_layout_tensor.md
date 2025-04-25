@@ -1,10 +1,10 @@
-## Introduction to LayoutTensor
+## Introduction to `LayoutTensor`
 
-TODO: link to docs when the content is ready!
+[LayoutTensor](https://docs.modular.com/mojo/stdlib/layout/layout_tensor/LayoutTensor/) provides a powerful abstraction for multi-dimensional data with precise control over memory organization. It supports various memory layouts (row-major, column-major, tiled) and efficient parallel access patterns.
 
-[LayoutTensor](https://docs.modular.com/mojo/stdlib/layout/layout_tensor/LayoutTensor/) provides a powerful abstraction for multi-dimensional data with precise control over memory organization. It supports various memory layouts (row-major, column-major, tiled), hardware-specific optimizations, and efficient parallel access patterns.
+For more details, check out the [Layouts and LayoutTensor documentation](https://docs.modular.com/mojo/manual/layout/layouts).
 
-Given a LayoutTensor instance `a`
+Given a LayoutTensor instance `a`:
 
 ```mojo
 from gpu.host import DeviceContext
@@ -29,6 +29,6 @@ def main():
     ctx.synchronize()
 ```
 
-we can get the `(i, j)` elements with the more familiar syntax `a_tensor[i, j]` which in the row-major case is the same as `a_ptr[j * WIDTH + i]`.
+we can get the `(i, j)` elements with the more familiar syntax `a_tensor[i, j]` which in the row-major case is equivalent to `a_ptr[j * WIDTH + i]` (assuming `a_ptr` is `a.unsafe_ptr()`).
 
-This abstraction makes multi-dimensional array access more intuitive and less error-prone, as it handles the complex linear memory mapping internally. Instead of manually calculating indices with formulas like `j * WIDTH + i`, we can use the natural `[i, j]` notation. We will explore more powerful features of LayoutTensor in upcoming puzzles, including different memory layouts, tiling, and optimized access patterns.
+This abstraction makes multi-dimensional array access more intuitive and less error-prone. Instead of manually calculating indices with formulas like `j * WIDTH + i`, we can use the natural `[i, j]` notation. We'll see both approaches in the upcoming puzzles to better understand the benefits of using LayoutTensor.
