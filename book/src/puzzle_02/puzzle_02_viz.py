@@ -59,7 +59,7 @@ class Puzzle02Visualization(Scene):
             fill_color=DARK_GRAY,
             fill_opacity=0.1
         )
-        block_label = Text("GPU Parallel Threads", font_size=18).next_to(block_bg, UP, buff=0.2)
+        block_label = Text("GPU Parallel Threads in a Block", font_size=18).next_to(block_bg, UP, buff=0.2)
 
         threads = VGroup()
         for i in range(4):
