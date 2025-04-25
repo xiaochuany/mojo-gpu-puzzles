@@ -1,7 +1,8 @@
 # Puzzle 6: Blocks
 
-Implement a kernel that adds \\(10\\) to each position of vector \\(a\\) and stores it in \\(out\\).
-**You have fewer threads per block than the size of \\(a\\).**
+Implement a kernel that adds 10 to each position of vector `a` and stores it in `out`.
+
+**Note:** _You have fewer threads per block than the size of a._
 
 ![Blocks visualization](./media/videos/720p30/puzzle_06_viz.gif)
 
@@ -13,11 +14,6 @@ In this puzzle, you'll learn about:
 - Computing global thread positions
 
 The key insight is understanding how blocks of threads work together to process data that's larger than a single block's capacity, while maintaining correct element-to-thread mapping.
-
-- **Thread blocks**: Groups of \\(\\text{THREADS\_PER\_BLOCK} = 4\\)  threads
-- **Block grid**: \\(\\text{BLOCKS\_PER\_GRID} = 3\\) blocks total
-- **Data size**: Processing \\(\\text{SIZE} = 9\\) elements
-- **Thread mapping**: Each thread processes one element across blocks
 
 ## Code to complete
 

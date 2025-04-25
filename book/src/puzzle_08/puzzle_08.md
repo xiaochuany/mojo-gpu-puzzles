@@ -1,7 +1,8 @@
 # Puzzle 8: Shared Memory
 
-Implement a kernel that adds \\(10\\) to each position of \\(a\\) and stores it in \\(out\\).
-You have fewer threads per block than the size of \\(a\\).
+Implement a kernel that adds 10 to each position of `a` and stores it in `out`.
+
+**Note:** _You have fewer threads per block than the size of `a`._
 
 ![Shared memory visualization](./media/videos/720p30/puzzle_08_viz.gif)
 
@@ -15,10 +16,13 @@ In this puzzle, you'll learn about:
 The key insight is understanding how shared memory provides fast, block-local storage that all threads in a block can access, requiring careful coordination between threads.
 
 Configuration:
-- Array size: \\(\\text{SIZE} = 8\\) elements
-- Threads per block: \\(\\text{TPB} = 4\\)
-- Number of blocks: \\(2\\)
-- Shared memory: \\(\\text{TPB}\\) elements per block
+
+- Array size: `SIZE = 8` elements
+- Threads per block: `TPB = 4`
+- Number of blocks: 2
+- Shared memory: `TPB` elements per block
+
+Recall:
 
 - **Shared memory**: Fast storage shared by threads in a block
 - **Thread sync**: Coordination using `barrier()`

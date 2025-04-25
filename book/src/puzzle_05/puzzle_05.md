@@ -1,6 +1,8 @@
 # Puzzle 5: Broadcast
 
-Implement a kernel that broadcast adds vector \\(a\\) and vector \\(b\\) and stores it in 2D matrix \\(out\\). You have more threads than positions.
+Implement a kernel that broadcast adds vector `a` and vector `b` and stores it in 2D matrix `out`.
+
+**Note:** _You have more threads than positions._
 
 ![Broadcast visualization](./media/videos/720p30/puzzle_05_viz.gif)
 
@@ -13,9 +15,9 @@ In this puzzle, you'll learn about:
 
 The key insight is understanding how to map elements from two 1D vectors to create a 2D output matrix through broadcasting, while handling thread bounds correctly.
 
-- **Broadcasting**: Each element of \\(a\\) combines with each element of \\(b\\)
+- **Broadcasting**: Each element of `a` combines with each element of `b`
 - **Thread mapping**: 2D thread grid \\((3 \times 3)\\) for \\(2 \times 2\\) output
-- **Vector access**: Different access patterns for \\(a\\) and \\(b\\)
+- **Vector access**: Different access patterns for `a` and `b`
 - **Bounds checking**: Guard against threads outside matrix dimensions
 
 ## Code to complete

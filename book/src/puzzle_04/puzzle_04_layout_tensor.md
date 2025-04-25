@@ -1,6 +1,8 @@
 # LayoutTensor version
 
-Implement a kernel that adds \\(10\\) to each position of 2D `LayoutTensor` \\(a\\) and stores it in 2D `LayoutTensor` \\(out\\). You have more threads than positions.
+Implement a kernel that adds 10 to each position of 2D LayoutTensor `a` and stores it in 2D LayoutTensor `out`.
+
+**Note:** _You have more threads than positions_.
 
 ## Key concepts
 

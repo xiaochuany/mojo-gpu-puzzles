@@ -1,6 +1,8 @@
 # LayoutTensor version
 
-Implement a kernel that adds \\(10\\) to each position of 2D `LayoutTensor` \\(a\\) and stores it in 2D `LayoutTensor` \\(out\\). You have fewer threads per block than the size of \\(a\\) in both directions.
+Implement a kernel that adds 10 to each position of 2D LayoutTensor `a` and stores it in 2D LayoutTensor `out`.
+
+**Note:** _You have fewer threads per block than the size of `a` in both directions._
 
 ## Key concepts
 
@@ -12,14 +14,12 @@ In this puzzle, you'll learn about:
 The key insight is that `LayoutTensor` simplifies 2D indexing while still requiring proper block coordination for large matrices.
 
 Configuration:
-- Matrix size: \\(5 \times 5\\) elements
-- Threads per block: \\(3 \times 3\\)
-- Number of blocks: \\(2 \times 2\\)
-- Total threads: \\(36\\) for \\(25\\) elements
 
+- **Matrix size**: \\(5 \times 5\\) elements
 - **Layout handling**: `LayoutTensor` manages row-major organization
 - **Block coordination**: Multiple blocks cover the full matrix
 - **2D indexing**: Natural \\((i,j)\\) access with bounds checking
+- **Total threads**: \\(36\\) for \\(25\\) elements
 - **Thread mapping**: Each thread processes one matrix element
 
 ## Code to complete

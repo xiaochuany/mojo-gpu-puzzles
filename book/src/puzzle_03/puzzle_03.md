@@ -1,6 +1,6 @@
 # Puzzle 3: Guards
 
-Implement a kernel that adds \\(10\\) to each position of vector \\(a\\) and stores it in vector \\(out\\).
+Implement a kernel that adds 10 to each position of vector a and stores it in vector out.
 
 **Note**: _You have more threads than positions. This means you need to protect against out-of-bounds memory access._
 
@@ -13,12 +13,11 @@ In this puzzle, you'll learn about:
 - Preventing out-of-bounds memory access
 - Using conditional execution in GPU kernels
 
-The key insight is that each thread \\(i\\) must check: \\[\\text{if}\\ i < \\text{size}: out[i] = a[i] + 10\\]
+The key insight is that each thread \\(i\\) must check:
+\\[\Large \\text{if}\\ i < \\text{size}: out[i] = a[i] + 10\\]
 
 - **Thread safety**: Only threads where \\(i < \\text{size}\\) should execute
-- **Guard condition**: Check `local_i < size` before accessing memory
-- **Memory bounds**: Prevent access when \\(i \geq \\text{size}\\)
-- **Thread count**: Handle \\(\\text{THREADS\_PER\_BLOCK} > \\text{size}\\)
+- **Guard condition**: Check `local_i < size` before accessing out-of-bound memory when \\(i \geq \\text{size}\\)
 
 ## Code to complete
 

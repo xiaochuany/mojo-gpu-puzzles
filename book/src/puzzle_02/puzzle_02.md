@@ -1,7 +1,8 @@
 # Puzzle 2: Zip
 
-Implement a kernel that adds together each position of vector \\(a\\) and vector \\(b\\) and stores it in \\(out\\).
-You have 1 thread per position.
+Implement a kernel that adds together each position of vector `a` and vector `b` and stores it in `out`.
+
+**Note:** _You have 1 thread per position._
 
 ![Zip](./media/videos/720p30/puzzle_02_viz.gif)
 
@@ -12,7 +13,8 @@ In this puzzle, you'll learn about:
 - Element-wise operations with multiple inputs
 - Thread-to-data mapping across arrays
 
-The key insight is that each thread \\(i\\) computes: \\[out[i] = a[i] + b[i]\\]
+The key insight is that each thread \\(i\\) computes:
+\\[\Large out[i] = a[i] + b[i]\\]
 
 - **Parallelism**: Each thread adds elements from both arrays at position \\(i\\)
 - **Thread indexing**: Access elements at position \\(i = \\text{thread\_idx.x}\\)
