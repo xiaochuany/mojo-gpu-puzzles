@@ -39,6 +39,7 @@ p07_layout_tensor = "mojo problems/p07/p07_layout_tensor.mojo"
 viz07 = "cd book/src/puzzle_07 && python puzzle_07_viz.py"
 
 p08 = "mojo problems/p08/p08.mojo"
+viz08 = "cd book/src/puzzle_08 && python puzzle_08_viz.py"
 
 p09 = "mojo problems/p09/p09.mojo"
 
