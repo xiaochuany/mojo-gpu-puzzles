@@ -23,18 +23,18 @@ class Puzzle06Visualization(Scene):
         input_array.arrange(RIGHT, buff=0)
         input_array.move_to(input_bg)
         input_group = VGroup(input_bg, input_array)
-        input_label = Text("Input Array (size=9)", font_size=16).next_to(input_group, UP, buff=0.2)
+        input_label = Text("Input Array (size=9)", font_size=18).next_to(input_group, UP, buff=0.2)
         input_group = VGroup(input_label, input_group)
 
         # GPU Grid - keep width but adjust internal spacing
         grid_bg = Rectangle(
             width=14,
             height=1.8,
-            stroke_color=BLUE_D,
+            stroke_color=GOLD_D,
             fill_color=DARK_GRAY,
             fill_opacity=0.1
         )
-        grid_label = Text("GPU (gridDim.x=3, gridDim.y=1) • (blockDim.x=4, blockDim.y=1)", font_size=16).next_to(grid_bg, UP, buff=0.2)
+        grid_label = Text("GPU (gridDim.x=3, gridDim.y=1) • (blockDim.x=4, blockDim.y=1)", font_size=18).next_to(grid_bg, UP, buff=0.2)
 
         # Create Thread Blocks with tighter spacing
         thread_blocks = VGroup()
@@ -42,9 +42,9 @@ class Puzzle06Visualization(Scene):
 
         for block_idx_x in range(3):
             block_bg = Rectangle(
-                width=4.5,  # Increased from 4.3 to fully cover threads
-                height=1.2,  # Increased from 1.1 to fully cover threads
-                stroke_color=RED_D,
+                width=4.5,
+                height=1.2,
+                stroke_color=PURPLE_D,
                 fill_color=DARK_GRAY,
                 fill_opacity=0.2
             )
@@ -58,7 +58,7 @@ class Puzzle06Visualization(Scene):
                 )
                 block_separators.add(separator)
 
-            block_label = Text(f"block_idx.x={block_idx_x}", font_size=10).next_to(block_bg, UP, buff=0.1)
+            block_label = Text(f"block_idx.x={block_idx_x}", font_size=12).next_to(block_bg, UP, buff=0.1)
 
             threads = VGroup()
             for i in range(4):
@@ -74,7 +74,7 @@ class Puzzle06Visualization(Scene):
                 thread_text = Text(
                     f"thread_idx.x={i}",
                     font_size=9,
-                    color=GREEN_A if global_idx < 9 else RED
+                    color=YELLOW if global_idx < 9 else RED
                 )
                 thread_cell.add(thread_text)
                 threads.add(thread_cell)
@@ -122,7 +122,7 @@ class Puzzle06Visualization(Scene):
         output_array.arrange(RIGHT, buff=0)
         output_array.move_to(output_bg)
         output_group = VGroup(output_bg, output_array)
-        output_label = Text("Output Array (size=9)", font_size=16).next_to(output_group, UP, buff=0.2)
+        output_label = Text("Output Array (size=9)", font_size=18).next_to(output_group, UP, buff=0.2)
         output_group = VGroup(output_label, output_group)
 
         # Animations

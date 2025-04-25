@@ -3,13 +3,13 @@ from gpu import thread_idx, block_dim, block_idx
 from gpu.host import DeviceContext, HostBuffer
 from testing import assert_equal
 
+# ANCHOR: broadcast_add
 alias SIZE = 2
 alias BLOCKS_PER_GRID = 1
 alias THREADS_PER_BLOCK = (3, 3)
 alias dtype = DType.float32
 
 
-# ANCHOR: broadcast_add
 fn broadcast_add(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],

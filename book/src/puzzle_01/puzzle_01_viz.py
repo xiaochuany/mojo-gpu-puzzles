@@ -2,111 +2,122 @@ from manim import *
 
 class Puzzle01Visualization(Scene):
     def construct(self):
-        array_scale = 0.5
-        thread_scale = 0.5
+        array_scale = 0.5  # Reduced scale
+        thread_scale = 0.4
 
+        # Input array - positioned at the top, centered
         input_array = VGroup()
-        input_values = [1, 2, 3, 4]
         input_bg = Rectangle(
-            width=array_scale * 4 + 0.6,
+            width=array_scale * 4 + 1.0,
             height=array_scale + 0.6,
             stroke_color=BLUE_D,
             fill_color=BLUE_E,
             fill_opacity=0.2
-        )
-        for i, val in enumerate(input_values):
+        ).shift(UP * 2.5)
+
+        for i in range(4):
             cell = Square(side_length=array_scale, stroke_width=1)
-            value_text = Text(f"{val}", font_size=20)
-            index_text = Text(f"a[{i}]", font_size=16, color=BLUE).next_to(cell, DOWN, buff=0.1)
-            cell.add(value_text, index_text)
+            index_text = Text(f"a[{i}]", font_size=10, color=YELLOW)
+            cell.add(index_text)
             input_array.add(cell)
         input_array.arrange(RIGHT, buff=0)
         input_array.move_to(input_bg)
         input_group = VGroup(input_bg, input_array)
-        input_label = Text("Input Array", font_size=24).next_to(input_group, UP)
+        input_label = Text("Input Array (size=4)", font_size=18).next_to(input_group, UP, buff=0.2)
         input_group = VGroup(input_label, input_group)
 
-        thread_block = VGroup()
-        for i in range(4):
-            cell = RoundedRectangle(width=1.2, height=1.4, corner_radius=0.2)
-            thread_info = VGroup(
-                Text(f"Thread {i}", font_size=18, color=WHITE),
-                Text(f"local_i = {i}", font_size=16, color=YELLOW),
-                Text("parallel", font_size=14, color=GREEN_A)
-            ).arrange(DOWN, buff=0.15)
-            cell.set_fill(DARK_GRAY, opacity=0.8)
-            cell.add(thread_info)
-            thread_block.add(cell)
-        thread_block.arrange(RIGHT, buff=0.4)
-        thread_label = Text("GPU Threads (Execute in Parallel)", font_size=24).next_to(thread_block, UP)
-        thread_group = VGroup(thread_label, thread_block)
+        # GPU Thread Block (single background rectangle)
+        block_bg = Rectangle(
+            width=9,
+            height=2,
+            stroke_color=GOLD_D,
+            fill_color=DARK_GRAY,
+            fill_opacity=0.1
+        )
+        block_label = Text("GPU Parallel Threads in a Block", font_size=18).next_to(block_bg, UP, buff=0.2)
 
+        threads = VGroup()
+        for i in range(4):
+            thread_cell = RoundedRectangle(
+                width=1.8,
+                height=1.2,
+                corner_radius=0.1,
+                stroke_color=WHITE,
+                fill_color=DARK_GRAY,
+                fill_opacity=0.8
+            )
+            thread_text = Text(f"thread_idx.x={i}", font_size=16, color=YELLOW)
+            thread_cell.add(thread_text)
+            threads.add(thread_cell)
+
+        threads.arrange(RIGHT, buff=0.3)
+        threads.move_to(block_bg)
+        threads.shift(UP * 0.1)
+
+        block_group = VGroup(block_bg, block_label, threads)
+        block_group.move_to(ORIGIN)
+        block_group.shift(UP * 0.3)
+
+        # Output array
         output_array = VGroup()
         output_bg = Rectangle(
-            width=array_scale * 4 + 0.8,
-            height=array_scale + 0.8,
+            width=array_scale * 4 + 1.5,
+            height=array_scale + 1,
             stroke_color=GREEN_D,
             fill_color=GREEN_E,
             fill_opacity=0.2
-        )
-        for i, val in enumerate(input_values):
-            cell = Square(side_length=array_scale, stroke_width=1)
-            value_text = Text("?", font_size=20, color=RED)
-            index_text = Text(f"out[{i}]", font_size=14, color=GREEN).next_to(cell, DOWN, buff=0.15)
-            cell.add(value_text, index_text)
+        ).shift(DOWN * 2.5)
+
+        for i in range(4):
+            cell = Square(side_length=array_scale * 1.2, stroke_width=1)
+            index_text = Text(f"out[{i}]", font_size=10, color=YELLOW)
+            cell.add(index_text)
             output_array.add(cell)
         output_array.arrange(RIGHT, buff=0)
         output_array.move_to(output_bg)
         output_group = VGroup(output_bg, output_array)
-        output_label = Text("Output Array", font_size=24).next_to(output_group, UP)
+        output_label = Text("Output Array (size=4)", font_size=18).next_to(output_group, UP, buff=0.2)
         output_group = VGroup(output_label, output_group)
 
-        full_group = VGroup(input_group, thread_group, output_group).arrange(DOWN, buff=0.8)
-        full_group.move_to(ORIGIN).shift(UP * 0.8)
-        full_group.scale(0.8)
-
+        # Animations
         self.play(Write(input_label))
-        self.play(
-            Create(input_bg),
-            Create(input_array),
-            run_time=1.5
-        )
+        self.play(Create(input_bg), Create(input_array), run_time=1.5)
 
-        self.play(Write(thread_label))
-        self.play(Create(thread_block), run_time=1.5)
+        self.play(Write(block_label))
+        self.play(Create(block_bg), Create(threads), run_time=1.5)
 
         self.play(Write(output_label))
-        self.play(
-            Create(output_bg),
-            Create(output_array),
-            run_time=1.5
-        )
+        self.play(Create(output_bg), Create(output_array), run_time=1.5)
 
+        # Create arrows flowing top to bottom
         arrows = VGroup()
         for i in range(4):
-            start = input_array[i].get_bottom() + DOWN * 0.2
-            end = thread_block[i].get_top() + UP * 0.2
-            arrow1 = Arrow(start, end, buff=0.1, color=BLUE)
+            # Arrow from input to thread
+            start = input_array[i].get_bottom()
+            end = threads[i].get_top()
+            arrow1 = Arrow(
+                start, end,
+                buff=0.2,
+                color=BLUE_C,
+                stroke_width=2,
+                max_tip_length_to_length_ratio=0.2
+            ).set_opacity(0.6)
 
-            start = thread_block[i].get_bottom() + DOWN * 0.2
-            end = output_array[i].get_top() + UP * 0.2
-            arrow2 = Arrow(start, end, buff=0.1, color=GREEN)
+            # Arrow from thread to output
+            start = threads[i].get_bottom()
+            end = output_array[i].get_top()
+            arrow2 = Arrow(
+                start, end,
+                buff=0.2,
+                color=GREEN_C,
+                stroke_width=2,
+                max_tip_length_to_length_ratio=0.2
+            ).set_opacity(0.6)
 
             arrows.add(arrow1, arrow2)
 
-        # Change Create to FadeIn for instant appearance
         self.play(FadeIn(arrows), run_time=0.3)
-
-        notes = VGroup(
-            Text("• Each thread processes one array element independently", font_size=18),
-            Text("• All threads execute the same operation in parallel", font_size=18),
-            Text("• Perfect for data-parallel operations like array transformations", font_size=18)
-        ).arrange(DOWN, aligned_edge=LEFT, buff=0.08)
-        notes.next_to(full_group, DOWN, buff=0.4)
-        notes.scale(0.8)
-
-        self.play(Write(notes), run_time=2)
-        self.wait(2)
+        self.wait(4)
 
 if __name__ == "__main__":
     with tempconfig({
