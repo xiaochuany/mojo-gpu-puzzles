@@ -5,9 +5,11 @@ In signal processing and image analysis, convolution is a fundamental operation 
 Implement a kernel that computes a 1D convolution between \\(a\\) and \\(b\\) and stores it in \\(out\\).
 You need to handle the general case. You only need 2 global reads and 1 global write per thread.
 
+![1D Convolution](./media/videos/720p30/puzzle_11_viz.gif)
+
 For those new to convolution, think of it as a weighted sliding window operation. At each position, we multiply the kernel values with the corresponding input values and sum the results. In mathematical notation, this is often written as:
 
-\\[ out[i] = \sum_{j=0}^{CONV-1} a[i+j] \cdot b[j] \\]
+\\[\Large out[i] = \sum_{j=0}^{\text{CONV}-1} a[i+j] \cdot b[j] \\]
 
 In pseudocode, 1D convolution is:
 ```python

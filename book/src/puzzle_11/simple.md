@@ -1,7 +1,5 @@
 ## Simple version: Single block
 
-![1D Convolution visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_50_1.svg)
-
 ## Key concepts
 
 In this puzzle, you'll learn about:

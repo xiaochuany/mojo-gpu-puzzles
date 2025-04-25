@@ -48,6 +48,7 @@ p10 = "mojo problems/p10/p10.mojo"
 viz10 = "cd book/src/puzzle_10 && python puzzle_10_viz.py"
 
 p11 = "mojo problems/p11/p11.mojo"
+viz11 = "cd book/src/puzzle_11 && python puzzle_11_viz.py"
 
 p12 = "mojo problems/p12/p12.mojo"
 
