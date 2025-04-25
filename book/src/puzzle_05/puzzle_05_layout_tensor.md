@@ -50,8 +50,8 @@ expected: HostBuffer([0.0, 1.0, 1.0, 2.0])
 
 ## Solution
 
-<details>
-<summary>Click to see the solution</summary>
+<details class="solution-details">
+<summary></summary>
 
 ```mojo
 {{#include ../../../solutions/p05/p05_layout_tensor.mojo:broadcast_add_layout_tensor_solution}}

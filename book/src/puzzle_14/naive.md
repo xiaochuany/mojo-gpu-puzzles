@@ -63,8 +63,8 @@ expected: HostBuffer([1.0, 3.0, 3.0, 13.0])
 
 ## Solution
 
-<details>
-<summary>Click to see the solution</summary>
+<details class="solution-details">
+<summary></summary>
 
 ```mojo
 {{#include ../../../solutions/p14/p14.mojo:naive_matmul_solution}}

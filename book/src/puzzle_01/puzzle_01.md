@@ -56,15 +56,14 @@ expected: HostBuffer([10.0, 11.0, 12.0, 13.0])
 
 ## Solution
 
-<details>
-<summary>Click to see the solution</summary>
+<details class="solution-details">
+<summary></summary>
 
 ```mojo
 {{#include ../../../solutions/p01/p01.mojo:add_10_solution}}
 ```
 
 <div class="solution-explanation">
-
 This solution:
 - Gets thread index with `local_i = thread_idx.x`
 - Adds 10 to input value: `out[local_i] = a[local_i] + 10.0`

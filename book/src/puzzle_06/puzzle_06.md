@@ -49,8 +49,8 @@ expected: HostBuffer([10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0])
 
 ## Solution
 
-<details>
-<summary>Click to see the solution</summary>
+<details class="solution-details">
+<summary></summary>
 
 ```mojo
 {{#include ../../../solutions/p06/p06.mojo:add_10_blocks_solution}}

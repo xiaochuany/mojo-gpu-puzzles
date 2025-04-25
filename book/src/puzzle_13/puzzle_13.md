@@ -77,8 +77,8 @@ expected: HostBuffer([15.0, 51.0, 87.0, 123.0])
 
 ## Solution
 
-<details>
-<summary>Click to see the solution</summary>
+<details class="solution-details">
+<summary></summary>
 
 ```mojo
 {{#include ../../../solutions/p13/p13.mojo:axis_sum_solution}}

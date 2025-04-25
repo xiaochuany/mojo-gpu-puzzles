@@ -53,8 +53,8 @@ Grid (3×3 blocks):        Each block (3×3 threads):
 
 ## Solution
 
-<details>
-<summary>Click to see the solution</summary>
+<details class="solution-details">
+<summary></summary>
 
 ```mojo
 {{#include ../../../solutions/p14/p14.mojo:matmul_tiled_solution}}

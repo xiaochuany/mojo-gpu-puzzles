@@ -64,8 +64,8 @@ expected: HostBuffer([140.0])
 
 ## Solution
 
-<details>
-<summary>Click to see the solution</summary>
+<details class="solution-details">
+<summary></summary>
 
 ```mojo
 {{#include ../../../solutions/p10/p10.mojo:dot_product_solution}}

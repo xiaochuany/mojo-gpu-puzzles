@@ -17,7 +17,6 @@ The key insight is that each thread \\(i\\) computes:
 \\[\Large out[i] = a[i] + b[i]\\]
 
 - **Parallelism**: Each thread adds elements from both arrays at position \\(i\\)
-- **Thread indexing**: Access elements at position \\(i = \\text{thread\_idx.x}\\)
 - **Memory access**: Read from \\(a[i]\\) and \\(b[i]\\), write to \\(out[i]\\)
 - **Data independence**: Each output depends only on corresponding inputs
 
@@ -55,8 +54,8 @@ expected: HostBuffer([0.0, 2.0, 4.0, 6.0])
 
 ## Solution
 
-<details>
-<summary>Click to see the solution</summary>
+<details class="solution-details">
+<summary></summary>
 
 ```mojo
 {{#include ../../../solutions/p02/p02.mojo:add_solution}}

@@ -2,7 +2,6 @@
 
 ![Prefix Sum visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_58_1.svg)
 
-
 Configuration:
 - Array size: \\(\\text{SIZE} = 8\\) elements
 - Threads per block: \\(\\text{TPB} = 8\\)
@@ -47,10 +46,10 @@ out: DeviceBuffer([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 expected: HostBuffer([0.0, 1.0, 3.0, 6.0, 10.0, 15.0, 21.0, 28.0])
 ```
 
-### Solution
+## Solution
 
-<details>
-<summary>Click to see the solution</summary>
+<details class="solution-details">
+<summary></summary>
 
 ```mojo
 {{#include ../../../solutions/p12/p12.mojo:prefix_sum_simple_solution}}
