@@ -1,5 +1,6 @@
 # Summary
 
+# Getting Started
 - [Introduction](./introduction.md)
 - [Mojo 🔥: The Best Way to Program GPUs]()
 - [How to Use These Learning Puzzles]()
@@ -9,7 +10,7 @@
 - [Puzzle 1: Map](./puzzle_01/puzzle_01.md)
 - [Puzzle 2: Zip](./puzzle_02/puzzle_02.md)
 - [Puzzle 3: Guards](./puzzle_03/puzzle_03.md)
-- [Puzzle 4: Map 2D](./puzzle_04/puzzle_04.md)
+- [Puzzle 4: 2D Map](./puzzle_04/puzzle_04.md)
     - [📚 Learn about LayoutTensor](./puzzle_04/introduction_layout_tensor.md)
     - [LayoutTensor Version](./puzzle_04/puzzle_04_layout_tensor.md)
 - [Puzzle 5: Broadcast](./puzzle_05/puzzle_05.md)
