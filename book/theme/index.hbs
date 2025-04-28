@@ -98,27 +98,10 @@
 
         <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
 
-        <!-- Hide / unhide sidebar before it is displayed -->
-        <script>
-            let sidebar = null;
-            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
-            sidebar_toggle.checked = window.innerWidth >= 1220;
-            window.addEventListener('resize', function() {
-                if (window.innerWidth >= 1220) {
-                    try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
-                    sidebar_toggle.checked = true;
-                    sidebar = 'visible';
-                } else {
-                    sidebar = 'hidden';
-                }
-                sidebar_toggle.checked = sidebar === 'visible';
-                html.classList.remove('sidebar-visible');
-                html.classList.add("sidebar-" + sidebar);
-            })
-        </script>
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <!-- populated by js -->
             <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <button class="collapse-sidebar" aria-label="Collapse sidebar"></button>
             <noscript>
                 <iframe class="sidebar-iframe-outer" src="{{ path_to_root }}toc.html"></iframe>
             </noscript>
@@ -127,7 +110,7 @@
             </div>
         </nav>
 
-        <!-- Toggle color mode directly with button click -->
+        <!-- Toggle color mode and talk to us buttons -->
         <script>
             document.addEventListener('click', function (event) {
                 if (!event.target.matches('.theme-toggle')) return;
@@ -138,25 +121,23 @@
                 html.classList.add(newTheme);
                 theme = newTheme
             }, false);
-        </script>
-
-        <script>
             document.addEventListener('click', function() {
                 if (!event.target.matches('.talk-to-us')) return;
+                event.preventDefault();
                 window.open('https://www.modular.com/company/talk-to-us', '_blank');
             });
         </script>
 
         <div class="page-header">
+            <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                <i class="fa fa-bars"></i>
+            </label>
             <div id="menu-bar" class="menu-bar">
                 <div class="left-buttons">
                     <div class="logo-section">
                         <a class="logo-link" href="https://modular.com"></a>
                         <div class="slash">/</div>
                         <a class="internal-link" ref="/">Puzzles</a>
-                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
-                            <i class="fa fa-bars"></i>
-                        </label>
                     </div>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
@@ -217,15 +198,6 @@
                     </div>
                 </div>
                 {{/if}}
-
-                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
-                <script>
-                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
-                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
-                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
-                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
-                    });
-                </script>
 
                 <div id="content" class="content">
                     <main>

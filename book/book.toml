@@ -9,7 +9,8 @@ title = "Mojo 🔥 GPU Puzzles"
 additional-css = ["theme/css/custom.css", "theme/css/highlight.css"]
 additional-js = [
     "theme/mojolang.js",
-    "theme/animation.js"
+    "theme/sidebar.js",
+    "theme/solution.js"
 ]
 default-theme = "light"
 preferred-dark-theme = "ayu"
