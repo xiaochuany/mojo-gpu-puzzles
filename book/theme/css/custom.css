@@ -280,7 +280,7 @@ body.sidebar-hidden #sidebar-toggle {
 
   ol.chapter {
     margin-top: 0;
-    li:first-of-type {
+    li.affix {
       display: none;
     }
   }
