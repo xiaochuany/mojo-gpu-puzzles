@@ -5,6 +5,8 @@ Prefix sum (also known as scan) is a fundamental parallel algorithm that compute
 Implement a kernel that computes a running sum / prefix-sum over \\(a\\) and stores it in \\(out\\).
 If the size of \\(a\\) is greater than the block size, only store the sum of each block.
 
+![Prefix sum](./media/videos/720p30/puzzle_12_viz.gif)
+
 ## Key concepts
 
 In this puzzle, you'll learn about:
@@ -26,8 +28,6 @@ Mathematically, for a sequence \\([x_0, x_1, ..., x_n]\\), the prefix sum produc
 \\[ [x_0, x_0+x_1, x_0+x_1+x_2, ..., \sum_{i=0}^n x_i] \\]
 
 While a sequential algorithm would need \\(O(n)\\) steps, our parallel approach will use a clever two-phase algorithm that completes in \\(O(\log n)\\) steps! Here's a visualization of this process:
-
-![Prefix Sum Algorithm](https://user-images.githubusercontent.com/35882/178757889-1c269623-93af-4a2e-a7e9-22cd55a42e38.png)
 
 This puzzle is split into two parts to help you master the concept:
 
