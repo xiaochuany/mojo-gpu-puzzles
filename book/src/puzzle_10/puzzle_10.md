@@ -1,7 +1,9 @@
 # Puzzle 10: Dot Product
 
-Implement a kernel that computes the dot-product of vector \\(a\\) and vector \\(b\\) and stores it in \\(out\\).
-You have 1 thread per position. You only need 2 global reads and 1 global write per thread.
+## Overview
+Implement a kernel that computes the dot-product of vector `a` and vector `b` and stores it in `out`.
+
+**Note:** _You have 1 thread per position. You only need 2 global reads and 1 global write per thread._
 
 ![Dot product visualization](./media/videos/720p30/puzzle_10_viz.gif)
 
@@ -14,12 +16,15 @@ In this puzzle, you'll learn about:
 
 The key insight is understanding how to efficiently combine multiple values into a single result using parallel computation and shared memory.
 
-Configuration:
-- Vector size: \\(\\text{SIZE} = 8\\) elements
-- Threads per block: \\(\\text{TPB} = 8\\)
-- Number of blocks: \\(1\\)
-- Output size: \\(1\\) element
-- Shared memory: \\(\\text{TPB}\\) elements
+## Configuration
+
+- Vector size: `SIZE = 8` elements
+- Threads per block: `TPB = 8`
+- Number of blocks: 1
+- Output size: 1 element
+- Shared memory: `TPB` elements
+
+Notes:
 
 - **Element access**: Each thread reads corresponding elements from `a` and `b`
 - **Partial results**: Computing and storing intermediate values
@@ -73,67 +78,64 @@ expected: HostBuffer([140.0])
 
 <div class="solution-explanation">
 
-The parallel reduction algorithm for dot product works as follows:
+The solution implements a parallel reduction algorithm for dot product computation using shared memory. Here's a detailed breakdown:
 
-### Initial State
-Each thread multiplies corresponding elements from vectors \\(a\\) and \\(b\\):
+### Phase 1: Element-wise Multiplication
+
+Each thread performs one multiplication:
 ```txt
-Threads:     T0   T1   T2   T3   T4   T5   T6   T7
-a:          [0    1    2    3    4    5    6    7]
-b:          [0    1    2    3    4    5    6    7]
-shared:     [0    1    4    9    16   25   36   49]
-             ↑    ↑    ↑    ↑    ↑    ↑    ↑    ↑
-            T0   T1   T2   T3   T4   T5   T6   T7
+Thread i: shared[i] = a[i] * b[i]
 ```
 
-### Parallel Reduction Steps
+### Phase 2: Parallel Reduction
+The reduction uses a tree-based approach that halves active threads in each step:
 
-#### Step 1: stride = \\(\\text{TPB} / 2 = 4\\)
-Active threads: \\(T_0, T_1, T_2, T_3\\)
 ```txt
-Before:     [0    1    4    9    16   25   36   49]
-Add:         +16  +25  +36  +49
-             |    |    |    |
-Result:     [16   26   40   58   16   25   36   49]
-             ↑    ↑    ↑    ↑
-            T0   T1   T2   T3
+Initial:  [0*0  1*1  2*2  3*3  4*4  5*5  6*6  7*7]
+        = [0    1    4    9    16   25   36   49]
+
+Step 1:   [0+16 1+25 4+36 9+49  16   25   36   49]
+        = [16   26   40   58   16   25   36   49]
+
+Step 2:   [16+40 26+58 40   58   16   25   36   49]
+        = [56   84   40   58   16   25   36   49]
+
+Step 3:   [56+84  84   40   58   16   25   36   49]
+        = [140   84   40   58   16   25   36   49]
 ```
 
-#### Step 2: stride = \\(\\text{TPB} / 4 = 2\\)
-Active threads: \\(T_0, T_1\\)
-```txt
-Before:     [16   26   40   58   16   25   36   49]
-Add:         +40  +58
-             |    |
-Result:     [56   84   40   58   16   25   36   49]
-             ↑    ↑
-            T0   T1
-```
+### Key Implementation Features:
 
-#### Step 3: stride = \\(\\text{TPB} / 8 = 1\\)
-Active thread: \\(T_0\\)
-```txt
-Before:     [56   84   40   58   16   25   36   49]
-Add:         +84
-             |
-Result:     [140  84   40   58   16   25   36   49]
-             ↑
-            T0
-```
+1. **Memory Access Pattern**:
+   - Each thread loads exactly two values from global memory (`a[i]`, `b[i]`)
+   - Uses shared memory for intermediate results
+   - Final result written once to global memory
 
-### Final Write
-Only thread \\(T_0\\) writes the final result:
-```txt
-Thread T0: out[0] = 140
-```
+2. **Thread Synchronization**:
+   - `barrier()` after initial multiplication
+   - `barrier()` after each reduction step
+   - Prevents race conditions between reduction steps
 
-Key Implementation Details:
-1. Uses `shared` memory for fast intermediate results
-2. Halves the stride in each step: \\(4 \\rightarrow 2 \\rightarrow 1\\)
-3. Calls `barrier()` between steps for synchronization
-4. Only active threads where `local_i < stride` perform additions
-5. Final result is sum of all element-wise products: \\(\sum_{i=0}^{7} a[i] \cdot b[i] = 140\\)
+3. **Reduction Logic**:
 
-This parallel reduction approach reduces the time complexity from \\(O(n)\\) to \\(O(\log n)\\) by performing additions in parallel.
+   ```mojo
+   stride = TPB // 2
+   while stride > 0:
+       if local_i < stride:
+           shared[local_i] += shared[local_i + stride]
+       barrier()
+       stride //= 2
+   ```
+   - Halves stride in each step
+   - Only active threads perform additions
+   - Maintains work efficiency
+
+4. **Performance Considerations**:
+   - \\(\log_2(n)\\) steps for \\(n\\) elements
+   - Coalesced memory access pattern
+   - Minimal thread divergence
+   - Efficient use of shared memory
+
+This implementation achieves \\(O(\log n)\\) time complexity compared to \\(O(n)\\) in sequential execution, demonstrating the power of parallel reduction algorithms.
 </div>
 </details>

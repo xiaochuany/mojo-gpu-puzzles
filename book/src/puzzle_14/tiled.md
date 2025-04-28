@@ -1,35 +1,48 @@
 # Tiled Matrix Multiplication
 
-Implement a kernel that multiplies square matrices \\(a\\) and \\(transpose(a)\\) and stores the result in \\(out\\),
-using tiled matrix multiplication with shared memory. This version handles matrices larger than a single thread block by processing tiles.
+## Overview
 
-<div class="solution-tips">
-
-Update your [shared memory code](./shared_memory.md) to compute a partial dot-product and iteratively move the part you copied into shared memory. You should be able to do the hard case in 6 global reads.
-</div>
+Implement a kernel that multiplies square matrices \\(A\\) and \\(\text{transpose}(A)\\) using tiled matrix multiplication. This approach handles large matrices by processing them in smaller chunks (tiles).
 
 ## Key concepts
 
-In this puzzle, you'll learn about:
-- Processing large matrices in smaller chunks
-- Coordinating multiple thread blocks
-- Managing shared memory efficiently
-- Handling matrix boundaries
+- Matrix tiling for large-scale computation
+- Multi-block coordination
+- Efficient shared memory usage
+- Boundary handling for tiles
 
-The key insight is understanding how to break down matrix operations into tiles that can be processed efficiently in shared memory while maintaining correct synchronization.
+## Configuration
 
-Configuration:
-- Matrix size: \(SIZE\_TILED = 8\) elements
-- Threads per block: \(TPB \times TPB = 3 \times 3\)
-- Grid dimensions: \(3 \times 3\) blocks
-- Shared memory: Two \(TPB \times TPB\) arrays per block
+- Matrix size: \\(\\text{SIZE\_TILED} = 8\\)
+- Threads per block: \\(\\text{TPB} \times \\text{TPB} = 3 \times 3\\)
+- Grid dimensions: \\(3 \times 3\\) blocks
+- Shared memory: Two \\(\\text{TPB} \times \\text{TPB}\\) arrays per block
 
-Block layout:
+## Tiling strategy
+
+### Block organization
 ```txt
-Grid (3×3 blocks):        Each block (3×3 threads):
-[B00][B01][B02]          [T00 T01 T02]
-[B10][B11][B12]          [T10 T11 T12]
-[B20][B21][B22]          [T20 T21 T22]
+Grid Layout (3×3):           Thread Layout per Block:
+[B00][B01][B02]             [T00 T01 T02]
+[B10][B11][B12]             [T10 T11 T12]
+[B20][B21][B22]             [T20 T21 T22]
+```
+
+### Tile processing steps
+
+1. Load tile from matrix A into shared memory
+2. Load corresponding tile from matrix B into shared memory
+3. Compute partial products
+4. Accumulate results
+5. Move to next tile
+6. Repeat until all tiles are processed
+
+### Memory access pattern
+```txt
+For each tile:
+  Input Tiles:                Output Computation:
+    A[i:i+TPB, k:k+TPB]   ×    Result tile
+    B[k:k+TPB, j:j+TPB]   →    C[i:i+TPB, j:j+TPB]
 ```
 
 ## Code to complete
@@ -76,59 +89,82 @@ expected: HostBuffer([140.0, 364.0, 588.0, 812.0, 1036.0, 1260.0, 1484.0, 1708.0
 
 <div class="solution-explanation">
 
-The solution implements tiled matrix multiplication by breaking down the computation into manageable chunks:
+The tiled implementation handles large matrices efficiently by processing them in blocks. Here's a comprehensive analysis:
 
-1. Thread organization:
+### Tiling Strategy
+
+```txt
+Matrix Decomposition (8×8 matrix):
+ [T00 T01 T02]  Each Tij is a 3×3 tile
+ [T10 T11 T12]  processed by one block
+ [T20 T21 T22]
+```
+
+Per-Tile Processing:
+1. Load tile from A and B
+2. Compute partial results
+3. Move to next tile
+4. Accumulate final result
+
+### Implementation Details:
+
+1. **Thread and Block Organization**:
    ```mojo
    global_row = block_idx.x * TPB + thread_idx.x
    global_col = block_idx.y * TPB + thread_idx.y
    ```
-   Each thread knows its global position in the output matrix.
 
-2. Shared memory management:
-   - Two TPB×TPB buffers (`a_shared` and `b_shared`)
-   - Clear buffers before each tile load
-   - Use barriers to ensure memory coherency
-
-3. Tile processing:
+2. **Tile Processing Loop**:
    ```mojo
    for tile in range((size + TPB - 1) // TPB):
+       # Load tile data
+       # Compute partial results
+       # Synchronize
+       # Move to next tile
    ```
-   - Load a tile from matrix A and corresponding elements from B
-   - Compute partial dot products within the tile
-   - Accumulate results in local variable
 
-4. Memory access pattern:
-   - Matrix A: `global_row * size + (tile * TPB + local_col)`
-   - Matrix B: `(tile * TPB + local_row) + global_col * size`
-   - Shared memory: `local_row * TPB + local_col`
+3. **Memory Management**:
+   ```txt
+   Phase 1: Load A tile    Phase 2: Load B tile    Phase 3: Compute
+    [a00 a01 a02]          [b00 b01 b02]           [p00 p01 p02]
+    [a10 a11 a12]    +     [b10 b11 b12]    =      [p10 p11 p12]
+    [a20 a21 a22]          [b20 b21 b22]           [p20 p21 p22]
+   ```
 
-Key optimizations:
-- Minimizes global memory accesses
-- Uses shared memory for frequently accessed data
-- Proper synchronization between load and compute phases
-- Handles matrix boundaries correctly
+### Key Optimizations:
+
+1. **Memory Access Pattern**:
+   - Coalesced global memory loads
+   - Efficient shared memory usage
+   - Minimal redundant access
+
+2. **Computation Efficiency**:
+   - Reuse of shared memory data
+   - Balanced thread workload
+   - Optimal cache utilization
+
+3. **Scalability Features**:
+   - Handles arbitrary matrix sizes
+   - Efficient for large matrices
+   - Good thread utilization
+
+### Performance Characteristics:
+
+1. **Memory Bandwidth**:
+   - Reduced global memory traffic
+   - Efficient shared memory usage
+   - Better cache hit rate
+
+2. **Computational Efficiency**:
+   - Improved data locality
+   - Better instruction throughput
+   - Reduced thread divergence
+
+3. **Synchronization**:
+   - Minimal barrier usage
+   - Efficient thread coordination
+   - Proper boundary handling
+
+This implementation achieves near-optimal performance for matrix multiplication on GPUs through efficient tiling and memory access patterns.
 </div>
 </details>
-
-## Block and tile layout
-
-```txt
-Matrix Layout (8×8 with 3×3 blocks):
-[B00][B01][B02]  Each Bij is a block
-[B10][B11][B12]  Each block processes
-[B20][B21][B22]  multiple tiles
-
-Block Thread Layout (3×3):
-[T00 T01 T02]    Each thread handles
-[T10 T11 T12]    multiple elements
-[T20 T21 T22]    across tiles
-
-Tile Processing:
-1. Load tile from A and B into shared memory
-2. Compute partial products
-3. Move to next tile
-4. Accumulate results
-```
-
-Note: This version can handle matrices of any size and provides better performance through efficient use of shared memory and tiling.

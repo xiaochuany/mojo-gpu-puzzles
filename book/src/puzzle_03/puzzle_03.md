@@ -1,5 +1,6 @@
 # Puzzle 3: Guards
 
+## Overview
 Implement a kernel that adds 10 to each position of vector a and stores it in vector out.
 
 **Note**: _You have more threads than positions. This means you need to protect against out-of-bounds memory access._

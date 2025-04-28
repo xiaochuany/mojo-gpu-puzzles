@@ -30,17 +30,9 @@ fn pooling(
 
     barrier()
 
-    # the cpu version
-    # for i in range(a.shape[0]):
-    #        out[i] = a[max(i - 2, 0) : i + 1].sum()
-
-    # which is equivalent to:
     out[0] = shared[0]
     out[1] = shared[0] + shared[1]
-    # out[2] = shared[0] + shared[1] + shared[2]
-    # out[3] = shared[1] + shared[2] + shared[3]
 
-    # can keep the first 2 and use:
     if 1 < global_i < size:
         out[global_i] = (
             shared[local_i - 2] + shared[local_i - 1] + shared[local_i]

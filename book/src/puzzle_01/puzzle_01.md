@@ -1,5 +1,7 @@
 # Puzzle 1: Map
 
+## Overview
+
 GPU programming is all about parallelism. In this puzzle, each thread will process a single element of the input array independently.
 Implement a kernel that adds 10 to each position of vector `a` and stores it in vector `out`.
 

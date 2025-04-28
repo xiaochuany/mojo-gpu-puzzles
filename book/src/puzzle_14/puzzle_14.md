@@ -1,10 +1,12 @@
 # Puzzle 14: Matrix Multiplication (MatMul)
 
-Matrix multiplication is a fundamental operation in scientific computing, machine learning, and graphics. Given two matrices \\(A\\) and \\(B\\), we want to compute their product \\(C = A \\times B\\).
+## Overview
+
+Matrix multiplication is a fundamental operation in scientific computing, machine learning, and graphics. Given two matrices \\(A\\) and \\(B\\), we want to compute their product \\(C = A \\times B.\\)
 
 For matrices \\(A_{m\\times k}\\) and \\(B_{k\\times n}\\), each element of the result \\(C_{m\\times n}\\) is computed as:
 
-\\[ C_{ij} = \sum_{l=0}^{k-1} A_{il} \\cdot B_{lj} \\]
+\\[\Large C_{ij} = \sum_{l=0}^{k-1} A_{il} \\cdot B_{lj} \\]
 
 ![Matrix Multiply visualization](./media/videos/720p30/puzzle_14_viz.gif)
 

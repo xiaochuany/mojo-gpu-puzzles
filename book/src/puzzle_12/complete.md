@@ -1,17 +1,18 @@
-## Complete Version
+# Complete Version
 
-Configuration:
-- Array size: \\(\\text{SIZE} = 15\\) elements
-- Threads per block: \\(\\text{TPB} = 8\\)
-- Number of blocks: \\(2\\)
-- Shared memory: \\(\\text{TPB}\\) elements per block
+## Configuration
+- Array size: `SIZE = 15` elements
+- Threads per block: `TPB = 8`
+- Number of blocks: 2
+- Shared memory: `TPB` elements per block
 
+Notes:
 - **Block handling**: Multiple blocks process array segments
 - **Partial blocks**: Last block may not be full
 - **Block sums**: Store running totals between blocks
 - **Global result**: Combine local and block sums
 
-### Code to complete
+## Code to complete
 
 ```mojo
 {{#include ../../../problems/p12/p12.mojo:prefix_sum_complete}}

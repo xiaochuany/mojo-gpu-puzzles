@@ -31,7 +31,7 @@ fn dot_product(
 
     barrier()
 
-    # The following causes race condition: all threds writing to the same location
+    # The following causes race condition: all threads writing to the same location
     # out[0] += shared[local_i]
 
     # Instead can do parallel reduction in shared memory as opposed to

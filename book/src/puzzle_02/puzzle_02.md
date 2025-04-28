@@ -1,5 +1,7 @@
 # Puzzle 2: Zip
 
+## Overview
+
 Implement a kernel that adds together each position of vector `a` and vector `b` and stores it in `out`.
 
 **Note:** _You have 1 thread per position._

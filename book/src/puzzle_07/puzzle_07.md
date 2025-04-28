@@ -1,5 +1,6 @@
 # Puzzle 7: 2D Blocks
 
+## Overview
 Implement a kernel that adds 10 to each position of matrix `a` and stores it in `out`.
 
 **Note:** _You have fewer threads per block than the size of `a` in both directions._
@@ -16,7 +17,7 @@ In this puzzle, you'll learn about:
 
 The key insight is understanding how to coordinate multiple blocks of threads to process a 2D matrix that's larger than a single block's dimensions.
 
-Configuration:
+## Configuration
 
 - **Matrix size**: \\(5 \times 5\\) elements
 - **2D blocks**: Each block processes a \\(3 \times 3\\) region

@@ -1,9 +1,11 @@
 # Puzzle 11: 1D Convolution
 
+## Overview
 In signal processing and image analysis, convolution is a fundamental operation that combines two sequences to produce a third sequence. This puzzle challenges you to implement a 1D convolution on the GPU, where each output element is computed by sliding a kernel over an input array.
 
-Implement a kernel that computes a 1D convolution between \\(a\\) and \\(b\\) and stores it in \\(out\\).
-You need to handle the general case. You only need 2 global reads and 1 global write per thread.
+Implement a kernel that computes a 1D convolution between vector `a` and vector `b` and stores it in `out`.
+
+**Note:** _You need to handle the general case. You only need 2 global reads and 1 global write per thread._
 
 ![1D Convolution](./media/videos/720p30/puzzle_11_viz.gif)
 

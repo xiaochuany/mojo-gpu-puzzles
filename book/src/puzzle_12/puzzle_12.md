@@ -1,9 +1,11 @@
 # Puzzle 12: Prefix Sum
 
-Prefix sum (also known as scan) is a fundamental parallel algorithm that computes running totals of a sequence. Found at the heart of many parallel applications - from sorting algorithms to scientific simulations - it transforms a sequence of numbers into their running totals. While simple to compute sequentially, making this efficient on a GPU requires clever parallel thinking!
+## Overview
+Prefix sum (also known as _scan_) is a fundamental parallel algorithm that computes running totals of a sequence. Found at the heart of many parallel applications - from sorting algorithms to scientific simulations - it transforms a sequence of numbers into their running totals. While simple to compute sequentially, making this efficient on a GPU requires clever parallel thinking!
 
-Implement a kernel that computes a running sum / prefix-sum over \\(a\\) and stores it in \\(out\\).
-If the size of \\(a\\) is greater than the block size, only store the sum of each block.
+Implement a kernel that computes a prefix-sum over vector `a` and stores it in `out`.
+
+**Note:** _If the size of `a` is greater than the block size, only store the sum of each block._
 
 ![Prefix sum](./media/videos/720p30/puzzle_12_viz.gif)
 

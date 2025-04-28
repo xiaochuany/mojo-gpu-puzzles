@@ -1,6 +1,6 @@
 # Shared Memory Matrix Multiplication
 
-Implement a kernel that multiplies square matrices \\(a\\) and \\(transpose(a)\\) and stores the result in \\(out\\), using shared memory to improve memory access efficiency. This version loads matrix blocks into shared memory before computation.
+Implement a kernel that multiplies square matrices \\(A\\) and \\(\text{transpose}(A)\\) and stores the result in \\ \text{out}\\, using shared memory to improve memory access efficiency. This version loads matrix blocks into shared memory before computation.
 
 ## Key concepts
 
@@ -12,7 +12,8 @@ In this puzzle, you'll learn about:
 
 The key insight is understanding how to use fast shared memory to reduce expensive global memory operations.
 
-Configuration:
+## Configuration
+
 - Matrix size: \\(\\text{SIZE} \\times \\text{SIZE} = 2 \\times 2\\)
 - Threads per block: \\(\\text{TPB} \\times \\text{TPB} = 3 \\times 3\\)
 - Grid dimensions: \\(1 \\times 1\\)
@@ -21,9 +22,9 @@ Configuration:
 Memory layout:
 ```txt
 Matrix A (2×2):     Matrix B (2×2):     Shared Memory (3×3 each):
-[0 1]              [0 1]                a_shared: [0 1 *]  b_shared: [0 1 *]
-[2 3]              [2 3]                          [2 3 *]            [2 3 *]
-                                                  [* * *]            [* * *]
+ [0 1]              [0 1]                a_shared: [0 1 *]  b_shared: [0 1 *]
+ [2 3]              [2 3]                          [2 3 *]            [2 3 *]
+                                                   [* * *]            [* * *]
 ```
 Where \\(*\\) represents unused shared memory cells.
 
@@ -71,30 +72,62 @@ expected: HostBuffer([1.0, 3.0, 3.0, 13.0])
 
 <div class="solution-explanation">
 
-This solution implements shared memory matrix multiplication in three phases:
+The shared memory implementation improves performance by reducing global memory access. Here's a detailed analysis:
 
-1. Memory allocation:
+### Memory Organization
+
+```txt
+Global Memory:           Shared Memory (per block):
+ Matrix A (2×2):         a_shared (3×3):
+  [0 1]                   [0 1 *]
+  [2 3]                   [2 3 *]
+                          [* * *]
+
+Matrix B (2×2):          b_shared (3×3):
+  [0 1]                   [0 1 *]
+  [2 3]                   [2 3 *]
+                          [* * *]
+```
+
+### Implementation Phases:
+
+1. **Shared Memory Setup**:
    ```mojo
    a_shared = stack_allocation[TPB * TPB * sizeof[dtype](), ...]
    b_shared = stack_allocation[TPB * TPB * sizeof[dtype](), ...]
    ```
 
-2. Data loading:
-   - Calculate global and local indices
-   - Load within bounds: `if global_i < size and global_j < size`
-   - Store in shared memory:
-     ```mojo
-     a_shared[local_i * size + local_j] = a[global_i * size + global_j]
-     b_shared[local_i * size + local_j] = b[global_i * size + global_j]
-     ```
-   - Synchronize: `barrier()`
+2. **Data Loading**:
+   ```mojo
+   if global_i < size and global_j < size:
+       a_shared[local_i * size + local_j] = a[global_i * size + global_j]
+       b_shared[local_i * size + local_j] = b[global_i * size + global_j]
+   barrier()
+   ```
 
-3. Computation:
-   - For each \\(k\\) in range \\(\\text{SIZE}\\):
-     ```mojo
-     out[...] += a_shared[local_i * size + k] * b_shared[k + local_j * size]
-     ```
+3. **Computation**:
+   ```mojo
+   for k in range(size):
+       out[...] += a_shared[local_i * size + k] * b_shared[k + local_j * size]
+   ```
 
-The solution ensures proper synchronization and bounds checking while utilizing fast shared memory access.
+### Performance Improvements:
+
+1. **Memory Access Efficiency**:
+   - Reduced global memory accesses
+   - Fast shared memory for repeated access
+   - Better data locality
+
+2. **Thread Cooperation**:
+   - Threads cooperate to load data
+   - Shared data reuse within block
+   - Synchronized access with barriers
+
+3. **Limitations**:
+   - Still limited by block size
+   - Not optimal for large matrices
+   - Room for further tiling optimization
+
+This implementation significantly reduces memory bandwidth requirements compared to the naive version.
 </div>
 </details>

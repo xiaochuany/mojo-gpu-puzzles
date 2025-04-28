@@ -1,17 +1,18 @@
-## Simple Version
+# Simple Version
 
-Configuration:
-- Array size: \\(\\text{SIZE} = 8\\) elements
-- Threads per block: \\(\\text{TPB} = 8\\)
-- Number of blocks: \\(1\\)
-- Shared memory: \\(\\text{TPB}\\) elements
+## Configuration
+- Array size: `SIZE = 8` elements
+- Threads per block: `TPB = 8`
+- Number of blocks: 1
+- Shared memory: `TPB` elements
 
+Notes:
 - **Data loading**: Each thread loads one element
 - **Memory pattern**: Shared memory for intermediate results
 - **Thread sync**: Coordination between computation phases
 - **Access pattern**: Stride-based parallel computation
 
-### Code to complete
+## Code to complete
 
 ```mojo
 {{#include ../../../problems/p12/p12.mojo:prefix_sum_simple}}

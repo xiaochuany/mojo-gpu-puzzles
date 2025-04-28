@@ -13,6 +13,7 @@ alias BLOCKS_PER_GRID = (1, BATCH)
 alias THREADS_PER_BLOCK = (TPB, 1)
 alias dtype = DType.float32
 
+
 fn axis_sum(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
