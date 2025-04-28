@@ -1,6 +1,4 @@
-## Complete version: Block boundary case
-
-![1D Convolution visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_53_1.svg)
+## Complete version: Block Boundary Case
 
 Configuration:
 - Input array size: \\(\\text{SIZE} = 15\\) elements

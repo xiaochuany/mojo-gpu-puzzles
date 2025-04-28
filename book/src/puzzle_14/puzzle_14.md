@@ -1,4 +1,4 @@
-# Puzzle 14: Matrix multiplication
+# Puzzle 14: Matrix Multiplication (MatMul)
 
 Matrix multiplication is a fundamental operation in scientific computing, machine learning, and graphics. Given two matrices \\(A\\) and \\(B\\), we want to compute their product \\(C = A \\times B\\).
 

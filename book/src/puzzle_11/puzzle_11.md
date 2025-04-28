@@ -1,4 +1,4 @@
-# Puzzle 11: 1D convolution
+# Puzzle 11: 1D Convolution
 
 In signal processing and image analysis, convolution is a fundamental operation that combines two sequences to produce a third sequence. This puzzle challenges you to implement a 1D convolution on the GPU, where each output element is computed by sliding a kernel over an input array.
 

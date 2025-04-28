@@ -1,4 +1,4 @@
-# Puzzle 10: Dot product
+# Puzzle 10: Dot Product
 
 Implement a kernel that computes the dot-product of vector \\(a\\) and vector \\(b\\) and stores it in \\(out\\).
 You have 1 thread per position. You only need 2 global reads and 1 global write per thread.

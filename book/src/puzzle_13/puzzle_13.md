@@ -1,4 +1,4 @@
-# Puzzle 13: Axis sum
+# Puzzle 13: Axis Sum
 
 Implement a kernel that computes a sum over each row of \\(a\\) and stores it in \\(out\\).
 

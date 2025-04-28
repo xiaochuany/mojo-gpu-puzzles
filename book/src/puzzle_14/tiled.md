@@ -1,4 +1,4 @@
-# Tiled matrix multiplication
+# Tiled Matrix Multiplication
 
 Implement a kernel that multiplies square matrices \\(a\\) and \\(transpose(a)\\) and stores the result in \\(out\\),
 using tiled matrix multiplication with shared memory. This version handles matrices larger than a single thread block by processing tiles.

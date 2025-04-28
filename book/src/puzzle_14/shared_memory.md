@@ -1,4 +1,4 @@
-# Shared memory matrix multiplication
+# Shared Memory Matrix Multiplication
 
 Implement a kernel that multiplies square matrices \\(a\\) and \\(transpose(a)\\) and stores the result in \\(out\\), using shared memory to improve memory access efficiency. This version loads matrix blocks into shared memory before computation.
 

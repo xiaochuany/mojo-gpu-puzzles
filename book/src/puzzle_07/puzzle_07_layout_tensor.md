@@ -1,4 +1,4 @@
-# LayoutTensor version
+# LayoutTensor Version
 
 Implement a kernel that adds 10 to each position of 2D LayoutTensor `a` and stores it in 2D LayoutTensor `out`.
 

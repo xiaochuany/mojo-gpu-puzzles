@@ -1,4 +1,4 @@
-## Complete case
+## Complete Version
 
 Configuration:
 - Array size: \\(\\text{SIZE} = 15\\) elements

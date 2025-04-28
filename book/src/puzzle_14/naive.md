@@ -1,4 +1,4 @@
-# Naive matrix multiplication
+# Naive matrix Multiplication
 
 Implement a kernel that multiplies square matrices \\(a\\) and \\(transpose(a)\\) and stores the result in \\(out\\).
 This is the most straightforward implementation where each thread computes one element of the output matrix.

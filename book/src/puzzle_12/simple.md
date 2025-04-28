@@ -1,4 +1,4 @@
-## Simple case
+## Simple Version
 
 Configuration:
 - Array size: \\(\\text{SIZE} = 8\\) elements

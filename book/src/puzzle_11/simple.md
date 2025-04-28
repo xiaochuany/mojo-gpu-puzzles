@@ -1,4 +1,4 @@
-## Simple version: Single block
+## Simple version: Single Block
 
 ## Key concepts
 

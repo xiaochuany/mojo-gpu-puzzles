@@ -1,4 +1,4 @@
-# LayoutTensor version
+# LayoutTensor Version
 
 Implement a kernel that broadcast adds vector \\(a\\) and vector \\(b\\) and stores it in `LayoutTensor` \\(out\\). You have more threads than positions.
 

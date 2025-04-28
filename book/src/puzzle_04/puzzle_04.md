@@ -1,4 +1,4 @@
-# Puzzle 4: Map 2D
+# Puzzle 4: 2D Map
 
 Implement a kernel that adds 10 to each position of 2D square matrix `a` and stores it in 2D square matrix `out`.
 
