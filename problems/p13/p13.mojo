@@ -5,6 +5,7 @@ from gpu.memory import AddressSpace
 from sys import sizeof
 from testing import assert_equal
 
+# ANCHOR: axis_sum
 alias TPB = 8
 alias BATCH = 4
 alias SIZE = 6
@@ -12,8 +13,6 @@ alias BLOCKS_PER_GRID = (1, BATCH)
 alias THREADS_PER_BLOCK = (TPB, 1)
 alias dtype = DType.float32
 
-
-# ANCHOR: axis_sum
 fn axis_sum(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],

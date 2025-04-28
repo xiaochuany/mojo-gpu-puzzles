@@ -2,21 +2,7 @@
 
 Implement a kernel that computes a sum over each row of \\(a\\) and stores it in \\(out\\).
 
-In pseudocode:
-```python
-# For a matrix of size (BATCH × SIZE)
-for batch in range(BATCH):  # each row
-    sum = 0
-    for i in range(SIZE):   # elements in row
-        sum += a[batch * SIZE + i]  # row-major order
-    out[batch] = sum
-```
-
-## Visual Representation
-
-TODO: this image is wrong and is transposed
-
-![Axis Sum visualization](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_64_1.svg)
+![Axis Sum visualization](./media/videos/720p30/puzzle_13_viz.gif)
 
 ## Key concepts
 
