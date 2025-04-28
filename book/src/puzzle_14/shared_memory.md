@@ -2,8 +2,6 @@
 
 Implement a kernel that multiplies square matrices \\(a\\) and \\(transpose(a)\\) and stores the result in \\(out\\), using shared memory to improve memory access efficiency. This version loads matrix blocks into shared memory before computation.
 
-![Matrix Multiply with Shared Memory](https://raw.githubusercontent.com/srush/GPU-Puzzles/main/GPU_puzzlers_files/GPU_puzzlers_67_1.svg)
-
 ## Key concepts
 
 In this puzzle, you'll learn about:

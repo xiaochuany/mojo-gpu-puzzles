@@ -6,6 +6,8 @@ For matrices \\(A_{m\\times k}\\) and \\(B_{k\\times n}\\), each element of the 
 
 \\[ C_{ij} = \sum_{l=0}^{k-1} A_{il} \\cdot B_{lj} \\]
 
+![Matrix Multiply visualization](./media/videos/720p30/puzzle_14_viz.gif)
+
 This puzzle explores different approaches to implementing matrix multiplication on GPUs, each with its own performance characteristics:
 
 - [Naive Version](./naive.md)
