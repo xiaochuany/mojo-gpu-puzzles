@@ -10,19 +10,20 @@ Implement a kernel that adds 10 to each position of vector `a` and stores it in 
 ![Map](./media/videos/720p30/puzzle_01_viz.gif)
 
 ## Key concepts
-
-In this puzzle, you'll learn about:
 - Basic GPU kernel structure
-- Thread indexing with `thread_idx.x`
-- Simple parallel operations
+- One-to-one thread to data mapping
+- Memory access patterns
+- Array operations on GPU
 
-The key insight is that each thread \\(i\\) computes:
+For each position \\(i\\):
 \\[\Large out[i] = a[i] + 10\\]
 
-- **Parallelism**: Each thread executes independently
-- **Thread indexing**: Access element at position \\(i = \\text{thread\_idx.x}\\)
-- **Memory access**: Read from \\(a[i]\\) and write to \\(out[i]\\)
-- **Data independence**: Each output depends only on its corresponding input
+## What we cover
 
-- [Tranditional way](./traditional.md)
-- [LayoutTensor Preview](./layout_tensor_preview.md)
+### [🔰 Raw Memory Approach](./raw.md)
+Start with direct memory manipulation to understand GPU fundamentals.
+
+### [💡 Preview: Modern Approach with LayoutTensor](./layout_tensor_preview.md)
+See how LayoutTensor simplifies GPU programming with safer, cleaner code.
+
+💡 **Tip**: Understanding both approaches helps you better appreciate modern GPU programming patterns.

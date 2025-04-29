@@ -2,7 +2,7 @@
 
 Looking at our traditional implementation above, you might notice some potential issues:
 
-### Current Approach
+### Current approach
 ```mojo
 local_i = thread_idx.x
 out[local_i] = a[local_i] + 10.0
@@ -13,7 +13,7 @@ This works for 1D arrays, but what happens when we need to:
 - Deal with different memory layouts?
 - Ensure coalesced memory access?
 
-### Preview of Future Challenges
+### Preview of future challenges
 
 As we progress through the puzzles, array indexing will become more complex:
 ```mojo
@@ -27,7 +27,7 @@ idx = (batch * HEIGHT + row) * WIDTH + col
 idx = (batch * padded_height + row) * padded_width + col
 ```
 
-### LayoutTensor Preview
+### LayoutTensor preview
 
 [LayoutTensor](https://docs.modular.com/mojo/stdlib/layout/layout_tensor/LayoutTensor/) will help us handle these cases more elegantly:
 

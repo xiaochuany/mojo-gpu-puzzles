@@ -1,3 +1,15 @@
+## Key concepts
+
+In this puzzle, you'll learn about:
+- Basic GPU kernel structure
+- Thread indexing with `thread_idx.x`
+- Simple parallel operations
+
+- **Parallelism**: Each thread executes independently
+- **Thread indexing**: Access element at position `i = thread_idx.x`
+- **Memory access**: Read from `a[i]` and write to `out[i]`
+- **Data independence**: Each output depends only on its corresponding input
+
 ## Code to complete
 
 ```mojo
