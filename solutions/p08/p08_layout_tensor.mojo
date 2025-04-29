@@ -14,7 +14,9 @@ alias layout = Layout.row_major(SIZE)
 
 
 # ANCHOR: add_10_shared_layout_tensor_solution
-fn add_10_shared_layout_tensor[layout: Layout](
+fn add_10_shared_layout_tensor[
+    layout: Layout
+](
     out: LayoutTensor[mut=True, dtype, layout],
     a: LayoutTensor[mut=True, dtype, layout],
     size: Int,
@@ -32,6 +34,7 @@ fn add_10_shared_layout_tensor[layout: Layout](
 
     if global_i < size:
         out[global_i] = shared[local_i] + 10
+
 
 # ANCHOR_END: add_10_shared_layout_tensor_solution
 

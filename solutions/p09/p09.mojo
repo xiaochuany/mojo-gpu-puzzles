@@ -30,8 +30,10 @@ fn pooling(
 
     barrier()
 
-    out[0] = shared[0]
-    out[1] = shared[0] + shared[1]
+    if global_i == 0:
+        out[0] = shared[0]
+    elif global_i == 1:
+        out[1] = shared[0] + shared[1]
 
     if 1 < global_i < size:
         out[global_i] = (

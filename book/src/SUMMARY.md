@@ -29,6 +29,8 @@
 
 # Part II: GPU Algorithms
 - [Puzzle 9: Pooling](./puzzle_09/puzzle_09.md)
+  - [🔰 Raw Memory Approach](./puzzle_09/raw.md)
+  - [📐 LayoutTensor Version](./puzzle_09/layout_tensor.md)
 - [Puzzle 10: Dot Product](./puzzle_10/puzzle_10.md)
 - [Puzzle 11: 1D Convolution](./puzzle_11/puzzle_11.md)
   - [🔰 Simple Version](./puzzle_11/simple.md)

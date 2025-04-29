@@ -18,7 +18,7 @@ Implement a kernel that adds 10 to each position of matrix `a` and stores it in 
 ### [🔰 Raw memory approach](./raw.md)
 Learn how to handle multi-block operations with manual indexing.
 
-### [🚀 Modern block operations](./layout_tensor.md)
+### [📐 LayoutTensor Version](./layout_tensor.md)
 Use LayoutTensor features to elegantly handle block-based processing.
 
 💡 **Note**: See how LayoutTensor simplifies block coordination and memory access patterns.
