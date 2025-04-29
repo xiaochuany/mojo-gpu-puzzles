@@ -14,13 +14,20 @@ In this puzzle, you'll learn about:
 - Processing multiple input arrays in parallel
 - Element-wise operations with multiple inputs
 - Thread-to-data mapping across arrays
+- Memory access patterns with multiple arrays
 
-The key insight is that each thread \\(i\\) computes:
-\\[\Large out[i] = a[i] + b[i]\\]
+For each thread \\(i\\): \\[\Large out[i] = a[i] + b[i]\\]
 
-- **Parallelism**: Each thread adds elements from both arrays at position \\(i\\)
-- **Memory access**: Read from \\(a[i]\\) and \\(b[i]\\), write to \\(out[i]\\)
-- **Data independence**: Each output depends only on corresponding inputs
+### Memory access pattern
+
+```txt
+Thread 0:  a[0] + b[0] → out[0]
+Thread 1:  a[1] + b[1] → out[1]
+Thread 2:  a[2] + b[2] → out[2]
+...
+```
+
+💡 **Note**: Notice how we're now managing three arrays (`a`, `b`, `out`) in our kernel. As we progress to more complex operations, managing multiple array accesses will become increasingly challenging.
 
 ## Code to complete
 
@@ -70,3 +77,12 @@ This solution:
 - Adds values from both arrays: `out[local_i] = a[local_i] + b[local_i]`
 </div>
 </details>
+
+### Looking ahead
+
+While this direct indexing works for simple element-wise operations, consider:
+- What if arrays have different layouts?
+- What if we need to broadcast one array to another?
+- How to ensure coalesced access across multiple arrays?
+
+These questions will be addressed when we [introduce LayoutTensor in Puzzle 4](../puzzle_04/).

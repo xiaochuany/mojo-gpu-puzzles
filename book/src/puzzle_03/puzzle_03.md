@@ -1,7 +1,7 @@
 # Puzzle 3: Guards
 
 ## Overview
-Implement a kernel that adds 10 to each position of vector a and stores it in vector out.
+Implement a kernel that adds 10 to each position of vector `a` and stores it in vector `out`.
 
 **Note**: _You have more threads than positions. This means you need to protect against out-of-bounds memory access._
 
@@ -13,12 +13,26 @@ In this puzzle, you'll learn about:
 - Handling thread/data size mismatches
 - Preventing out-of-bounds memory access
 - Using conditional execution in GPU kernels
+- Safe memory access patterns
 
-The key insight is that each thread \\(i\\) must check:
-\\[\Large \\text{if}\\ i < \\text{size}: out[i] = a[i] + 10\\]
+### Mathematical Description
+For each thread \\(i\\):
+\\[\Large \text{if}\\ i < \text{size}: out[i] = a[i] + 10\\]
 
-- **Thread safety**: Only threads where \\(i < \\text{size}\\) should execute
-- **Guard condition**: Check `local_i < size` before accessing out-of-bound memory when \\(i \geq \\text{size}\\)
+### Memory Safety Pattern
+```txt
+Thread 0 (i=0):  if 0 < size:  out[0] = a[0] + 10  ✓ Valid
+Thread 1 (i=1):  if 1 < size:  out[1] = a[1] + 10  ✓ Valid
+Thread 2 (i=2):  if 2 < size:  out[2] = a[2] + 10  ✓ Valid
+Thread 3 (i=3):  if 3 < size:  out[3] = a[3] + 10  ✓ Valid
+Thread 4 (i=4):  if 4 < size:  ❌ Skip (out of bounds)
+Thread 5 (i=5):  if 5 < size:  ❌ Skip (out of bounds)
+```
+
+💡 **Note**: Boundary checking becomes increasingly complex with:
+- Multi-dimensional arrays
+- Different array shapes
+- Complex access patterns
 
 ## Code to complete
 
@@ -69,3 +83,25 @@ This solution:
 - Inside guard: adds 10 to input value
 </div>
 </details>
+
+### Looking ahead
+
+While simple boundary checks work here, consider these challenges:
+- What about 2D/3D array boundaries?
+- How to handle different shapes efficiently?
+- What if we need padding or edge handling?
+
+Example of growing complexity:
+```mojo
+# Current: 1D bounds check
+if i < size: ...
+
+# Coming soon: 2D bounds check
+if i < height and j < width: ...
+
+# Later: 3D with padding
+if i < height and j < width and k < depth and
+   i >= padding and j >= padding: ...
+```
+
+These boundary handling patterns will become more elegant when we [learn about LayoutTensor in Puzzle 4](../puzzle_04/), which provides built-in boundary checking and shape management.

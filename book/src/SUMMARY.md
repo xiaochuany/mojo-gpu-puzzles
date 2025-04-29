@@ -8,6 +8,8 @@
 
 # Part I: GPU Fundamentals
 - [Puzzle 1: Map](./puzzle_01/puzzle_01.md)
+  - [🔰 Traditional Approach](./puzzle_01/traditional.md)
+  - [💡 Preview: Why LayoutTensor?](./puzzle_01/layout_tensor_preview.md)
 - [Puzzle 2: Zip](./puzzle_02/puzzle_02.md)
 - [Puzzle 3: Guards](./puzzle_03/puzzle_03.md)
 - [Puzzle 4: 2D Map](./puzzle_04/puzzle_04.md)

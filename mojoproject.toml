@@ -26,6 +26,7 @@ viz03 = "cd book/src/puzzle_03 && python puzzle_03_viz.py"
 p04 = "mojo problems/p04/p04.mojo"
 p04_layout_tensor = "mojo problems/p04/p04_layout_tensor.mojo"
 viz04 = "cd book/src/puzzle_04 && python puzzle_04_viz.py"
+layout_tensor_intro = "mojo book/src/puzzle_04/intro.mojo"
 
 p05 = "mojo problems/p05/p05.mojo"
 p05_layout_tensor = "mojo problems/p05/p05_layout_tensor.mojo"
