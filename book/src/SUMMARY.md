@@ -32,6 +32,8 @@
   - [🔰 Raw Memory Approach](./puzzle_09/raw.md)
   - [📐 LayoutTensor Version](./puzzle_09/layout_tensor.md)
 - [Puzzle 10: Dot Product](./puzzle_10/puzzle_10.md)
+  - [🔰 Raw Memory Approach](./puzzle_10/raw.md)
+  - [📐 LayoutTensor Version](./puzzle_10/layout_tensor.md)
 - [Puzzle 11: 1D Convolution](./puzzle_11/puzzle_11.md)
   - [🔰 Simple Version](./puzzle_11/simple.md)
   - [⭐ Complete Version](./puzzle_11/complete.md)

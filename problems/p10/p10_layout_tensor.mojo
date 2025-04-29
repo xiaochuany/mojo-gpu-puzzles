@@ -1,29 +1,34 @@
-from memory import UnsafePointer, stack_allocation
-from gpu import thread_idx, block_idx, block_dim, barrier
-from gpu.host import DeviceContext
-from gpu.memory import AddressSpace
-from sys import sizeof
 from testing import assert_equal
+from gpu.host import DeviceContext
 
-# ANCHOR: dot_product
+# ANCHOR: dot_product_layout_tensor
+from gpu import thread_idx, block_idx, block_dim, barrier
+from layout import Layout, LayoutTensor
+from layout.tensor_builder import LayoutTensorBuild as tb
+
+
 alias TPB = 8
 alias SIZE = 8
 alias BLOCKS_PER_GRID = (1, 1)
 alias THREADS_PER_BLOCK = (SIZE, 1)
 alias dtype = DType.float32
+alias layout = Layout.row_major(SIZE)
+alias out_layout = Layout.row_major(1)
 
 
-fn dot_product(
-    out: UnsafePointer[Scalar[dtype]],
-    a: UnsafePointer[Scalar[dtype]],
-    b: UnsafePointer[Scalar[dtype]],
+fn dot_product[
+    in_layout: Layout, out_layout: Layout
+](
+    out: LayoutTensor[mut=True, dtype, out_layout],
+    a: LayoutTensor[mut=True, dtype, in_layout],
+    b: LayoutTensor[mut=True, dtype, in_layout],
     size: Int,
 ):
     # FILL ME IN (roughly 13 lines)
     ...
 
 
-# ANCHOR_END: dot_product
+# ANCHOR_END: dot_product_layout_tensor
 
 
 def main():
@@ -31,22 +36,26 @@ def main():
         out = ctx.enqueue_create_buffer[dtype](1).enqueue_fill(0)
         a = ctx.enqueue_create_buffer[dtype](SIZE).enqueue_fill(0)
         b = ctx.enqueue_create_buffer[dtype](SIZE).enqueue_fill(0)
+
         with a.map_to_host() as a_host, b.map_to_host() as b_host:
             for i in range(SIZE):
                 a_host[i] = i
                 b_host[i] = i
 
-        ctx.enqueue_function[dot_product](
-            out.unsafe_ptr(),
-            a.unsafe_ptr(),
-            b.unsafe_ptr(),
+        out_tensor = LayoutTensor[dtype, out_layout](out.unsafe_ptr())
+        a_tensor = LayoutTensor[dtype, layout](a.unsafe_ptr())
+        b_tensor = LayoutTensor[dtype, layout](b.unsafe_ptr())
+
+        ctx.enqueue_function[dot_product[layout, out_layout]](
+            out_tensor,
+            a_tensor,
+            b_tensor,
             SIZE,
             grid_dim=BLOCKS_PER_GRID,
             block_dim=THREADS_PER_BLOCK,
         )
 
         expected = ctx.enqueue_create_host_buffer[dtype](1).enqueue_fill(0)
-
         ctx.synchronize()
 
         with a.map_to_host() as a_host, b.map_to_host() as b_host:
