@@ -1,33 +1,34 @@
-from memory import UnsafePointer, stack_allocation
-from gpu import thread_idx, block_idx, block_dim, barrier
-from gpu.host import DeviceContext
-from gpu.memory import AddressSpace
 from sys import sizeof
 from testing import assert_equal
+from gpu.host import DeviceContext
 
 # ANCHOR: axis_sum
+from gpu import thread_idx, block_idx, block_dim, barrier
+from layout import Layout, LayoutTensor
+from layout.tensor_builder import LayoutTensorBuild as tb
+
+
 alias TPB = 8
 alias BATCH = 4
 alias SIZE = 6
 alias BLOCKS_PER_GRID = (1, BATCH)
 alias THREADS_PER_BLOCK = (TPB, 1)
 alias dtype = DType.float32
+alias in_layout = Layout.row_major(BATCH, SIZE)
+alias out_layout = Layout.row_major(BATCH, 1)
 
 
-fn axis_sum(
-    out: UnsafePointer[Scalar[dtype]],
-    a: UnsafePointer[Scalar[dtype]],
+fn axis_sum[
+    in_layout: Layout, out_layout: Layout
+](
+    out: LayoutTensor[mut=False, dtype, out_layout],
+    a: LayoutTensor[mut=False, dtype, in_layout],
     size: Int,
 ):
-    cache = stack_allocation[
-        TPB * sizeof[dtype](),
-        Scalar[dtype],
-        address_space = AddressSpace.SHARED,
-    ]()
     global_i = block_dim.x * block_idx.x + thread_idx.x
     local_i = thread_idx.x
     batch = block_idx.y
-    # FILL ME IN (roughly 12 lines)
+    # FILL ME IN (roughly 15 lines)
 
 
 # ANCHOR_END: axis_sum
@@ -38,12 +39,18 @@ def main():
         out = ctx.enqueue_create_buffer[dtype](BATCH).enqueue_fill(0)
         inp = ctx.enqueue_create_buffer[dtype](BATCH * SIZE).enqueue_fill(0)
         with inp.map_to_host() as inp_host:
-            for i in range(BATCH * SIZE):
-                inp_host[i] = i
+            for row in range(BATCH):
+                for col in range(SIZE):
+                    inp_host[row * SIZE + col] = row * SIZE + col
 
-        ctx.enqueue_function[axis_sum](
-            out.unsafe_ptr(),
-            inp.unsafe_ptr(),
+        out_tensor = LayoutTensor[mut=False, dtype, out_layout](
+            out.unsafe_ptr()
+        )
+        inp_tensor = LayoutTensor[mut=False, dtype, in_layout](inp.unsafe_ptr())
+
+        ctx.enqueue_function[axis_sum[in_layout, out_layout]](
+            out_tensor,
+            inp_tensor,
             SIZE,
             grid_dim=BLOCKS_PER_GRID,
             block_dim=THREADS_PER_BLOCK,

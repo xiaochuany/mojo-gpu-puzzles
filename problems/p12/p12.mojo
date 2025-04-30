@@ -17,7 +17,9 @@ alias dtype = DType.float32
 alias layout = Layout.row_major(SIZE)
 
 
-fn prefix_sum_simple[layout: Layout](
+fn prefix_sum_simple[
+    layout: Layout
+](
     out: LayoutTensor[mut=False, dtype, layout],
     a: LayoutTensor[mut=False, dtype, layout],
     size: Int,
@@ -25,6 +27,7 @@ fn prefix_sum_simple[layout: Layout](
     global_i = block_dim.x * block_idx.x + thread_idx.x
     local_i = thread_idx.x
     # FILL ME IN (roughly 12 lines)
+
 
 # ANCHOR_END: prefix_sum_simple
 
@@ -35,7 +38,9 @@ alias BLOCKS_PER_GRID_2 = (2, 1)
 alias THREADS_PER_BLOCK_2 = (TPB, 1)
 
 
-fn prefix_sum[layout: Layout](
+fn prefix_sum[
+    layout: Layout
+](
     out: LayoutTensor[mut=False, dtype, layout],
     a: LayoutTensor[mut=False, dtype, layout],
     size: Int,
@@ -43,6 +48,7 @@ fn prefix_sum[layout: Layout](
     global_i = block_dim.x * block_idx.x + thread_idx.x
     local_i = thread_idx.x
     # FILL ME IN (roughly 19 lines)
+
 
 # ANCHOR_END: prefix_sum_complete
 

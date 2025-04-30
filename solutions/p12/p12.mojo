@@ -15,7 +15,9 @@ alias layout = Layout.row_major(SIZE)
 
 
 # ANCHOR: prefix_sum_simple_solution
-fn prefix_sum_simple[layout: Layout](
+fn prefix_sum_simple[
+    layout: Layout
+](
     out: LayoutTensor[mut=False, dtype, layout],
     a: LayoutTensor[mut=False, dtype, layout],
     size: Int,
@@ -49,7 +51,9 @@ alias THREADS_PER_BLOCK_2 = (TPB, 1)
 
 
 # ANCHOR: prefix_sum_complete_solution
-fn prefix_sum[layout: Layout](
+fn prefix_sum[
+    layout: Layout
+](
     out: LayoutTensor[mut=False, dtype, layout],
     a: LayoutTensor[mut=False, dtype, layout],
     size: Int,

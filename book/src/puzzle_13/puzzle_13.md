@@ -1,26 +1,29 @@
 # Puzzle 13: Axis Sum
 
 ## Overview
-Implement a kernel that computes a sum over each row of 2D matrix `a` and stores it in `out`.
+Implement a kernel that computes a sum over each row of 2D matrix `a` and stores it in `out` using LayoutTensor.
 
 ![Axis Sum visualization](./media/videos/720p30/puzzle_13_viz.gif)
 
 ## Key concepts
 
 In this puzzle, you'll learn about:
-- Parallel reduction along matrix dimensions
+- Parallel reduction along matrix dimensions using LayoutTensor
 - Using block coordinates for data partitioning
 - Efficient shared memory reduction patterns
+- Working with multi-dimensional tensor layouts
 
-The key insight is understanding how to map thread blocks to matrix rows and perform efficient parallel reduction within each block.
+The key insight is understanding how to map thread blocks to matrix rows and perform efficient parallel reduction within each block while leveraging LayoutTensor's dimensional indexing.
 
 ## Configuration
 - Matrix dimensions: \\(\\text{BATCH} \\times \\text{SIZE} = 4 \\times 6\\)
 - Threads per block: \\(\\text{TPB} = 8\\)
 - Grid dimensions: \\(1 \\times \\text{BATCH}\\)
 - Shared memory: \\(\\text{TPB}\\) elements per block
+- Input layout: `Layout.row_major(BATCH, SIZE)`
+- Output layout: `Layout.row_major(BATCH, 1)`
 
-Matrix layout in row-major order:
+Matrix visualization:
 
 ```txt
 Row 0: [0, 1, 2, 3, 4, 5]       → Block(0,0)
@@ -73,25 +76,25 @@ expected: HostBuffer([15.0, 51.0, 87.0, 123.0])
 
 <div class="solution-explanation">
 
-The solution implements a parallel row-wise sum reduction for a 2D matrix. Here's a comprehensive breakdown:
+The solution implements a parallel row-wise sum reduction for a 2D matrix using LayoutTensor. Here's a comprehensive breakdown:
 
 ### Matrix Layout and Block Mapping
 ```txt
-Matrix (4×6):                     Block Assignment:
-[0  1  2  3  4  5 ] → sum=15     Block(0,0) → Row 0
-[6  7  8  9  10 11] → sum=51     Block(0,1) → Row 1
-[12 13 14 15 16 17] → sum=87     Block(0,2) → Row 2
-[18 19 20 21 22 23] → sum=123    Block(0,3) → Row 3
+Input Matrix (4×6) with LayoutTensor:                Block Assignment:
+[[ a[0,0]  a[0,1]  a[0,2]  a[0,3]  a[0,4]  a[0,5] ] → Block(0,0)
+ [ a[1,0]  a[1,1]  a[1,2]  a[1,3]  a[1,4]  a[1,5] ] → Block(0,1)
+ [ a[2,0]  a[2,1]  a[2,2]  a[2,3]  a[2,4]  a[2,5] ] → Block(0,2)
+ [ a[3,0]  a[3,1]  a[3,2]  a[3,3]  a[3,4]  a[3,5] ] → Block(0,3)
 ```
 
 ### Parallel Reduction Process
 
 1. **Initial Data Loading**:
    ```txt
-   Block(0,0): cache = [0 1 2 3 4 5 * *]  // * = unused
-   Block(0,1): cache = [6 7 8 9 10 11 * *]
-   Block(0,2): cache = [12 13 14 15 16 17 * *]
-   Block(0,3): cache = [18 19 20 21 22 23 * *]
+   Block(0,0): cache = [a[0,0] a[0,1] a[0,2] a[0,3] a[0,4] a[0,5] * *]  // * = padding
+   Block(0,1): cache = [a[1,0] a[1,1] a[1,2] a[1,3] a[1,4] a[1,5] * *]
+   Block(0,2): cache = [a[2,0] a[2,1] a[2,2] a[2,3] a[2,4] a[2,5] * *]
+   Block(0,3): cache = [a[3,0] a[3,1] a[3,2] a[3,3] a[3,4] a[3,5] * *]
    ```
 
 2. **Reduction Steps** (for Block 0,0):
@@ -104,16 +107,15 @@ Matrix (4×6):                     Block Assignment:
 
 ### Key Implementation Features:
 
-1. **Block-Row Mapping**:
-   ```mojo
-   batch = block_idx.y    --> Each y-block handles one row
-   offset = batch * size  --> Starting position in global memory
-   ```
+1. **Layout Configuration**:
+   - Input: row-major layout (BATCH × SIZE)
+   - Output: row-major layout (BATCH × 1)
+   - Each block processes one complete row
 
 2. **Memory Access Pattern**:
-   - Row-aligned loading: `cache[local_i] = a[batch * size + local_i]`
-   - Coalesced global memory access
+   - LayoutTensor 2D indexing for input: `a[batch, local_i]`
    - Shared memory for efficient reduction
+   - LayoutTensor 2D indexing for output: `out[batch, 0]`
 
 3. **Parallel Reduction Logic**:
    ```mojo
@@ -128,15 +130,15 @@ Matrix (4×6):                     Block Assignment:
 4. **Output Writing**:
    ```mojo
    if local_i == 0:
-       out[batch] = cache[0]  --> One result per row
+       out[batch, 0] = cache[0]  --> One result per batch
    ```
 
 ### Performance Optimizations:
 
 1. **Memory Efficiency**:
-   - Single global memory load per thread
+   - Coalesced memory access through LayoutTensor
    - Shared memory for fast reduction
-   - Minimal global memory writes
+   - Single write per row result
 
 2. **Thread Utilization**:
    - Perfect load balancing across rows

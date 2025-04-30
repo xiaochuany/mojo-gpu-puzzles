@@ -73,7 +73,9 @@ def main():
             for i in range(CONV):
                 b_host[i] = i
 
-        out_tensor = LayoutTensor[mut=False, dtype, out_layout](out.unsafe_ptr())
+        out_tensor = LayoutTensor[mut=False, dtype, out_layout](
+            out.unsafe_ptr()
+        )
         a_tensor = LayoutTensor[mut=False, dtype, in_layout](a.unsafe_ptr())
         b_tensor = LayoutTensor[mut=False, dtype, in_layout](b.unsafe_ptr())
 
