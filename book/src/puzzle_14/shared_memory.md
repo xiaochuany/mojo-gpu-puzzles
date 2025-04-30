@@ -1,32 +1,39 @@
 # Shared Memory Matrix Multiplication
 
-Implement a kernel that multiplies square matrices \\(A\\) and \\(\text{transpose}(A)\\) and stores the result in \\ \text{out}\\, using shared memory to improve memory access efficiency. This version loads matrix blocks into shared memory before computation.
+## Overview
+
+Implement a kernel that multiplies square matrices \\(A\\) and \\(\text{transpose}(A)\\) and stores the result in \\(\text{out}\\), using shared memory to improve memory access efficiency. This version loads matrix blocks into shared memory before computation.
 
 ## Key concepts
 
 In this puzzle, you'll learn about:
-- Block-local memory management
+- Block-local memory management with LayoutTensor
 - Thread synchronization patterns
-- Memory access optimization
-- Collaborative data loading
+- Memory access optimization using shared memory
+- Collaborative data loading with 2D indexing
+- Efficient use of LayoutTensor for matrix operations
 
-The key insight is understanding how to use fast shared memory to reduce expensive global memory operations.
+The key insight is understanding how to use fast shared memory with LayoutTensor to reduce expensive global memory operations.
 
 ## Configuration
 
 - Matrix size: \\(\\text{SIZE} \\times \\text{SIZE} = 2 \\times 2\\)
 - Threads per block: \\(\\text{TPB} \\times \\text{TPB} = 3 \\times 3\\)
 - Grid dimensions: \\(1 \\times 1\\)
-- Shared memory: Two \\(\\text{TPB} \\times \\text{TPB}\\) arrays
 
-Memory layout:
+Layout configuration:
+- Input A: `Layout.row_major(SIZE, SIZE)`
+- Input B: `Layout.row_major(SIZE, SIZE)` (transpose of A)
+- Output: `Layout.row_major(SIZE, SIZE)`
+- Shared Memory: Two `TPB × TPB` LayoutTensors
+
+Memory organization:
+
 ```txt
-Matrix A (2×2):     Matrix B (2×2):     Shared Memory (3×3 each):
- [0 1]              [0 1]                a_shared: [0 1 *]  b_shared: [0 1 *]
- [2 3]              [2 3]                          [2 3 *]            [2 3 *]
-                                                   [* * *]            [* * *]
+Global Memory (LayoutTensor):          Shared Memory (LayoutTensor):
+A[i,j]: Direct access                  a_shared[local_i, local_j]
+B[i,j]: Transposed access              b_shared[local_i, local_j]
 ```
-Where \\(*\\) represents unused shared memory cells.
 
 ## Code to complete
 
@@ -72,62 +79,138 @@ expected: HostBuffer([1.0, 3.0, 3.0, 13.0])
 
 <div class="solution-explanation">
 
-The shared memory implementation improves performance by reducing global memory access. Here's a detailed analysis:
+The shared memory implementation with LayoutTensor improves performance through efficient memory access patterns:
 
 ### Memory Organization
 
 ```txt
-Global Memory:           Shared Memory (per block):
- Matrix A (2×2):         a_shared (3×3):
-  [0 1]                   [0 1 *]
-  [2 3]                   [2 3 *]
-                          [* * *]
-
-Matrix B (2×2):          b_shared (3×3):
-  [0 1]                   [0 1 *]
-  [2 3]                   [2 3 *]
-                          [* * *]
+Input Tensors (2×2):                Shared Memory (3×3):
+Matrix A:                           a_shared:
+ [a[0,0] a[0,1]]                    [s[0,0] s[0,1] s[0,2]]
+ [a[1,0] a[1,1]]                    [s[1,0] s[1,1] s[1,2]]
+                                    [s[2,0] s[2,1] s[2,2]]
+Matrix B (transpose):               b_shared: (similar layout)
+ [b[0,0] b[0,1]]                    [t[0,0] t[0,1] t[0,2]]
+ [b[1,0] b[1,1]]                    [t[1,0] t[1,1] t[1,2]]
+                                    [t[2,0] t[2,1] t[2,2]]
 ```
 
 ### Implementation Phases:
 
 1. **Shared Memory Setup**:
    ```mojo
-   a_shared = stack_allocation[TPB * TPB * sizeof[dtype](), ...]
-   b_shared = stack_allocation[TPB * TPB * sizeof[dtype](), ...]
+   # Create 2D shared memory tensors using TensorBuilder
+   a_shared = tb[dtype]().row_major[TPB, TPB]().shared().alloc()
+   b_shared = tb[dtype]().row_major[TPB, TPB]().shared().alloc()
    ```
 
-2. **Data Loading**:
+2. **Thread Indexing**:
    ```mojo
+   # Global indices for matrix access
+   global_i = block_dim.x * block_idx.x + thread_idx.x
+   global_j = block_dim.y * block_idx.y + thread_idx.y
+
+   # Local indices for shared memory
+   local_i = thread_idx.x
+   local_j = thread_idx.y
+   ```
+
+3. **Data Loading**:
+   ```mojo
+   # Load data into shared memory using LayoutTensor indexing
    if global_i < size and global_j < size:
-       a_shared[local_i * size + local_j] = a[global_i * size + global_j]
-       b_shared[local_i * size + local_j] = b[global_i * size + global_j]
-   barrier()
+       a_shared[local_i, local_j] = a[global_i, global_j]
+       b_shared[local_i, local_j] = b[global_i, global_j]
    ```
 
-3. **Computation**:
+4. **Computation with Shared Memory**:
    ```mojo
-   for k in range(size):
-       out[...] += a_shared[local_i * size + k] * b_shared[k + local_j * size]
+   # Guard ensures we only compute for valid matrix elements
+   if global_i < size and global_j < size:
+       # Initialize accumulator with output tensor's type
+       var acc: out.element_type = 0
+
+       # Compile-time unrolled loop for matrix multiplication
+       @parameter
+       for k in range(size):
+           acc += a_shared[local_i, k] * b_shared[k, local_j]
+
+       # Write result only for threads within matrix bounds
+       out[global_i, global_j] = acc
    ```
 
-### Performance Improvements:
+   Key aspects:
+   - **Boundary Check**: `if global_i < size and global_j < size`
+     * Prevents out-of-bounds computation
+     * Only valid threads perform work
+     * Essential because TPB (3×3) > SIZE (2×2)
+
+   - **Accumulator Type**: `var acc: out.element_type`
+     * Uses output tensor's element type for type safety
+     * Ensures consistent numeric precision
+     * Initialized to zero before accumulation
+
+   - **Loop Optimization**: `@parameter for k in range(size)`
+     * Unrolls the loop at compile time
+     * Enables better instruction scheduling
+     * Efficient for small, known matrix sizes
+
+   - **Result Writing**: `out[global_i, global_j] = acc`
+     * Protected by the same guard condition
+     * Only valid threads write results
+     * Maintains matrix bounds safety
+
+### Thread Safety and Synchronization:
+
+1. **Guard Conditions**:
+   - Input Loading: `if global_i < size and global_j < size`
+   - Computation: Same guard ensures thread safety
+   - Output Writing: Protected by the same condition
+   - Prevents invalid memory access and race conditions
+
+2. **Memory Access Safety**:
+   - Shared memory: Accessed only within TPB bounds
+   - Global memory: Protected by size checks
+   - Output: Guarded writes prevent corruption
+
+### Key Language Features:
+
+1. **LayoutTensor Benefits**:
+   - Direct 2D indexing simplifies code
+   - Type safety through `element_type`
+   - Efficient memory layout handling
+
+2. **Shared Memory Allocation**:
+   - TensorBuilder for structured allocation
+   - Row-major layout matching input tensors
+   - Proper alignment for efficient access
+
+3. **Synchronization**:
+   - `barrier()` ensures shared memory consistency
+   - Proper synchronization between load and compute
+   - Thread cooperation within block
+
+### Performance Optimizations:
 
 1. **Memory Access Efficiency**:
-   - Reduced global memory accesses
-   - Fast shared memory for repeated access
-   - Better data locality
+   - Single global memory load per element
+   - Multiple reuse through shared memory
+   - Coalesced memory access patterns
 
 2. **Thread Cooperation**:
-   - Threads cooperate to load data
-   - Shared data reuse within block
-   - Synchronized access with barriers
+   - Collaborative data loading
+   - Shared data reuse
+   - Efficient thread synchronization
 
-3. **Limitations**:
-   - Still limited by block size
-   - Not optimal for large matrices
-   - Room for further tiling optimization
+3. **Computational Benefits**:
+   - Reduced global memory traffic
+   - Better cache utilization
+   - Improved instruction throughput
 
-This implementation significantly reduces memory bandwidth requirements compared to the naive version.
+This implementation significantly improves performance over the naive version by:
+- Reducing global memory accesses
+- Enabling data reuse through shared memory
+- Using efficient 2D indexing with LayoutTensor
+- Maintaining proper thread synchronization
 </div>
 </details>

@@ -2,44 +2,52 @@
 
 ## Overview
 
-Implement a kernel that multiplies square matrices \\(A\\) and \\(\text{transpose}(A)\\) using tiled matrix multiplication. This approach handles large matrices by processing them in smaller chunks (tiles).
+Implement a kernel that multiplies square matrices \\(A\\) and \\(\text{transpose}(A)\\) using tiled matrix multiplication with LayoutTensor. This approach handles large matrices by processing them in smaller chunks (tiles).
 
 ## Key concepts
 
-- Matrix tiling for large-scale computation
-- Multi-block coordination
-- Efficient shared memory usage
-- Boundary handling for tiles
+- Matrix tiling with LayoutTensor for large-scale computation
+- Multi-block coordination with proper layouts
+- Efficient shared memory usage through TensorBuilder
+- Boundary handling for tiles with LayoutTensor indexing
 
 ## Configuration
 
 - Matrix size: \\(\\text{SIZE\_TILED} = 8\\)
 - Threads per block: \\(\\text{TPB} \times \\text{TPB} = 3 \times 3\\)
 - Grid dimensions: \\(3 \times 3\\) blocks
-- Shared memory: Two \\(\\text{TPB} \times \\text{TPB}\\) arrays per block
+- Shared memory: Two \\(\\text{TPB} \times \\text{TPB}\\) LayoutTensors per block
+
+Layout configuration:
+- Input A: `Layout.row_major(SIZE_TILED, SIZE_TILED)`
+- Input B: `Layout.row_major(SIZE_TILED, SIZE_TILED)` (transpose of A)
+- Output: `Layout.row_major(SIZE_TILED, SIZE_TILED)`
+- Shared Memory: Two `TPB × TPB` LayoutTensors using TensorBuilder
 
 ## Tiling strategy
 
 ### Block organization
 ```txt
-Grid Layout (3×3):           Thread Layout per Block:
-[B00][B01][B02]             [T00 T01 T02]
-[B10][B11][B12]             [T10 T11 T12]
-[B20][B21][B22]             [T20 T21 T22]
+Grid Layout (3×3):           Thread Layout per Block (3×3):
+[B00][B01][B02]               [T00 T01 T02]
+[B10][B11][B12]               [T10 T11 T12]
+[B20][B21][B22]               [T20 T21 T22]
+
+Each block processes a tile using LayoutTensor indexing
 ```
 
 ### Tile processing steps
 
-1. Load tile from matrix A into shared memory
+1. Load tile from matrix A into shared memory using LayoutTensor indexing
 2. Load corresponding tile from matrix B into shared memory
-3. Compute partial products
-4. Accumulate results
+3. Compute partial products using shared memory
+4. Accumulate results in registers
 5. Move to next tile
 6. Repeat until all tiles are processed
 
 ### Memory access pattern
 ```txt
-For each tile:
+For each tile using LayoutTensor:
   Input Tiles:                Output Computation:
     A[i:i+TPB, k:k+TPB]   ×    Result tile
     B[k:k+TPB, j:j+TPB]   →    C[i:i+TPB, j:j+TPB]
@@ -64,15 +72,6 @@ For each tile:
 </div>
 </details>
 
-## Solution
-
-<details class="solution-details">
-<summary></summary>
-
-```mojo
-{{#include ../../../solutions/p14/p14.mojo:matmul_tiled_solution}}
-```
-
 ## Running the code
 
 To test your solution, run the following command in your terminal:
@@ -87,84 +86,175 @@ out: HostBuffer([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
 expected: HostBuffer([140.0, 364.0, 588.0, 812.0, 1036.0, 1260.0, 1484.0, 1708.0, 364.0, 1100.0, 1836.0, 2572.0, 3308.0, 4044.0, 4780.0, 5516.0, 588.0, 1836.0, 3084.0, 4332.0, 5580.0, 6828.0, 8076.0, 9324.0, 812.0, 2572.0, 4332.0, 6092.0, 7852.0, 9612.0, 11372.0, 13132.0, 1036.0, 3308.0, 5580.0, 7852.0, 10124.0, 12396.0, 14668.0, 16940.0, 1260.0, 4044.0, 6828.0, 9612.0, 12396.0, 15180.0, 17964.0, 20748.0, 1484.0, 4780.0, 8076.0, 11372.0, 14668.0, 17964.0, 21260.0, 24556.0, 1708.0, 5516.0, 9324.0, 13132.0, 16940.0, 20748.0, 24556.0, 28364.0])
 ```
 
-<div class="solution-explanation">
+## Solution
 
-The tiled implementation handles large matrices efficiently by processing them in blocks. Here's a comprehensive analysis:
+<details class="solution-details">
+<summary></summary>
 
-### Tiling Strategy
-
-```txt
-Matrix Decomposition (8×8 matrix):
- [T00 T01 T02]  Each Tij is a 3×3 tile
- [T10 T11 T12]  processed by one block
- [T20 T21 T22]
+```mojo
+{{#include ../../../solutions/p14/p14.mojo:matmul_tiled_solution}}
 ```
 
-Per-Tile Processing:
-1. Load tile from A and B
-2. Compute partial results
-3. Move to next tile
-4. Accumulate final result
 
-### Implementation Details:
 
-1. **Thread and Block Organization**:
+<div class="solution-explanation">
+
+The tiled implementation with LayoutTensor handles large matrices efficiently by processing them in blocks. Here's a comprehensive analysis:
+
+### Implementation Architecture
+
+1. **Layout Configuration**:
    ```mojo
-   global_row = block_idx.x * TPB + thread_idx.x
-   global_col = block_idx.y * TPB + thread_idx.y
+   alias layout_tiled = Layout.row_major(SIZE_TILED, SIZE_TILED)
    ```
+   - Defines row-major layout for all tensors
+   - Ensures consistent memory access patterns
+   - Enables efficient 2D indexing
 
-2. **Tile Processing Loop**:
+2. **Shared Memory Setup**:
    ```mojo
+   a_shared = tb[dtype]().row_major[TPB, TPB]().shared().alloc()
+   b_shared = tb[dtype]().row_major[TPB, TPB]().shared().alloc()
+   ```
+   - Uses TensorBuilder for structured allocation
+   - Maintains row-major layout for consistency
+   - Enables efficient tile processing
+
+3. **Thread and Block Organization**:
+   ```mojo
+   local_row = thread_idx.x
+   local_col = thread_idx.y
+   global_row = block_idx.x * TPB + local_row
+   global_col = block_idx.y * TPB + local_col
+   ```
+   - Maps threads to matrix elements
+   - Handles 2D indexing efficiently
+   - Maintains proper boundary checks
+
+### Tile Processing Pipeline
+
+1. **Tile Iteration**:
+   ```mojo
+   @parameter
    for tile in range((size + TPB - 1) // TPB):
-       # Load tile data
-       # Compute partial results
-       # Synchronize
-       # Move to next tile
    ```
+   - Compile-time unrolled loop
+   - Handles matrix size not divisible by TPB
+   - Processes matrix in TPB×TPB tiles
 
-3. **Memory Management**:
+2. **Shared Memory Reset**:
+   ```mojo
+   if local_row < TPB and local_col < TPB:
+       a_shared[local_row, local_col] = 0
+       b_shared[local_row, local_col] = 0
+   ```
+   - Clears previous tile data
+   - Ensures clean state for new tile
+   - Prevents data corruption
+
+3. **Tile Loading**:
+   ```mojo
+   # Load A tile
+   if global_row < size and (tile * TPB + local_col) < size:
+       a_shared[local_row, local_col] = a[global_row, tile * TPB + local_col]
+
+   # Load B tile
+   if (tile * TPB + local_row) < size and global_col < size:
+       b_shared[local_row, local_col] = b[tile * TPB + local_row, global_col]
+   ```
+   - Handles boundary conditions
+   - Uses LayoutTensor indexing
+   - Maintains memory coalescing
+
+4. **Computation**:
+   ```mojo
+   @parameter
+   for k in range(min(TPB, size - tile * TPB)):
+       acc += a_shared[local_row, k] * b_shared[k, local_col]
+   ```
+   - Processes current tile
+   - Uses shared memory for efficiency
+   - Handles partial tiles correctly
+
+### Memory Access Optimization
+
+1. **Global Memory Pattern**:
    ```txt
-   Phase 1: Load A tile    Phase 2: Load B tile    Phase 3: Compute
-    [a00 a01 a02]          [b00 b01 b02]           [p00 p01 p02]
-    [a10 a11 a12]    +     [b10 b11 b12]    =      [p10 p11 p12]
-    [a20 a21 a22]          [b20 b21 b22]           [p20 p21 p22]
+   A[global_row, tile * TPB + local_col] → Coalesced reads
+   B[tile * TPB + local_row, global_col] → Transposed access
    ```
+   - Maximizes memory coalescing
+   - Minimizes bank conflicts
+   - Efficient for transposed access
 
-### Key Optimizations:
+2. **Shared Memory Usage**:
+   ```txt
+   a_shared[local_row, k] → Row-wise access
+   b_shared[k, local_col] → Column-wise access
+   ```
+   - Optimized for matrix multiplication
+   - Reduces bank conflicts
+   - Enables data reuse
 
-1. **Memory Access Pattern**:
-   - Coalesced global memory loads
-   - Efficient shared memory usage
-   - Minimal redundant access
+### Synchronization and Safety
 
-2. **Computation Efficiency**:
-   - Reuse of shared memory data
-   - Balanced thread workload
-   - Optimal cache utilization
+1. **Barrier Points**:
+   ```mojo
+   barrier()  # After shared memory reset
+   barrier()  # After tile loading
+   barrier()  # After computation
+   ```
+   - Ensures shared memory consistency
+   - Prevents race conditions
+   - Maintains thread cooperation
 
-3. **Scalability Features**:
+2. **Boundary Handling**:
+   ```mojo
+   if global_row < size and global_col < size:
+       out[global_row, global_col] = acc
+   ```
+   - Prevents out-of-bounds access
+   - Handles matrix edges
+   - Safe result writing
+
+### Performance Characteristics
+
+1. **Memory Efficiency**:
+   - Reduced global memory traffic through tiling
+   - Efficient shared memory reuse
+   - Coalesced memory access patterns
+
+2. **Computational Throughput**:
+   - High data locality in shared memory
+   - Efficient thread utilization
+   - Minimal thread divergence
+
+3. **Scalability**:
    - Handles arbitrary matrix sizes
    - Efficient for large matrices
-   - Good thread utilization
+   - Good thread occupancy
 
-### Performance Characteristics:
+### Key Optimizations
 
-1. **Memory Bandwidth**:
-   - Reduced global memory traffic
+1. **Layout Optimization**:
+   - Row-major layout for all tensors
+   - Efficient 2D indexing
+   - Proper alignment
+
+2. **Memory Access**:
+   - Coalesced global memory loads
    - Efficient shared memory usage
-   - Better cache hit rate
+   - Minimal bank conflicts
 
-2. **Computational Efficiency**:
-   - Improved data locality
-   - Better instruction throughput
-   - Reduced thread divergence
+3. **Computation**:
+   - Register-based accumulation
+   - Compile-time loop unrolling
+   - Efficient tile processing
 
-3. **Synchronization**:
-   - Minimal barrier usage
-   - Efficient thread coordination
-   - Proper boundary handling
-
-This implementation achieves near-optimal performance for matrix multiplication on GPUs through efficient tiling and memory access patterns.
+This implementation achieves high performance through:
+- Efficient use of LayoutTensor for memory access
+- Optimal tiling strategy
+- Proper thread synchronization
+- Careful boundary handling
 </div>
 </details>

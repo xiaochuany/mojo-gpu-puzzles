@@ -2,7 +2,7 @@
 
 ## Overview
 
-Implement a kernel that multiplies square matrices \\(A\\) and \\(\text{transpose}(A)\\) and stores the result in \\ \text{out}\\.
+Implement a kernel that multiplies square matrices \\(A\\) and \\(\text{transpose}(A)\\) and stores the result in \\(\text{out}\\).
 This is the most straightforward implementation where each thread computes one element of the output matrix.
 
 ## Key concepts
@@ -21,13 +21,15 @@ The key insight is understanding how to map 2D thread indices to matrix elements
 - Threads per block: \\(\\text{TPB} \\times \\text{TPB} = 3 \\times 3\\)
 - Grid dimensions: \\(1 \\times 1\\)
 
-For position \\((i,j)\\) in the output matrix:
-\\[\Large C_{ij} = \sum_{k=0}^{\\text{SIZE}-1} A_{ik} \\cdot B_{kj} \\]
+Layout configuration:
+- Input A: `Layout.row_major(SIZE, SIZE)`
+- Input B: `Layout.row_major(SIZE, SIZE)` (transpose of A)
+- Output: `Layout.row_major(SIZE, SIZE)`
 
-Memory layout (row-major):
-- Matrix \\(A\\): \\(A_{ik} = a[i \\cdot \\text{SIZE} + k]\\)
-- Matrix \\(B\\): \\(B_{kj} = b[k + j \\cdot \\text{SIZE}]\\)
-- Output \\(C\\): \\(C_{ij} = \\text{out}[i \\cdot \\text{SIZE} + j]\\)
+Memory layout (LayoutTensor):
+- Matrix A: `a[i, j]` directly indexes position (i,j)
+- Matrix B: `b[i, j]` is the transpose of A
+- Output C: `out[i, j]` stores result at position (i,j)
 
 ## Code to complete
 
@@ -73,21 +75,13 @@ expected: HostBuffer([1.0, 3.0, 3.0, 13.0])
 
 <div class="solution-explanation">
 
-The naive matrix multiplication implementation demonstrates the basic approach. Here's a detailed breakdown:
+The naive matrix multiplication using LayoutTensor demonstrates the basic approach:
 
 ### Matrix Layout (2×2 example)
 ```txt
-Matrix A:        Matrix B:        Output C:
- [0 1]           [0 1]            [c00 c01]
- [2 3]           [2 3]            [c10 c11]
-```
-
-Where:
-```txt
-c00 = a00*b00 + a01*b10 = 0*0 + 1*2 = 2
-c01 = a00*b01 + a01*b11 = 0*1 + 1*3 = 3
-c10 = a10*b00 + a11*b10 = 2*0 + 3*2 = 6
-c11 = a10*b01 + a11*b11 = 2*1 + 3*3 = 11
+Matrix A:        Matrix B (transpose of A):    Output C:
+ [a[0,0] a[0,1]]  [b[0,0] b[0,1]]             [c[0,0] c[0,1]]
+ [a[1,0] a[1,1]]  [b[1,0] b[1,1]]             [c[1,0] c[1,1]]
 ```
 
 ### Implementation Details:
@@ -97,19 +91,33 @@ c11 = a10*b01 + a11*b11 = 2*1 + 3*3 = 11
    global_i = block_dim.x * block_idx.x + thread_idx.x
    global_j = block_dim.y * block_idx.y + thread_idx.y
    ```
-   Each thread computes one element of the output matrix.
 
 2. **Memory Access Pattern**:
-   - Row access: `a[global_i * size + k]`
-   - Column access: `b[k + global_j * size]`
-   - Output: `out[global_i * size + global_j]`
+   - Direct 2D indexing: `a[global_i, k]`
+   - Transposed access: `b[k, global_j]`
+   - Output writing: `out[global_i, global_j]`
 
 3. **Computation Flow**:
    ```mojo
-   total = 0
+   # Use var for mutable accumulator with tensor's element type
+   var acc: out.element_type = 0
+
+   # @parameter for compile-time loop unrolling
+   @parameter
    for k in range(size):
-       total += a[global_i * size + k] * b[k + global_j * size]
+       acc += a[global_i, k] * b[k, global_j]
    ```
+
+### Key Language Features:
+
+1. **Variable Declaration**:
+   - The use of `var` in `var acc: out.element_type = 0` allows for type inference with `out.element_type` ensures type compatibility with the output tensor
+   - Initialized to zero before accumulation
+
+2. **Loop Optimization**:
+   - [`@parameter`](https://docs.modular.com/mojo/manual/decorators/parameter/#parametric-for-statement) decorator unrolls the loop at compile time
+   - Improves performance for small, known matrix sizes
+   - Enables better instruction scheduling
 
 ### Performance Characteristics:
 
