@@ -21,9 +21,6 @@ This puzzle explores different approaches to implementing matrix multiplication 
 - [Tiled Version](./tiled.md)
   Further optimizes by dividing the computation into tiles, allowing threads to cooperate on loading and computing blocks of the output matrix. This approach better utilizes memory hierarchy and thread cooperation.
 
-- [Tiling with LayoutTensor](./tiled_layout_tensor.md)
-  Implements the tiled approach using Mojo's `LayoutTensor`, which provides a more natural way to work with multi-dimensional arrays while maintaining high performance.
-
 Each version builds upon the previous one, introducing new optimization techniques common in GPU programming. You'll learn how different memory access patterns and thread cooperation strategies affect performance.
 
 The progression illustrates a common pattern in GPU optimization:
