@@ -7,10 +7,11 @@
 - Shared memory: `TPB` elements
 
 Notes:
-- **Data loading**: Each thread loads one element
-- **Memory pattern**: Shared memory for intermediate results
+- **Data loading**: Each thread loads one element using LayoutTensor access
+- **Memory pattern**: Shared memory for intermediate results using `LayoutTensorBuild`
 - **Thread sync**: Coordination between computation phases
 - **Access pattern**: Stride-based parallel computation
+- **Type safety**: Leveraging LayoutTensor's type system
 
 ## Code to complete
 
@@ -59,9 +60,8 @@ expected: HostBuffer([0.0, 1.0, 3.0, 6.0, 10.0, 15.0, 21.0, 28.0])
 The parallel (inclusive) prefix-sum algorithm works as follows:
 
 ### Setup & Configuration
-- \\(\\text{TPB}\\) (Threads Per Block) = 8
-- \\(\\text{SIZE}\\) (Array Size) = 8
-- \\(\\text{BLOCKS}\\) = 1
+- `TPB` (Threads Per Block) = 8
+- `SIZE` (Array Size) = 8
 
 ### Thread Mapping
 - `thread_idx.x`: \\([0, 1, 2, 3, 4, 5, 6, 7]\\) (`local_i`)
@@ -72,7 +72,7 @@ The parallel (inclusive) prefix-sum algorithm works as follows:
 ```txt
 Threads:      T₀   T₁   T₂   T₃   T₄   T₅   T₆   T₇
 Input array:  [0    1    2    3    4    5    6    7]
-shared[]:     [0    1    2    3    4    5    6    7]
+shared:       [0    1    2    3    4    5    6    7]
                ↑    ↑    ↑    ↑    ↑    ↑    ↑    ↑
               T₀   T₁   T₂   T₃   T₄   T₅   T₆   T₇
 ```

@@ -1,7 +1,7 @@
 # Complete Version
 
 ## Configuration
-- Array size: `SIZE = 15` elements
+- Array size: `SIZE_2 = 15` elements
 - Threads per block: `TPB = 8`
 - Number of blocks: 2
 - Shared memory: `TPB` elements per block
@@ -11,6 +11,7 @@ Notes:
 - **Partial blocks**: Last block may not be full
 - **Block sums**: Store running totals between blocks
 - **Global result**: Combine local and block sums
+- **Layout safety**: Consistent layout handling through LayoutTensor
 
 ## Code to complete
 
