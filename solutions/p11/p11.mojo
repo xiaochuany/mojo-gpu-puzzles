@@ -1,40 +1,36 @@
-from memory import UnsafePointer, stack_allocation
 from gpu import thread_idx, block_idx, block_dim, barrier
 from gpu.host import DeviceContext
-from gpu.memory import AddressSpace
+from layout import Layout, LayoutTensor
+from layout.tensor_builder import LayoutTensorBuild as tb
 from sys import sizeof, argv
 from testing import assert_equal
 
 alias MAX_CONV = 4
 alias TPB = 8
-alias TPB_MAX_CONV = TPB + MAX_CONV
 alias SIZE = 6
 alias CONV = 3
 alias BLOCKS_PER_GRID = (1, 1)
 alias THREADS_PER_BLOCK = (TPB, 1)
 alias dtype = DType.float32
+alias in_layout = Layout.row_major(SIZE)
+alias out_layout = Layout.row_major(SIZE)
+alias conv_layout = Layout.row_major(CONV)
 
 
 # ANCHOR: conv_1d_simple_solution
-fn conv_1d_simple(
-    out: UnsafePointer[Scalar[dtype]],
-    a: UnsafePointer[Scalar[dtype]],
-    b: UnsafePointer[Scalar[dtype]],
+fn conv_1d_simple[
+    in_layout: Layout, out_layout: Layout, conv_layout: Layout
+](
+    out: LayoutTensor[mut=False, dtype, out_layout],
+    a: LayoutTensor[mut=False, dtype, in_layout],
+    b: LayoutTensor[mut=False, dtype, in_layout],
     a_size: Int,
     b_size: Int,
 ):
     global_i = block_dim.x * block_idx.x + thread_idx.x
     local_i = thread_idx.x
-    shared_a = stack_allocation[
-        SIZE * sizeof[dtype](),
-        Scalar[dtype],
-        address_space = AddressSpace.SHARED,
-    ]()
-    shared_b = stack_allocation[
-        CONV * sizeof[dtype](),
-        Scalar[dtype],
-        address_space = AddressSpace.SHARED,
-    ]()
+    shared_a = tb[dtype]().row_major[SIZE]().shared().alloc()
+    shared_b = tb[dtype]().row_major[CONV]().shared().alloc()
     if global_i < a_size:
         shared_a[local_i] = a[global_i]
 
@@ -54,7 +50,13 @@ fn conv_1d_simple(
 
     # Safe and correct:
     if global_i < a_size:
-        local_sum = Scalar[dtype](0)
+        # Note: using `var` allows us to include the type in the type inference
+        # `out.element_type` is available in LayoutTensor
+        var local_sum: out.element_type = 0
+
+        # Note: `@parameter` decorator unrolls the loop at compile time given `CONV` is a compile-time constant
+        # See: https://docs.modular.com/mojo/manual/decorators/parameter/#parametric-for-statement
+        @parameter
         for j in range(CONV):
             # Bonus: do we need this check for this specific example with fixed SIZE, CONV
             if local_i + j < SIZE:
@@ -72,26 +74,20 @@ alias THREADS_PER_BLOCK_2 = (TPB, 1)
 
 
 # ANCHOR: conv_1d_block_boundary_solution
-fn conv_1d_block_boundary(
-    out: UnsafePointer[Scalar[dtype]],
-    a: UnsafePointer[Scalar[dtype]],
-    b: UnsafePointer[Scalar[dtype]],
+fn conv_1d_block_boundary[
+    in_layout: Layout, out_layout: Layout, conv_layout: Layout, dtype: DType
+](
+    out: LayoutTensor[mut=False, dtype, out_layout],
+    a: LayoutTensor[mut=False, dtype, in_layout],
+    b: LayoutTensor[mut=False, dtype, in_layout],
     a_size: Int,
     b_size: Int,
 ):
     global_i = block_dim.x * block_idx.x + thread_idx.x
     local_i = thread_idx.x
     # first: need to account for padding
-    shared_a = stack_allocation[
-        (TPB + CONV - 1) * sizeof[dtype](),
-        Scalar[dtype],
-        address_space = AddressSpace.SHARED,
-    ]()
-    shared_b = stack_allocation[
-        CONV * sizeof[dtype](),
-        Scalar[dtype],
-        address_space = AddressSpace.SHARED,
-    ]()
+    shared_a = tb[dtype]().row_major[TPB + CONV - 1]().shared().alloc()
+    shared_b = tb[dtype]().row_major[CONV]().shared().alloc()
     if global_i < a_size:
         shared_a[local_i] = a[global_i]
 
@@ -108,7 +104,9 @@ fn conv_1d_block_boundary(
     barrier()
 
     if global_i < a_size:
-        local_sum = Scalar[dtype](0)
+        var local_sum: out.element_type = 0
+
+        @parameter
         for j in range(CONV):
             if local_i + j < TPB + CONV - 1:
                 local_sum += shared_a[local_i + j] * shared_b[j]
@@ -122,8 +120,11 @@ fn conv_1d_block_boundary(
 def main():
     with DeviceContext() as ctx:
         out = ctx.enqueue_create_buffer[dtype](SIZE).enqueue_fill(0)
+        out_tensor = LayoutTensor[mut=True, dtype, out_layout](out.unsafe_ptr())
         a = ctx.enqueue_create_buffer[dtype](SIZE).enqueue_fill(0)
+        a_tensor = LayoutTensor[mut=True, dtype, in_layout](a.unsafe_ptr())
         b = ctx.enqueue_create_buffer[dtype](CONV).enqueue_fill(0)
+        b_tensor = LayoutTensor[mut=True, dtype, in_layout](b.unsafe_ptr())
         with a.map_to_host() as a_host:
             for i in range(SIZE):
                 a_host[i] = i
@@ -133,20 +134,26 @@ def main():
                 b_host[i] = i
 
         if argv()[1] == "--simple":
-            ctx.enqueue_function[conv_1d_simple](
-                out.unsafe_ptr(),
-                a.unsafe_ptr(),
-                b.unsafe_ptr(),
+            ctx.enqueue_function[
+                conv_1d_simple[in_layout, out_layout, conv_layout]
+            ](
+                out_tensor,
+                a_tensor,
+                b_tensor,
                 SIZE,
                 CONV,
                 grid_dim=BLOCKS_PER_GRID,
                 block_dim=THREADS_PER_BLOCK,
             )
         elif argv()[1] == "--block-boundary":
-            ctx.enqueue_function[conv_1d_block_boundary](
-                out.unsafe_ptr(),
-                a.unsafe_ptr(),
-                b.unsafe_ptr(),
+            ctx.enqueue_function[
+                conv_1d_block_boundary[
+                    in_layout, out_layout, conv_layout, dtype
+                ]
+            ](
+                out_tensor,
+                a_tensor,
+                b_tensor,
                 SIZE,
                 CONV,
                 grid_dim=BLOCKS_PER_GRID_2,
@@ -156,7 +163,6 @@ def main():
             raise Error("Invalid argument")
 
         expected = ctx.enqueue_create_host_buffer[dtype](SIZE).enqueue_fill(0)
-
         ctx.synchronize()
 
         with a.map_to_host() as a_host, b.map_to_host() as b_host:

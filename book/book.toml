@@ -13,8 +13,6 @@ additional-js = [
     "theme/solution.js"
 ]
 default-theme = "light"
-preferred-dark-theme = "ayu"
-additional-theme = ["navy", "coal", "ayu"]
 copy-fonts = true
 smart-punctuation = true
 no-section-label = true
