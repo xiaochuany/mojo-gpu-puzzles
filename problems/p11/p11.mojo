@@ -63,11 +63,8 @@ fn conv_1d_block_boundary[
 def main():
     with DeviceContext() as ctx:
         out = ctx.enqueue_create_buffer[dtype](SIZE).enqueue_fill(0)
-        out_tensor = LayoutTensor[mut=True, dtype, out_layout](out.unsafe_ptr())
         a = ctx.enqueue_create_buffer[dtype](SIZE).enqueue_fill(0)
-        a_tensor = LayoutTensor[mut=True, dtype, in_layout](a.unsafe_ptr())
         b = ctx.enqueue_create_buffer[dtype](CONV).enqueue_fill(0)
-        b_tensor = LayoutTensor[mut=True, dtype, in_layout](b.unsafe_ptr())
         with a.map_to_host() as a_host:
             for i in range(SIZE):
                 a_host[i] = i
@@ -75,6 +72,10 @@ def main():
         with b.map_to_host() as b_host:
             for i in range(CONV):
                 b_host[i] = i
+
+        out_tensor = LayoutTensor[mut=False, dtype, out_layout](out.unsafe_ptr())
+        a_tensor = LayoutTensor[mut=False, dtype, in_layout](a.unsafe_ptr())
+        b_tensor = LayoutTensor[mut=False, dtype, in_layout](b.unsafe_ptr())
 
         if argv()[1] == "--simple":
             ctx.enqueue_function[
