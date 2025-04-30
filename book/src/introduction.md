@@ -26,7 +26,8 @@ Mojo represents a fresh approach to GPU programming, making this massive paralle
 - **Ergonomic and Safety Improvements** over traditional C/C++ GPU programming
 - **Lower Barrier to Entry** enabling more programmers to harness GPU power effectively
 
-Mojo aims to fuel innovation by democratizing GPU programming. By expanding on Python's familiar syntax while adding direct GPU access, Mojo empowers programmers with minimal specialized knowledge to build high-performance, GPU-enabled applications.
+>**Mojo 🔥 aims to fuel innovation by democratizing GPU programming.**
+>**By expanding on Python's familiar syntax while adding direct GPU access, Mojo empowers programmers with minimal specialized knowledge to build high-performance, heterogeneous (CPU, GPU-enabled) applications.**
 
 ## The GPU Programming Mindset
 
