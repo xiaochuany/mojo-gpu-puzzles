@@ -27,6 +27,9 @@
   <a href="https://discord.com/channels/1087530497313357884/1098713601386233997">
     <img src="https://img.shields.io/badge/Discord-Join_Chat-5865F2?logo=discord" alt="Discord">
   </a>
+  <a href="https://www.modular.com/company/talk-to-us">
+    <img src="https://img.shields.io/badge/Subscribe-Updates-00B5AD?logo=mail.ru" alt="Subscribe for Updates">
+  </a>
 </p>
 
 
@@ -37,7 +40,9 @@
 
 Welcome to **Mojo🔥 GPU Puzzles** — an interactive approach to learning GPU programming through hands-on puzzle solving. Instead of traditional textbook learning, you'll immediately dive into writing real GPU code and seeing the results.
 
-**Start Learning Now** 👉 [https://puzzles.modular.com](https://puzzles.modular.com)
+Start Learning Now 👉 [https://puzzles.modular.com](https://puzzles.modular.com)
+
+> 📬 [Subscribe to updates](https://www.modular.com/company/talk-to-us) to get notified when new puzzles are released!
 
 ## Why Mojo🔥
 
@@ -106,6 +111,9 @@ Please feel free to:
   </a>
   <a href="https://discord.com/channels/1087530497313357884/1098713601386233997">
     <img src="https://img.shields.io/badge/Discord-Join_Chat-5865F2?logo=discord" alt="Discord">
+  </a>
+  <a href="https://www.modular.com/company/talk-to-us">
+    <img src="https://img.shields.io/badge/Subscribe-Updates-00B5AD?logo=mail.ru" alt="Subscribe for Updates">
   </a>
 </p>
 
