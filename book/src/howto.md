@@ -18,11 +18,11 @@ All puzzles are designed to be run with the provided testing framework that veri
 
 ### Compatible GPU
 
-You'll need a compatible GPU to run the examples. [Here](https://docs.modular.com/max/faq#gpu-requirements) is a list of supported GPU architectures.
+You'll need a [compatible GPU](https://docs.modular.com/max/faq#gpu-requirements) to run the examples.
 
 ### Setting up your environment
 
-Clone the repository and make sure you have the `magic` CLI installed:
+[Clone the GitHub repository](https://github.com/modular/mojo-gpu-puzzles) and make sure you have the `magic` CLI installed to be able to run the Mojo programs:
 
 ```bash
 # Clone the repository
@@ -49,3 +49,15 @@ No prior GPU programming experience is necessary! We'll build that knowledge thr
 
 Let's begin our journey into the exciting world of GPU computing with Mojo 🔥!
 
+## Join the community
+
+<p align="center" style="display: flex; justify-content: center; gap: 10px;">
+  <a href="https://forum.modular.com/c/">
+    <img src="https://img.shields.io/badge/Modular-Forum-2ECC71?logo=discourse" alt="Modular Forum">
+  </a>
+  <a href="https://discord.com/channels/1087530497313357884/1098713601386233997">
+    <img src="https://img.shields.io/badge/Discord-Join_Chat-5865F2?logo=discord" alt="Discord">
+  </a>
+</p>
+
+Join our vibrant community to discuss GPU programming, share solutions, and get help!
