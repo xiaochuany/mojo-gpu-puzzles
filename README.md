@@ -21,14 +21,14 @@
   <a href="https://docs.modular.com/mojo">
     <img src="https://img.shields.io/badge/Powered%20by-Mojo-FF5F1F" alt="Powered by Mojo">
   </a>
+  <a href="https://www.modular.com/company/talk-to-us">
+    <img src="https://img.shields.io/badge/Subscribe-Updates-00B5AD?logo=mail.ru" alt="Subscribe for Updates">
+  </a>
   <a href="https://forum.modular.com/c/">
     <img src="https://img.shields.io/badge/Modular-Forum-9B59B6?logo=discourse" alt="Modular Forum">
   </a>
   <a href="https://discord.com/channels/1087530497313357884/1098713601386233997">
     <img src="https://img.shields.io/badge/Discord-Join_Chat-5865F2?logo=discord" alt="Discord">
-  </a>
-  <a href="https://www.modular.com/company/talk-to-us">
-    <img src="https://img.shields.io/badge/Subscribe-Updates-00B5AD?logo=mail.ru" alt="Subscribe for Updates">
   </a>
 </p>
 
@@ -106,14 +106,14 @@ Please feel free to:
 ## Community
 
 <p align="center">
+  <a href="https://www.modular.com/company/talk-to-us">
+    <img src="https://img.shields.io/badge/Subscribe-Updates-00B5AD?logo=mail.ru" alt="Subscribe for Updates">
+  </a>
   <a href="https://forum.modular.com/c/">
     <img src="https://img.shields.io/badge/Modular-Forum-9B59B6?logo=discourse" alt="Modular Forum">
   </a>
   <a href="https://discord.com/channels/1087530497313357884/1098713601386233997">
     <img src="https://img.shields.io/badge/Discord-Join_Chat-5865F2?logo=discord" alt="Discord">
-  </a>
-  <a href="https://www.modular.com/company/talk-to-us">
-    <img src="https://img.shields.io/badge/Subscribe-Updates-00B5AD?logo=mail.ru" alt="Subscribe for Updates">
   </a>
 </p>
 
