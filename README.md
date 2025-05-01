@@ -22,7 +22,7 @@
     <img src="https://img.shields.io/badge/Powered%20by-Mojo-FF5F1F" alt="Powered by Mojo">
   </a>
   <a href="https://forum.modular.com/c/">
-    <img src="https://img.shields.io/badge/Modular-Forum-2ECC71?logo=discourse" alt="Modular Forum">
+    <img src="https://img.shields.io/badge/Modular-Forum-9B59B6?logo=discourse" alt="Modular Forum">
   </a>
   <a href="https://discord.com/channels/1087530497313357884/1098713601386233997">
     <img src="https://img.shields.io/badge/Discord-Join_Chat-5865F2?logo=discord" alt="Discord">
@@ -102,7 +102,7 @@ Please feel free to:
 
 <p align="center">
   <a href="https://forum.modular.com/c/">
-    <img src="https://img.shields.io/badge/Modular-Forum-FF5F1F?logo=discourse" alt="Modular Forum">
+    <img src="https://img.shields.io/badge/Modular-Forum-9B59B6?logo=discourse" alt="Modular Forum">
   </a>
   <a href="https://discord.com/channels/1087530497313357884/1098713601386233997">
     <img src="https://img.shields.io/badge/Discord-Join_Chat-5865F2?logo=discord" alt="Discord">
