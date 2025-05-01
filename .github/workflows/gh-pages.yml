@@ -55,5 +55,5 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: ./book/html
-          cname: puzzles.modular.com
+          cname: builds.modular.com/gpu-puzzles
           allow_empty_commit: true
