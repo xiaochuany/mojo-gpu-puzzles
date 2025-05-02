@@ -1,4 +1,8 @@
 <p align="center">
+  <img src="book/src/images/puzzle-logo.png" alt="Mojo GPU Puzzles Logo" width="100">
+</p>
+
+<p align="center">
   <h1 align="center">Mojo🔥 GPU Puzzles</h1>
 </p>
 
