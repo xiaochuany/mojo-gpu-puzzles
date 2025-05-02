@@ -1,6 +1,12 @@
 # Mojo 🔥 GPU Puzzles
 
 <p align="center" style="display: flex; justify-content: center; gap: 8px;">
+  <a href="https://github.com/modular/mojo-gpu-puzzles">
+    <img src="https://img.shields.io/badge/GitHub-Repository-181717?logo=github" alt="GitHub Repository">
+  </a>
+  <a href="https://docs.modular.com/mojo">
+    <img src="https://img.shields.io/badge/Powered%20by-Mojo-FF5F1F" alt="Powered by Mojo">
+  </a>
   <a href="https://www.modular.com/company/talk-to-us">
     <img src="https://img.shields.io/badge/Subscribe-Updates-00B5AD?logo=mail.ru" alt="Subscribe for Updates">
   </a>
