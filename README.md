@@ -44,7 +44,7 @@
 
 Welcome to **Mojo🔥 GPU Puzzles** — an interactive approach to learning GPU programming through hands-on puzzle solving. Instead of traditional textbook learning, you'll immediately dive into writing real GPU code and seeing the results.
 
-Start Learning Now 👉 [https://puzzles.modular.com](https://puzzles.modular.com)
+Start Learning Now 👉 [https://builds.modular.com/puzzles](https://builds.modular.com/puzzles)
 
 > 📬 [Subscribe to updates](https://www.modular.com/company/talk-to-us) to get notified when new puzzles are released!
 
@@ -66,7 +66,7 @@ Start Learning Now 👉 [https://puzzles.modular.com](https://puzzles.modular.co
 
 You'll need a [compatible GPU](https://docs.modular.com/max/faq#gpu-requirements) to run the examples.
 
-1. Visit [puzzles.modular.com](https://puzzles.modular.com)
+1. Visit [https://builds.modular.com/puzzles](https://builds.modular.com/puzzles)
 2. Clone this repository
    ```bash
    git clone https://github.com/modular/mojo-gpu-puzzles
