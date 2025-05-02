@@ -25,6 +25,7 @@ mathjax-support = true
 theme-switcher = true
 no-theme-selection = false
 draft = true
+favicon = "images/puzzle-logo.png"
 
 [output.html.highlight]
 enable = true
