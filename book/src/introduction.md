@@ -1,4 +1,10 @@
-# Mojo 🔥 GPU Puzzles
+<p align="center">
+  <img src="images/puzzle-logo.png" alt="Mojo GPU Puzzles Logo" width="100">
+</p>
+
+<p align="center">
+  <h1 align="center">Mojo🔥 GPU Puzzles</h1>
+</p>
 
 <p align="center" style="display: flex; justify-content: center; gap: 8px;">
   <a href="https://github.com/modular/mojo-gpu-puzzles">
