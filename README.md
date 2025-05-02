@@ -50,7 +50,7 @@ Start Learning Now 👉 [https://puzzles.modular.com](https://puzzles.modular.co
 
 ## Why Mojo🔥
 
-Mojo represents a revolutionary approach to GPU programming, making massive parallelism accessible while maintaining systems-level performance:
+[Mojo](https://docs.modular.com/mojo/manual/) represents a revolutionary approach to GPU programming, making massive parallelism accessible while maintaining systems-level performance:
 
 - 🐍 **Python-like Syntax** with systems programming capabilities
 - ⚡ **Zero-cost Abstractions** that compile to efficient machine code
@@ -127,12 +127,12 @@ Join our vibrant community to discuss GPU programming, share solutions, and get 
 
 - Thanks to all our [contributors](https://github.com/modular/mojo-gpu-puzzles/graphs/contributors)
 - Initial puzzles are heavily inspired by [GPU Puzzles](https://github.com/srush/GPU-Puzzles)
-- Built with [MDBook](https://rust-lang.github.io/mdBook/)
+- Built with [mdBook](https://rust-lang.github.io/mdBook/)
 
 ## License
 
 This project is licensed under the LLVM License - see the [LICENSE](LICENSE) file for details.
 
 <p align="center">
-  <sub>Built with 🔥 by the Modular team</sub>
+  <sub>Built with ❤️ by the Modular team</sub>
 </p>
