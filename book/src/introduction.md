@@ -115,3 +115,15 @@ Your learning path includes:
 - **Real-world Applications**: Applying these concepts to machine learning, signal processing, and computational tasks
 
 The book uniquely challenges the status quo approach by first building understanding with low-level memory manipulation, then gradually transitioning to Mojo's powerful LayoutTensor abstractions. This gives you both deep understanding of GPU memory patterns and practical knowledge of modern tensor-based approaches.
+
+## 🏆 Prizes and Rewards 🎉
+
+Have you completed the available puzzles? We're giving away free sticker packs to celebrate your achievement!
+
+To claim your free stickers:
+
+1. Fork the GitHub repository [https://github.com/modular/mojo-gpu-puzzles](https://github.com/modular/mojo-gpu-puzzles)
+2. Add your solutions to the available puzzles
+3. Submit your solutions through [this form](https://forms.gle/bchQpB3GanHMNY3x9) and we'll send you exclusive Modular stickers!
+
+_Note: More puzzles are being added regularly - complete the currently available ones to claim your reward!_
