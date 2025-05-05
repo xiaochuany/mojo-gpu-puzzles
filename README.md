@@ -19,8 +19,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/modular/mojo-gpu-puzzles/actions/workflows/gh-pages.yml">
-    <img src="https://github.com/modular/mojo-gpu-puzzles/actions/workflows/gh-pages.yml/badge.svg?branch=main" alt="Github Pages">
+  <a href="https://github.com/modular/mojo-gpu-puzzles/actions/workflows/ci.yml">
+    <img src="https://github.com/modular/mojo-gpu-puzzles/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI">
   </a>
   <a href="https://docs.modular.com/mojo">
     <img src="https://img.shields.io/badge/Powered%20by-Mojo-FF5F1F" alt="Powered by Mojo">
