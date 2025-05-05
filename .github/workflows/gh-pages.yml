@@ -59,7 +59,7 @@ jobs:
         run: npm install -g vercel
 
       - name: Trigger Vercel Redeploy
-        run: vercel redeploy ${{ secrets.VERCEL_DEPLOYMENT_URL }} --target=stable --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel redeploy ${{ secrets.VERCEL_DEPLOYMENT_URL }} --scope=${{ secrets.VERCEL_SCOPE }} --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
