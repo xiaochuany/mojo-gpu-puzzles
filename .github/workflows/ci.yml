@@ -1,4 +1,4 @@
-name: Github Pages
+name: CI
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Add Rust caching
+      # Add Rust caching for mdbook
       - uses: actions/cache@v3
         with:
           path: |
@@ -28,7 +28,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-
 
-      # Add Modular caching
       - uses: actions/cache@v3
         with:
           path: |
@@ -55,6 +54,12 @@ jobs:
         with:
           node-version: '20'
 
+      # Cache global npm packages
+      - uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-global-packages
+
       - name: Install Vercel CLI
         run: npm install -g vercel
 
@@ -67,5 +72,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: ./book/html
-          cname: puzzles.modular.com
           allow_empty_commit: true
