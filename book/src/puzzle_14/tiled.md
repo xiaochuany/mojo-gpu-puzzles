@@ -2,11 +2,11 @@
 
 ## Overview
 
-Implement a kernel that multiplies square matrices \\(A\\) and \\(\text{transpose}(A)\\) using tiled matrix multiplication with LayoutTensor. This approach handles large matrices by processing them in smaller chunks (tiles).
+Implement a kernel that multiplies square matrices \\(A\\) and \\(B\\) using tiled matrix multiplication with LayoutTensor. This approach handles large matrices by processing them in smaller chunks (tiles).
 
 ## Key concepts
 
-- Matrix tiling with LayoutTensor for large-scale computation
+- Matrix tiling with LayoutTensor for efficient computation
 - Multi-block coordination with proper layouts
 - Efficient shared memory usage through TensorBuilder
 - Boundary handling for tiles with LayoutTensor indexing
@@ -20,7 +20,7 @@ Implement a kernel that multiplies square matrices \\(A\\) and \\(\text{transpos
 
 Layout configuration:
 - Input A: `Layout.row_major(SIZE_TILED, SIZE_TILED)`
-- Input B: `Layout.row_major(SIZE_TILED, SIZE_TILED)` (transpose of A)
+- Input B: `Layout.row_major(SIZE_TILED, SIZE_TILED)`
 - Output: `Layout.row_major(SIZE_TILED, SIZE_TILED)`
 - Shared Memory: Two `TPB × TPB` LayoutTensors using TensorBuilder
 
@@ -38,19 +38,21 @@ Each block processes a tile using LayoutTensor indexing
 
 ### Tile processing steps
 
-1. Load tile from matrix A into shared memory using LayoutTensor indexing
-2. Load corresponding tile from matrix B into shared memory
-3. Compute partial products using shared memory
-4. Accumulate results in registers
-5. Move to next tile
-6. Repeat until all tiles are processed
+1. Calculate global and local indices for thread position
+2. Allocate shared memory for A and B tiles
+3. For each tile:
+   - Reset shared memory
+   - Load tile from matrix A and B
+   - Compute partial products
+   - Accumulate results in registers
+4. Write final accumulated result
 
 ### Memory access pattern
 ```txt
-For each tile using LayoutTensor:
+For each tile:
   Input Tiles:                Output Computation:
-    A[i:i+TPB, k:k+TPB]   ×    Result tile
-    B[k:k+TPB, j:j+TPB]   →    C[i:i+TPB, j:j+TPB]
+    A[global_i, tile*TPB + j] ×    Result accumulator
+    B[tile*TPB + i, global_j] →    C[global_i, global_j]
 ```
 
 ## Code to complete
@@ -65,7 +67,7 @@ For each tile using LayoutTensor:
 
 <div class="solution-tips">
 
-1. Calculate global thread positions from block and thread indices
+1. Calculate global thread positions from block and thread indices correctly
 2. Clear shared memory before loading new tiles
 3. Load tiles with proper bounds checking
 4. Accumulate results across tiles with proper synchronization
@@ -83,7 +85,7 @@ magic run p14 --tiled
 Your output will look like this if the puzzle isn't solved yet:
 ```txt
 out: HostBuffer([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-expected: HostBuffer([140.0, 364.0, 588.0, 812.0, 1036.0, 1260.0, 1484.0, 1708.0, 364.0, 1100.0, 1836.0, 2572.0, 3308.0, 4044.0, 4780.0, 5516.0, 588.0, 1836.0, 3084.0, 4332.0, 5580.0, 6828.0, 8076.0, 9324.0, 812.0, 2572.0, 4332.0, 6092.0, 7852.0, 9612.0, 11372.0, 13132.0, 1036.0, 3308.0, 5580.0, 7852.0, 10124.0, 12396.0, 14668.0, 16940.0, 1260.0, 4044.0, 6828.0, 9612.0, 12396.0, 15180.0, 17964.0, 20748.0, 1484.0, 4780.0, 8076.0, 11372.0, 14668.0, 17964.0, 21260.0, 24556.0, 1708.0, 5516.0, 9324.0, 13132.0, 16940.0, 20748.0, 24556.0, 28364.0])
+expected: HostBuffer([2240.0, 2296.0, 2352.0, 2408.0, 2464.0, 2520.0, 2576.0, 2632.0, 5824.0, 6008.0, 6192.0, 6376.0, 6560.0, 6744.0, 6928.0, 7112.0, 9408.0, 9720.0, 10032.0, 10344.0, 10656.0, 10968.0, 11280.0, 11592.0, 12992.0, 13432.0, 13872.0, 14312.0, 14752.0, 15192.0, 15632.0, 16072.0, 16576.0, 17144.0, 17712.0, 18280.0, 18848.0, 19416.0, 19984.0, 20552.0, 20160.0, 20856.0, 21552.0, 22248.0, 22944.0, 23640.0, 24336.0, 25032.0, 23744.0, 24568.0, 25392.0, 26216.0, 27040.0, 27864.0, 28688.0, 29512.0, 27328.0, 28280.0, 29232.0, 30184.0, 31136.0, 32088.0, 33040.0, 33992.0])
 ```
 
 ## Solution
@@ -95,17 +97,18 @@ expected: HostBuffer([140.0, 364.0, 588.0, 812.0, 1036.0, 1260.0, 1484.0, 1708.0
 {{#include ../../../solutions/p14/p14.mojo:matmul_tiled_solution}}
 ```
 
-
-
 <div class="solution-explanation">
 
-The tiled implementation with LayoutTensor handles large matrices efficiently by processing them in blocks. Here's a comprehensive analysis:
+The tiled implementation with LayoutTensor handles matrices efficiently by processing them in blocks. Here's a comprehensive analysis:
 
 ### Implementation Architecture
 
-1. **Layout Configuration**:
+1. **Thread and Block Organization**:
    ```mojo
-   alias layout_tiled = Layout.row_major(SIZE_TILED, SIZE_TILED)
+   local_i = thread_idx.x
+   local_j = thread_idx.y
+   global_i = block_idx.x * TPB + local_i
+   global_j = block_idx.y * TPB + local_j
    ```
    - Defines row-major layout for all tensors
    - Ensures consistent memory access patterns
@@ -120,17 +123,6 @@ The tiled implementation with LayoutTensor handles large matrices efficiently by
    - Maintains row-major layout for consistency
    - Enables efficient tile processing
 
-3. **Thread and Block Organization**:
-   ```mojo
-   local_row = thread_idx.x
-   local_col = thread_idx.y
-   global_row = block_idx.x * TPB + local_row
-   global_col = block_idx.y * TPB + local_col
-   ```
-   - Maps threads to matrix elements
-   - Handles 2D indexing efficiently
-   - Maintains proper boundary checks
-
 ### Tile Processing Pipeline
 
 1. **Tile Iteration**:
@@ -144,9 +136,9 @@ The tiled implementation with LayoutTensor handles large matrices efficiently by
 
 2. **Shared Memory Reset**:
    ```mojo
-   if local_row < TPB and local_col < TPB:
-       a_shared[local_row, local_col] = 0
-       b_shared[local_row, local_col] = 0
+   if local_i < TPB and local_j < TPB:
+       a_shared[local_i, local_j] = 0
+       b_shared[local_i, local_j] = 0
    ```
    - Clears previous tile data
    - Ensures clean state for new tile
@@ -154,13 +146,13 @@ The tiled implementation with LayoutTensor handles large matrices efficiently by
 
 3. **Tile Loading**:
    ```mojo
-   # Load A tile
-   if global_row < size and (tile * TPB + local_col) < size:
-       a_shared[local_row, local_col] = a[global_row, tile * TPB + local_col]
+   # Load A tile - global row stays the same, col determined by tile
+   if global_i < size and (tile * TPB + local_j) < size:
+       a_shared[local_i, local_j] = a[global_i, tile * TPB + local_j]
 
-   # Load B tile
-   if (tile * TPB + local_row) < size and global_col < size:
-       b_shared[local_row, local_col] = b[tile * TPB + local_row, global_col]
+   # Load B tile - row determined by tile, global col stays the same
+   if (tile * TPB + local_i) < size and global_j < size:
+       b_shared[local_i, local_j] = b[tile * TPB + local_i, global_j]
    ```
    - Handles boundary conditions
    - Uses LayoutTensor indexing
@@ -170,7 +162,7 @@ The tiled implementation with LayoutTensor handles large matrices efficiently by
    ```mojo
    @parameter
    for k in range(min(TPB, size - tile * TPB)):
-       acc += a_shared[local_row, k] * b_shared[k, local_col]
+       acc += a_shared[local_i, k] * b_shared[k, local_j]
    ```
    - Processes current tile
    - Uses shared memory for efficiency
@@ -180,17 +172,27 @@ The tiled implementation with LayoutTensor handles large matrices efficiently by
 
 1. **Global Memory Pattern**:
    ```txt
-   A[global_row, tile * TPB + local_col] → Coalesced reads
-   B[tile * TPB + local_row, global_col] → Transposed access
+   A[global_i, tile * TPB + local_j] → Row-major access
+   B[tile * TPB + local_i, global_j] → Row-major access
    ```
-   - Maximizes memory coalescing
-   - Minimizes bank conflicts
-   - Efficient for transposed access
+   - Maximizes memory coalescing:
+     ```txt
+     Coalesced Access (Good):          Non-Coalesced Access (Bad):
+     Thread0: [M0][M1][M2][M3]         Thread0: [M0][ ][ ][ ]
+     Thread1: [M4][M5][M6][M7]    vs   Thread1: [ ][M1][ ][ ]
+     Thread2: [M8][M9][MA][MB]         Thread2: [ ][ ][M2][ ]
+     Thread3: [MC][MD][ME][MF]         Thread3: [ ][ ][ ][M3]
+     ↓                                 ↓
+     1 memory transaction              4 memory transactions
+     ```
+     When threads access consecutive memory locations (left), the GPU can combine multiple reads into a single transaction.
+     When threads access scattered locations (right), each access requires a separate transaction, reducing performance.
 
 2. **Shared Memory Usage**:
+
    ```txt
-   a_shared[local_row, k] → Row-wise access
-   b_shared[k, local_col] → Column-wise access
+   a_shared[local_i, k] → Row-wise access
+   b_shared[k, local_j] → Row-wise access
    ```
    - Optimized for matrix multiplication
    - Reduces bank conflicts
@@ -210,29 +212,12 @@ The tiled implementation with LayoutTensor handles large matrices efficiently by
 
 2. **Boundary Handling**:
    ```mojo
-   if global_row < size and global_col < size:
-       out[global_row, global_col] = acc
+   if global_i < size and global_j < size:
+       out[global_i, global_j] = acc
    ```
    - Prevents out-of-bounds access
    - Handles matrix edges
    - Safe result writing
-
-### Performance Characteristics
-
-1. **Memory Efficiency**:
-   - Reduced global memory traffic through tiling
-   - Efficient shared memory reuse
-   - Coalesced memory access patterns
-
-2. **Computational Throughput**:
-   - High data locality in shared memory
-   - Efficient thread utilization
-   - Minimal thread divergence
-
-3. **Scalability**:
-   - Handles arbitrary matrix sizes
-   - Efficient for large matrices
-   - Good thread occupancy
 
 ### Key Optimizations
 

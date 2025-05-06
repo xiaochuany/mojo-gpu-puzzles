@@ -81,14 +81,13 @@ def main():
         expected = ctx.enqueue_create_host_buffer[dtype](
             size * size
         ).enqueue_fill(0)
-        # inp2 is the transposed of inp1
         with inp1.map_to_host() as inp1_host, inp2.map_to_host() as inp2_host:
             for row in range(size):
                 for col in range(size):
+                    val = row * size + col
                     # row major: placing elements row by row
-                    inp1_host[row * size + col] = row * size + col
-                    # also row major for inp2 (not column major)
-                    inp2_host[row * size + col] = col * size + row
+                    inp1_host[row * size + col] = val
+                    inp2_host[row * size + col] = Float32(2.0) * val
 
             # inp1 @ inp2.T
             for i in range(size):

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Implement a kernel that multiplies square matrices \\(A\\) and \\(\text{transpose}(A)\\) and stores the result in \\(\text{out}\\), using shared memory to improve memory access efficiency. This version loads matrix blocks into shared memory before computation.
+Implement a kernel that multiplies square matrices \\(A\\) and \\(B\\) and stores the result in \\(\text{out}\\), using shared memory to improve memory access efficiency. This version loads matrix blocks into shared memory before computation.
 
 ## Key concepts
 
@@ -65,7 +65,7 @@ magic run p14 --single-block
 Your output will look like this if the puzzle isn't solved yet:
 ```txt
 out: HostBuffer([0.0, 0.0, 0.0, 0.0])
-expected: HostBuffer([1.0, 3.0, 3.0, 13.0])
+expected: HostBuffer([4.0, 6.0, 12.0, 22.0])
 ```
 
 ## Solution

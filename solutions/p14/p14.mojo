@@ -85,10 +85,10 @@ fn matmul_tiled[
     a: LayoutTensor[mut=False, dtype, layout],
     b: LayoutTensor[mut=False, dtype, layout],
 ):
-    local_row = thread_idx.x
-    local_col = thread_idx.y
-    global_row = block_idx.x * TPB + local_row
-    global_col = block_idx.y * TPB + local_col
+    local_i = thread_idx.x
+    local_j = thread_idx.y
+    global_i = block_idx.x * TPB + local_i
+    global_j = block_idx.y * TPB + local_j
 
     a_shared = tb[dtype]().row_major[TPB, TPB]().shared().alloc()
     b_shared = tb[dtype]().row_major[TPB, TPB]().shared().alloc()
@@ -99,39 +99,38 @@ fn matmul_tiled[
     @parameter
     for tile in range((size + TPB - 1) // TPB):
         # Reset shared memory tiles
-        if local_row < TPB and local_col < TPB:
-            a_shared[local_row, local_col] = 0
-            b_shared[local_row, local_col] = 0
+        if local_i < TPB and local_j < TPB:
+            a_shared[local_i, local_j] = 0
+            b_shared[local_i, local_j] = 0
 
         barrier()
 
         # Load A tile - global row stays the same, col determined by tile
-        if global_row < size and (tile * TPB + local_col) < size:
-            a_shared[local_row, local_col] = a[
-                global_row, tile * TPB + local_col
+        if global_i < size and (tile * TPB + local_j) < size:
+            a_shared[local_i, local_j] = a[
+                global_i, tile * TPB + local_j
             ]
 
         # Load B tile - row determined by tile, global col stays the same
-        if (tile * TPB + local_row) < size and global_col < size:
-            b_shared[local_row, local_col] = b[
-                tile * TPB + local_row, global_col
+        if (tile * TPB + local_i) < size and global_j < size:
+            b_shared[local_i, local_j] = b[
+                tile * TPB + local_i, global_j
             ]
 
         barrier()
 
         # Matrix multiplication within the tile
-        if global_row < size and global_col < size:
+        if global_i < size and global_j < size:
 
             @parameter
             for k in range(min(TPB, size - tile * TPB)):
-                acc += a_shared[local_row, k] * b_shared[k, local_col]
+                acc += a_shared[local_i, k] * b_shared[k, local_j]
 
         barrier()
 
     # Write out final result
-    if global_row < size and global_col < size:
-        out[global_row, global_col] = acc
-
+    if global_i < size and global_j < size:
+        out[global_i, global_j] = acc
 
 # ANCHOR_END: matmul_tiled_solution
 
@@ -145,16 +144,15 @@ def main():
         expected = ctx.enqueue_create_host_buffer[dtype](
             size * size
         ).enqueue_fill(0)
-        # inp2 is the transposed of inp1
         with inp1.map_to_host() as inp1_host, inp2.map_to_host() as inp2_host:
             for row in range(size):
                 for col in range(size):
+                    val = row * size + col
                     # row major: placing elements row by row
-                    inp1_host[row * size + col] = row * size + col
-                    # also row major for inp2 (not column major)
-                    inp2_host[row * size + col] = col * size + row
+                    inp1_host[row * size + col] = val
+                    inp2_host[row * size + col] = Float32(2.0) * val
 
-            # inp1 @ inp2.T
+            # inp1 @ inp2
             for i in range(size):
                 for j in range(size):
                     for k in range(size):

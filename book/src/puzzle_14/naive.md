@@ -2,7 +2,7 @@
 
 ## Overview
 
-Implement a kernel that multiplies square matrices \\(A\\) and \\(\text{transpose}(A)\\) and stores the result in \\(\text{out}\\).
+Implement a kernel that multiplies square matrices \\(A\\) and \\(B\\) and stores the result in \\(\text{out}\\).
 This is the most straightforward implementation where each thread computes one element of the output matrix.
 
 ## Key concepts
@@ -23,7 +23,7 @@ The key insight is understanding how to map 2D thread indices to matrix elements
 
 Layout configuration:
 - Input A: `Layout.row_major(SIZE, SIZE)`
-- Input B: `Layout.row_major(SIZE, SIZE)` (transpose of A)
+- Input B: `Layout.row_major(SIZE, SIZE)`
 - Output: `Layout.row_major(SIZE, SIZE)`
 
 Memory layout (LayoutTensor):
@@ -61,7 +61,7 @@ magic run p14 --naive
 Your output will look like this if the puzzle isn't solved yet:
 ```txt
 out: HostBuffer([0.0, 0.0, 0.0, 0.0])
-expected: HostBuffer([1.0, 3.0, 3.0, 13.0])
+expected: HostBuffer([4.0, 6.0, 12.0, 22.0])
 ```
 
 ## Solution
