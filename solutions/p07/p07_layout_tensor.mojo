@@ -8,7 +8,7 @@ alias BLOCKS_PER_GRID = (2, 2)
 alias THREADS_PER_BLOCK = (3, 3)
 alias dtype = DType.float32
 alias out_layout = Layout.row_major(SIZE, SIZE)
-alias a_layout = Layout.row_major(SIZE, 1)
+alias a_layout = Layout.row_major(SIZE, SIZE)
 
 
 # ANCHOR: add_10_blocks_2d_layout_tensor_solution
@@ -17,7 +17,7 @@ fn add_10_blocks_2d[
     a_layout: Layout,
 ](
     out: LayoutTensor[mut=True, dtype, out_layout],
-    a: LayoutTensor[mut=True, dtype, a_layout],
+    a: LayoutTensor[mut=False, dtype, a_layout],
     size: Int,
 ):
     global_i = block_dim.x * block_idx.x + thread_idx.x
