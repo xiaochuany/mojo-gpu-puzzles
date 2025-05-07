@@ -24,9 +24,9 @@ The key insight is understanding how to map elements from two 1D vectors to crea
 
 <div class="solution-tips">
 
-1. Get 2D indices: `local_i = thread_idx.x`, `local_j = thread_idx.y`
-2. Add guard: `if local_i < size and local_j < size`
-3. Inside guard: `out[local_j * size + local_i] = a[local_i] + b[local_j]`
+1. Get 2D indices: `row = thread_idx.y`, `col = thread_idx.x`
+2. Add guard: `if row < size and col < size`
+3. Inside guard: think about how to broadcast values of `a` and `b`
 </div>
 </details>
 
@@ -55,9 +55,27 @@ expected: HostBuffer([0.0, 1.0, 1.0, 2.0])
 
 <div class="solution-explanation">
 
-This solution:
-- Gets 2D thread indices with `local_i = thread_idx.x`, `local_j = thread_idx.y`
-- Guards against out-of-bounds with `if local_i < size and local_j < size`
-- Broadcasts by adding `a[local_i]` and `b[local_j]` into the output matrix
+This solution demonstrates fundamental GPU broadcasting concepts without LayoutTensor abstraction:
+
+1. **Thread to matrix mapping**
+   - Uses `thread_idx.y` for row access and `thread_idx.x` for column access
+   - Direct mapping from 2D thread grid to output matrix elements
+   - Handles excess threads (3×3 grid) for 2×2 output matrix
+
+2. **Broadcasting mechanics**
+   - Vector `a` broadcasts horizontally: same `a[col]` used across each row
+   - Vector `b` broadcasts vertically: same `b[row]` used across each column
+   - Output combines both vectors through addition
+   ```txt
+   [ a0 a1 ]  +  [ b0 ]  =  [ a0+b0  a1+b0 ]
+                 [ b1 ]     [ a0+b1  a1+b1 ]
+   ```
+
+3. **Bounds checking**
+   - Single guard condition `row < size and col < size` handles both dimensions
+   - Prevents out-of-bounds access for both input vectors and output matrix
+   - Required due to 3×3 thread grid being larger than 2×2 data
+
+Compare this with the LayoutTensor version to see how the abstraction simplifies broadcasting operations while maintaining the same underlying concepts.
 </div>
 </details>

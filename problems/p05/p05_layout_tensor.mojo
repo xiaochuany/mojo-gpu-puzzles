@@ -9,8 +9,8 @@ alias BLOCKS_PER_GRID = 1
 alias THREADS_PER_BLOCK = (3, 3)
 alias dtype = DType.float32
 alias out_layout = Layout.row_major(SIZE, SIZE)
-alias a_layout = Layout.row_major(SIZE, 1)
-alias b_layout = Layout.row_major(1, SIZE)
+alias a_layout = Layout.row_major(1, SIZE)
+alias b_layout = Layout.row_major(SIZE, 1)
 
 
 fn broadcast_add[
@@ -19,12 +19,12 @@ fn broadcast_add[
     b_layout: Layout,
 ](
     out: LayoutTensor[mut=True, dtype, out_layout],
-    a: LayoutTensor[mut=True, dtype, a_layout],
-    b: LayoutTensor[mut=True, dtype, b_layout],
+    a: LayoutTensor[mut=False, dtype, a_layout],
+    b: LayoutTensor[mut=False, dtype, b_layout],
     size: Int,
 ):
-    local_i = thread_idx.x
-    local_j = thread_idx.y
+    row = thread_idx.y
+    col = thread_idx.x
     # FILL ME IN (roughly 2 lines)
 
 
