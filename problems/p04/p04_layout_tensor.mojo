@@ -16,8 +16,8 @@ fn add_10_2d(
     a: LayoutTensor[mut=True, dtype, layout],
     size: Int,
 ):
-    local_i = thread_idx.x
-    local_j = thread_idx.y
+    row = thread_idx.y
+    col = thread_idx.x
     # FILL ME IN (roughly 2 lines)
 
 

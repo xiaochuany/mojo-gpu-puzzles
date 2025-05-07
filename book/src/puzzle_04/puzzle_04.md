@@ -16,6 +16,7 @@ Implement a kernel that adds 10 to each position of 2D square matrix `a` and sto
 For each position \\((i,j)\\):
 \\[\Large out[i,j] = a[i,j] + 10\\]
 
+
 ## Implementation approaches
 
 ### [🔰 Raw memory approach](./raw.md)

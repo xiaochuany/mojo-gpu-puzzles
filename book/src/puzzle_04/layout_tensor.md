@@ -31,9 +31,9 @@ The key insight is that `LayoutTensor` provides a natural 2D indexing interface,
 
 <div class="solution-tips">
 
-1. Get 2D indices: `local_i = thread_idx.x`, `local_j = thread_idx.y`
-2. Add guard: `if local_i < size and local_j < size`
-3. Inside guard: `out[local_i, local_j] = a[local_i, local_j] + 10.0`
+1. Get 2D indices: `row = thread_idx.y`, `col = thread_idx.x`
+2. Add guard: `if row < size and col < size`
+3. Inside guard add 10 to `a[row, col]`
 </div>
 </details>
 
@@ -63,8 +63,8 @@ expected: HostBuffer([10.0, 11.0, 12.0, 13.0])
 <div class="solution-explanation">
 
 This solution:
-- Gets 2D thread indices with `local_i = thread_idx.x`, `local_j = thread_idx.y`
-- Guards against out-of-bounds with `if local_i < size and local_j < size`
-- Uses `LayoutTensor`'s 2D indexing: `out[local_i, local_j] = a[local_i, local_j] + 10.0`
+- Gets 2D thread indices with `row = thread_idx.y`, `col = thread_idx.x`
+- Guards against out-of-bounds with `if row < size and col < size`
+- Uses `LayoutTensor`'s 2D indexing: `out[row, col] = a[row, col] + 10.0`
 </div>
 </details>
