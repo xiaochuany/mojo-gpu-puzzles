@@ -15,8 +15,8 @@ fn add(
     a: UnsafePointer[Scalar[dtype]],
     b: UnsafePointer[Scalar[dtype]],
 ):
-    local_i = thread_idx.x
-    out[local_i] = a[local_i] + b[local_i]
+    i = thread_idx.x
+    out[i] = a[i] + b[i]
 
 
 # ANCHOR_END: add_solution

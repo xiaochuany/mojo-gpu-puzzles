@@ -41,9 +41,9 @@ Thread 2:  a[2] + b[2] → out[2]
 
 <div class="solution-tips">
 
-1. Store `thread_idx.x` in `local_i`
-2. Add `a[local_i]` and `b[local_i]`
-3. Store result in `out[local_i]`
+1. Store `thread_idx.x` in `i`
+2. Add `a[i]` and `b[i]`
+3. Store result in `out[i]`
 </div>
 </details>
 
@@ -73,8 +73,8 @@ expected: HostBuffer([0.0, 2.0, 4.0, 6.0])
 <div class="solution-explanation">
 
 This solution:
-- Gets thread index with `local_i = thread_idx.x`
-- Adds values from both arrays: `out[local_i] = a[local_i] + b[local_i]`
+- Gets thread index with `i = thread_idx.x`
+- Adds values from both arrays: `out[i] = a[i] + b[i]`
 </div>
 </details>
 

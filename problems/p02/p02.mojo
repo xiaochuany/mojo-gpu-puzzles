@@ -15,7 +15,7 @@ fn add(
     a: UnsafePointer[Scalar[dtype]],
     b: UnsafePointer[Scalar[dtype]],
 ):
-    local_i = thread_idx.x
+    i = thread_idx.x
     # FILL ME IN (roughly 1 line)
 
 
