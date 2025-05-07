@@ -4,8 +4,8 @@ Looking at our traditional implementation above, you might notice some potential
 
 ### Current approach
 ```mojo
-local_i = thread_idx.x
-out[local_i] = a[local_i] + 10.0
+i = thread_idx.x
+out[i] = a[i] + 10.0
 ```
 
 This works for 1D arrays, but what happens when we need to:

@@ -11,8 +11,8 @@ alias dtype = DType.float32
 
 # ANCHOR: add_10_solution
 fn add_10(out: UnsafePointer[Scalar[dtype]], a: UnsafePointer[Scalar[dtype]]):
-    local_i = thread_idx.x
-    out[local_i] = a[local_i] + 10.0
+    i = thread_idx.x
+    out[i] = a[i] + 10.0
 
 
 # ANCHOR_END: add_10_solution
