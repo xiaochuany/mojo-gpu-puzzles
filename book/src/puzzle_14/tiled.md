@@ -49,10 +49,33 @@ Each block processes a tile using LayoutTensor indexing
 
 ### Memory access pattern
 ```txt
-For each tile:
-  Input Tiles:                Output Computation:
-    A[global_i, tile*TPB + j] ×    Result accumulator
-    B[tile*TPB + i, global_j] →    C[global_i, global_j]
+Matrix A (8×8)                 Matrix B (8×8)               Matrix C (8×8)
++---+---+---+                  +---+---+---+                +---+---+---+
+|T00|T01|T02| ...              |T00|T01|T02| ...            |T00|T01|T02| ...
++---+---+---+                  +---+---+---+                +---+---+---+
+|T10|T11|T12|                  |T10|T11|T12|                |T10|T11|T12|
++---+---+---+                  +---+---+---+                +---+---+---+
+|T20|T21|T22|                  |T20|T21|T22|                |T20|T21|T22|
++---+---+---+                  +---+---+---+                +---+---+---+
+  ...                            ...                          ...
+
+Tile Processing (for computing C[T11]):
+1. Load tiles from A and B:
+   +---+      +---+
+   |A11| ×    |B11|     For each phase k:
+   +---+      +---+     C[T11] += A[row, k] × B[k, col]
+
+2. Tile movement:
+   Phase 1     Phase 2     Phase 3
+   A: [T10]    A: [T11]    A: [T12]
+   B: [T01]    B: [T11]    B: [T21]
+
+3. Each thread (i,j) in tile computes:
+   C[i,j] = Σ (A[i,k] × B[k,j]) for k in tile width
+
+Synchronization required:
+* After loading tiles to shared memory
+* After computing each phase
 ```
 
 ## Code to complete
@@ -99,81 +122,63 @@ expected: HostBuffer([2240.0, 2296.0, 2352.0, 2408.0, 2464.0, 2520.0, 2576.0, 26
 
 <div class="solution-explanation">
 
-The tiled implementation with LayoutTensor handles matrices efficiently by processing them in blocks. Here's a comprehensive analysis:
+The tiled matrix multiplication implementation demonstrates efficient handling of large matrices \((8 \times 8)\) using small tiles \((3 \times 3)\). Here's how it works:
 
-### Implementation Architecture
+1. **Thread indexing setup**
+   - Global position calculation:
+     ```txt
+     tiled_row = block_idx.y * TPB + thread_idx.y
+     tiled_col = block_idx.x * TPB + thread_idx.x
+     ```
+   - Local position in tile:
+     ```txt
+     local_row = thread_idx.y
+     local_col = thread_idx.x
+     ```
 
-1. **Thread and Block Organization**:
-   ```mojo
-   local_i = thread_idx.x
-   local_j = thread_idx.y
-   global_i = block_idx.x * TPB + local_i
-   global_j = block_idx.y * TPB + local_j
-   ```
-   - Defines row-major layout for all tensors
-   - Ensures consistent memory access patterns
-   - Enables efficient 2D indexing
-
-2. **Shared Memory Setup**:
-   ```mojo
-   a_shared = tb[dtype]().row_major[TPB, TPB]().shared().alloc()
-   b_shared = tb[dtype]().row_major[TPB, TPB]().shared().alloc()
-   ```
-   - Uses TensorBuilder for structured allocation
-   - Maintains row-major layout for consistency
-   - Enables efficient tile processing
-
-### Tile Processing Pipeline
-
-1. **Tile Iteration**:
-   ```mojo
-   @parameter
-   for tile in range((size + TPB - 1) // TPB):
-   ```
-   - Compile-time unrolled loop
-   - Handles matrix size not divisible by TPB
-   - Processes matrix in TPB×TPB tiles
-
-2. **Shared Memory Reset**:
-   ```mojo
-   if local_i < TPB and local_j < TPB:
-       a_shared[local_i, local_j] = 0
-       b_shared[local_i, local_j] = 0
-   ```
-   - Clears previous tile data
-   - Ensures clean state for new tile
-   - Prevents data corruption
-
-3. **Tile Loading**:
-   ```mojo
-   # Load A tile - global row stays the same, col determined by tile
-   if global_i < size and (tile * TPB + local_j) < size:
-       a_shared[local_i, local_j] = a[global_i, tile * TPB + local_j]
-
-   # Load B tile - row determined by tile, global col stays the same
-   if (tile * TPB + local_i) < size and global_j < size:
-       b_shared[local_i, local_j] = b[tile * TPB + local_i, global_j]
-   ```
-   - Handles boundary conditions
-   - Uses LayoutTensor indexing
-   - Maintains memory coalescing
-
-4. **Computation**:
-   ```mojo
-   @parameter
-   for k in range(min(TPB, size - tile * TPB)):
-       acc += a_shared[local_i, k] * b_shared[k, local_j]
-   ```
-   - Processes current tile
-   - Uses shared memory for efficiency
-   - Handles partial tiles correctly
-
-### Memory Access Optimization
-
-1. **Global Memory Pattern**:
+2. **Shared memory allocation**
    ```txt
-   A[global_i, tile * TPB + local_j] → Row-major access
-   B[tile * TPB + local_i, global_j] → Row-major access
+   Input matrices (8×8):
+   A = [0  1  2  3  4  5  6  7 ]    B = [0  2  4  6  8  10 12 14]
+       [8  9  10 11 12 13 14 15]        [16 18 20 22 24 26 28 30]
+       [16 17 18 19 20 21 22 23]        [32 34 36 38 40 42 44 46]
+       [24 25 26 27 28 29 30 31]        [48 50 52 54 56 58 60 62]
+       [32 33 34 35 36 37 38 39]        [64 66 68 70 72 74 76 78]
+       [40 41 42 43 44 45 46 47]        [80 82 84 86 88 90 92 94]
+       [48 49 50 51 52 53 54 55]        [96 98 100 102 104 106 108 110]
+       [56 57 58 59 60 61 62 63]        [112 114 116 118 120 122 124 126]
+
+   Shared memory per block (3×3):
+   a_shared[TPB, TPB]  b_shared[TPB, TPB]
+   ```
+
+3. **Tile processing loop**
+   ```txt
+   Number of tiles = (8 + 3 - 1) // 3 = 3 tiles
+
+   For each tile:
+   1. Reset shared memory
+   2. Load tile from A and B
+   3. Compute partial products
+   4. Accumulate in register
+   ```
+
+4. **Memory loading pattern**
+   - Loading A tile:
+     ```txt
+     if tiled_row < size and (tile * TPB + local_col) < size:
+         a_shared[local_row, local_col] = a[tiled_row, tile * TPB + local_col]
+     ```
+   - Loading B tile:
+     ```txt
+     if (tile * TPB + local_row) < size and tiled_col < size:
+         b_shared[local_row, local_col] = b[tile * TPB + local_row, tiled_col]
+     ```
+
+5. **Computation within tile**
+   ```txt
+   For k in range(min(TPB, size - tile * TPB)):
+       acc += a_shared[local_row, k] * b_shared[k, local_col]
    ```
    - Maximizes memory coalescing:
      ```txt
@@ -188,53 +193,44 @@ The tiled implementation with LayoutTensor handles matrices efficiently by proce
      When threads access consecutive memory locations (left), the GPU can combine multiple reads into a single transaction.
      When threads access scattered locations (right), each access requires a separate transaction, reducing performance.
 
-2. **Shared Memory Usage**:
 
+6. **Synchronization points**
    ```txt
-   a_shared[local_i, k] → Row-wise access
-   b_shared[k, local_j] → Row-wise access
+   barrier() after:
+   1. Shared memory reset
+   2. Tile loading
+   3. Tile computation
    ```
-   - Optimized for matrix multiplication
-   - Reduces bank conflicts
-   - Enables data reuse
 
-### Synchronization and Safety
+Key performance features:
+- Processes 8×8 matrix using 3×3 tiles
+- Uses shared memory for fast tile access
+- Minimizes global memory transactions
+- Handles matrix boundaries correctly
+- Maintains coalesced memory access
 
-1. **Barrier Points**:
+2. **Boundary handling**:
    ```mojo
-   barrier()  # After shared memory reset
-   barrier()  # After tile loading
-   barrier()  # After computation
-   ```
-   - Ensures shared memory consistency
-   - Prevents race conditions
-   - Maintains thread cooperation
-
-2. **Boundary Handling**:
-   ```mojo
-   if global_i < size and global_j < size:
-       out[global_i, global_j] = acc
+   if row < size and col < size:
+       out[row, col] = acc
    ```
    - Prevents out-of-bounds access
    - Handles matrix edges
    - Safe result writing
 
-### Key Optimizations
+### Key optimizations
 
-1. **Layout Optimization**:
+1. **Layout optimization**:
    - Row-major layout for all tensors
    - Efficient 2D indexing
-   - Proper alignment
 
-2. **Memory Access**:
+2. **Memory access**:
    - Coalesced global memory loads
    - Efficient shared memory usage
-   - Minimal bank conflicts
 
 3. **Computation**:
-   - Register-based accumulation
-   - Compile-time loop unrolling
-   - Efficient tile processing
+   - Register-based accumulation i.e. `var acc: out.element_type = 0`
+   - Compile-time loop unrolling via `@parameter`
 
 This implementation achieves high performance through:
 - Efficient use of LayoutTensor for memory access

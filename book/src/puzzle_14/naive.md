@@ -26,11 +26,6 @@ Layout configuration:
 - Input B: `Layout.row_major(SIZE, SIZE)`
 - Output: `Layout.row_major(SIZE, SIZE)`
 
-Memory layout (LayoutTensor):
-- Matrix A: `a[i, j]` directly indexes position (i,j)
-- Matrix B: `b[i, j]` is the transpose of A
-- Output C: `out[i, j]` stores result at position (i,j)
-
 ## Code to complete
 
 ```mojo
@@ -43,7 +38,7 @@ Memory layout (LayoutTensor):
 
 <div class="solution-tips">
 
-1. Calculate `global_i` and `global_j` from thread indices
+1. Calculate `row` and `col` from thread indices
 2. Check if indices are within `size`
 3. Accumulate products in a local variable
 4. Write final sum to correct output position
@@ -79,25 +74,25 @@ The naive matrix multiplication using LayoutTensor demonstrates the basic approa
 
 ### Matrix Layout (2×2 example)
 ```txt
-Matrix A:        Matrix B (transpose of A):    Output C:
- [a[0,0] a[0,1]]  [b[0,0] b[0,1]]             [c[0,0] c[0,1]]
- [a[1,0] a[1,1]]  [b[1,0] b[1,1]]             [c[1,0] c[1,1]]
+Matrix A:          Matrix B:                   Output C:
+[a[0,0] a[0,1]]    [b[0,0] b[0,1]]             [c[0,0] c[0,1]]
+[a[1,0] a[1,1]]    [b[1,0] b[1,1]]             [c[1,0] c[1,1]]
 ```
 
 ### Implementation Details:
 
-1. **Thread Mapping**:
+1. **Thread mapping**:
    ```mojo
-   global_i = block_dim.x * block_idx.x + thread_idx.x
-   global_j = block_dim.y * block_idx.y + thread_idx.y
+   row = block_dim.y * block_idx.y + thread_idx.y
+   col = block_dim.x * block_idx.x + thread_idx.x
    ```
 
-2. **Memory Access Pattern**:
-   - Direct 2D indexing: `a[global_i, k]`
-   - Transposed access: `b[k, global_j]`
-   - Output writing: `out[global_i, global_j]`
+2. **Memory access pattern**:
+   - Direct 2D indexing: `a[row, k]`
+   - Transposed access: `b[k, col]`
+   - Output writing: `out[row, col]`
 
-3. **Computation Flow**:
+3. **Computation flow**:
    ```mojo
    # Use var for mutable accumulator with tensor's element type
    var acc: out.element_type = 0
@@ -105,28 +100,28 @@ Matrix A:        Matrix B (transpose of A):    Output C:
    # @parameter for compile-time loop unrolling
    @parameter
    for k in range(size):
-       acc += a[global_i, k] * b[k, global_j]
+       acc += a[row, k] * b[k, col]
    ```
 
-### Key Language Features:
+### Key language features:
 
-1. **Variable Declaration**:
+1. **Variable declaration**:
    - The use of `var` in `var acc: out.element_type = 0` allows for type inference with `out.element_type` ensures type compatibility with the output tensor
    - Initialized to zero before accumulation
 
-2. **Loop Optimization**:
+2. **Loop pptimization**:
    - [`@parameter`](https://docs.modular.com/mojo/manual/decorators/parameter/#parametric-for-statement) decorator unrolls the loop at compile time
    - Improves performance for small, known matrix sizes
    - Enables better instruction scheduling
 
-### Performance Characteristics:
+### Performance characteristics:
 
-1. **Memory Access**:
+1. **Memory access**:
    - Each thread makes `2 x SIZE` global memory reads
    - One global memory write per thread
    - No data reuse between threads
 
-2. **Computational Efficiency**:
+2. **Computational efficiency**:
    - Simple implementation but suboptimal performance
    - Many redundant global memory accesses
    - No use of fast shared memory
