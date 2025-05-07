@@ -111,7 +111,7 @@ out: HostBuffer([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
 expected: HostBuffer([2240.0, 2296.0, 2352.0, 2408.0, 2464.0, 2520.0, 2576.0, 2632.0, 5824.0, 6008.0, 6192.0, 6376.0, 6560.0, 6744.0, 6928.0, 7112.0, 9408.0, 9720.0, 10032.0, 10344.0, 10656.0, 10968.0, 11280.0, 11592.0, 12992.0, 13432.0, 13872.0, 14312.0, 14752.0, 15192.0, 15632.0, 16072.0, 16576.0, 17144.0, 17712.0, 18280.0, 18848.0, 19416.0, 19984.0, 20552.0, 20160.0, 20856.0, 21552.0, 22248.0, 22944.0, 23640.0, 24336.0, 25032.0, 23744.0, 24568.0, 25392.0, 26216.0, 27040.0, 27864.0, 28688.0, 29512.0, 27328.0, 28280.0, 29232.0, 30184.0, 31136.0, 32088.0, 33040.0, 33992.0])
 ```
 
-## Solution
+## Solution: Manual tiling
 
 <details class="solution-details">
 <summary></summary>
@@ -237,5 +237,97 @@ This implementation achieves high performance through:
 - Optimal tiling strategy
 - Proper thread synchronization
 - Careful boundary handling
+</div>
+</details>
+
+## Solution: Idiomatic LayoutTensor tiling
+
+<details class="solution-details">
+<summary></summary>
+
+```mojo
+{{#include ../../../solutions/p14/p14.mojo:matmul_idiomatic_tiled_solution}}
+```
+
+<div class="solution-explanation">
+
+The idiomatic tiled matrix multiplication leverages Mojo's LayoutTensor API and asynchronous memory operations for a cleaner implementation:
+
+1. **LayoutTensor tile API**
+   ```mojo
+   out_tile = out.tile[TPB, TPB](block_idx.y, block_idx.x)
+   a_tile = a.tile[TPB, TPB](block_idx.y, idx)
+   b_tile = b.tile[TPB, TPB](idx, block_idx.x)
+   ```
+   This directly expresses "get the tile at position (block_idx.y, block_idx.x)" without manual coordinate calculation. See the [documentation](https://docs.modular.com/mojo/kernels/layout/layout_tensor/LayoutTensor/#tile) for more details.
+
+2. **Asynchronous memory operations**
+   ```mojo
+   copy_dram_to_sram_async[thread_layout=load_a_layout](a_shared, a_tile)
+   copy_dram_to_sram_async[thread_layout=load_b_layout](b_shared, b_tile)
+   async_copy_wait_all()
+   ```
+   These operations:
+   - Launch asynchronous memory transfers that may overlap with computation via [copy_dram_to_sram_async](https://docs.modular.com/mojo/kernels/layout/layout_tensor/copy_dram_to_sram_async/)
+   - Use specialized thread layouts for optimal memory access patterns
+   - Eliminate the need for manual memory initialization
+
+3. **Specialized compile-time load layouts**
+   ```mojo
+   alias load_a_layout = Layout.row_major(1, TPB)
+   alias load_b_layout = Layout.row_major(TPB, 1)
+   ```
+   These layouts optimize how threads cooperate during memory transfers:
+   - `load_a_layout`: Each thread loads a slice of a row (coalesced access)
+   - `load_b_layout`: Each thread loads a slice of a column (transposed access)
+
+4. **Efficient thread synchronization**
+   ```mojo
+   // Wait for async operations to complete
+   async_copy_wait_all()
+   // Ensure all threads can see the shared memory contents
+   barrier()
+   ```
+   The barriers ensure proper synchronization:
+   - After memory transfers complete
+   - After computation for each tile
+
+5. **Proper boundary handling**
+   ```mojo
+   if block_idx.y * TPB + local_row < size and block_idx.x * TPB + local_col < size:
+       out_tile[local_row, local_col] = acc
+   ```
+   This critical check prevents out-of-bounds writes for blocks at the matrix boundaries.
+
+6. **Tile processing loop**
+   ```mojo
+   for idx in range((size + TPB - 1) // TPB):
+      // Process one tile
+   ```
+   Uses ceiling division to handle matrices whose dimensions aren't perfect multiples of the tile size.
+
+### Performance considerations
+
+The idiomatic implementation maintains the performance benefits of tiling while providing cleaner abstractions:
+
+1. **Memory locality**: Exploits spatial and temporal locality through tiling
+2. **Coalesced access**: Specialized load layouts ensure coalesced memory access patterns
+3. **Compute-memory overlap**: Potential overlap through asynchronous memory operations
+4. **Shared memory efficiency**: No redundant initialization of shared memory
+5. **Register pressure**: Uses accumulation registers for optimal compute throughput
+
+This implementation shows how high-level abstractions can express complex GPU algorithms without sacrificing performance. It's a prime example of Mojo's philosophy: combining high-level expressiveness with low-level performance control.
+
+### Key differences from manual tiling
+
+| Feature | Manual Tiling | Idiomatic Tiling |
+|---------|--------------|------------------|
+| Memory access | Direct indexing with bounds checks | LayoutTensor tile API |
+| Tile loading | Explicit element-by-element copying | Asynchronous bulk transfers |
+| Shared memory | Manual initialization (zeroing) | Managed by copy functions |
+| Code complexity | More verbose with explicit indexing | More concise with higher-level APIs |
+| Bounds checking | Multiple checks during loading and computing | Single check at final write |
+
+The idiomatic approach is not just cleaner but also potentially more performant due to the use of specialized memory layouts and asynchronous operations.
 </div>
 </details>

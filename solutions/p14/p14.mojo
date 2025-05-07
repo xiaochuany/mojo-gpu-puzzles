@@ -133,12 +133,65 @@ fn matmul_tiled[
     if tiled_row < size and tiled_col < size:
         out[tiled_row, tiled_col] = acc
 
+
 # ANCHOR_END: matmul_tiled_solution
+
+# ANCHOR: matmul_idiomatic_tiled_solution
+from gpu.memory import async_copy_wait_all
+from layout.layout_tensor import copy_dram_to_sram_async
+
+
+fn matmul_idiomatic_tiled[
+    layout: Layout, size: Int
+](
+    out: LayoutTensor[mut=False, dtype, layout],
+    a: LayoutTensor[mut=False, dtype, layout],
+    b: LayoutTensor[mut=False, dtype, layout],
+):
+    # Get the tile of the output matrix `out` that this thread block is responsible for
+    out_tile = out.tile[TPB, TPB](block_idx.y, block_idx.x)
+    a_shared = tb[dtype]().row_major[TPB, TPB]().shared().alloc()
+    b_shared = tb[dtype]().row_major[TPB, TPB]().shared().alloc()
+    local_row = thread_idx.y
+    local_col = thread_idx.x
+
+    var acc: out.element_type = 0
+
+    alias load_a_layout = Layout.row_major(1, TPB)
+    alias load_b_layout = Layout.row_major(TPB, 1)
+    for idx in range((size + TPB - 1) // TPB):
+        a_tile = a.tile[TPB, TPB](block_idx.y, idx)
+        b_tile = b.tile[TPB, TPB](idx, block_idx.x)
+
+        copy_dram_to_sram_async[thread_layout=load_a_layout](a_shared, a_tile)
+        copy_dram_to_sram_async[thread_layout=load_b_layout](b_shared, b_tile)
+
+        async_copy_wait_all()
+
+        barrier()
+
+        @parameter
+        for k in range(TPB):
+            acc += a_shared[local_row, k] * b_shared[k, local_col]
+
+        barrier()
+
+    if (
+        block_idx.y * TPB + local_row < size
+        and block_idx.x * TPB + local_col < size
+    ):
+        out_tile[local_row, local_col] = acc
+
+
+# ANCHOR_END: matmul_idiomatic_tiled_solution
 
 
 def main():
     with DeviceContext() as ctx:
-        size = SIZE_TILED if argv()[1] == "--tiled" else SIZE
+        size = (
+            SIZE_TILED if argv()[1] == "--idiomatic-tiled"
+            or argv()[1] == "--tiled" else SIZE
+        )
         out = ctx.enqueue_create_buffer[dtype](size * size).enqueue_fill(0)
         inp1 = ctx.enqueue_create_buffer[dtype](size * size).enqueue_fill(0)
         inp2 = ctx.enqueue_create_buffer[dtype](size * size).enqueue_fill(0)
@@ -200,8 +253,30 @@ def main():
                 grid_dim=BLOCKS_PER_GRID_TILED,
                 block_dim=THREADS_PER_BLOCK_TILED,
             )
+        elif argv()[1] == "--idiomatic-tiled":
+            out_tensor_tiled = LayoutTensor[mut=False, dtype, layout_tiled](
+                out.unsafe_ptr()
+            )
+            a_tensor_tiled = LayoutTensor[mut=False, dtype, layout_tiled](
+                inp1.unsafe_ptr()
+            )
+            b_tensor_tiled = LayoutTensor[mut=False, dtype, layout_tiled](
+                inp2.unsafe_ptr()
+            )
+            ctx.enqueue_function[
+                matmul_idiomatic_tiled[layout_tiled, SIZE_TILED]
+            ](
+                out_tensor_tiled,
+                a_tensor_tiled,
+                b_tensor_tiled,
+                grid_dim=BLOCKS_PER_GRID_TILED,
+                block_dim=THREADS_PER_BLOCK_TILED,
+            )
         else:
-            raise Error("Invalid argument")
+            raise Error(
+                "Invalid option. Choose among the available flags: --naive,"
+                " --single-block, --tiled, --idiomatic-tiled"
+            )
 
         ctx.synchronize()
 
