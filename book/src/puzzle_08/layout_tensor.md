@@ -90,18 +90,49 @@ expected: HostBuffer([11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0])
 
 <div class="solution-explanation">
 
-This solution:
-- Creates shared memory using tensor builder's fluent API
-- Guards against out-of-bounds with `if global_i < size`
-- Uses natural indexing for both shared and global memory
-- Ensures thread synchronization with `barrier()`
-- Leverages LayoutTensor's built-in safety features
+This solution demonstrates how LayoutTensor simplifies shared memory usage while maintaining performance:
 
-Key steps:
-1. Allocate shared memory with proper layout
-2. Load global data into shared memory
-3. Synchronize threads
-4. Process data using shared memory
-5. Write results back to global memory
+1. **Memory hierarchy with LayoutTensor**
+   - Global tensors: `a` and `out` (slow, visible to all blocks)
+   - Shared tensor: `shared` (fast, thread-block local)
+   - Example for 8 elements with 4 threads per block:
+     ```txt
+     Global tensor a: [1 1 1 1 | 1 1 1 1]  # Input: all ones
+
+     Block (0):         Block (1):
+     shared[0..3]       shared[0..3]
+     [1 1 1 1]          [1 1 1 1]
+     ```
+
+2. **Thread coordination**
+   - Load phase with natural indexing:
+     ```txt
+     Thread 0: shared[0] = a[0]=1    Thread 2: shared[2] = a[2]=1
+     Thread 1: shared[1] = a[1]=1    Thread 3: shared[3] = a[3]=1
+     barrier()    ↓         ↓        ↓         ↓   # Wait for all loads
+     ```
+   - Process phase: Each thread adds 10 to its shared tensor value
+   - Result: `out[global_i] = shared[local_i] + 10 = 11`
+
+3. **LayoutTensor benefits**
+   - Shared memory allocation:
+     ```txt
+     # Clean tensor builder API
+     shared = tb[dtype]().row_major[TPB]().shared().alloc()
+     ```
+   - Natural indexing for both global and shared:
+     ```txt
+     Block 0 output: [11 11 11 11]
+     Block 1 output: [11 11 11 11]
+     ```
+   - Built-in layout management and type safety
+
+4. **Memory access pattern**
+   - Load: Global tensor → Shared tensor (optimized)
+   - Sync: Same `barrier()` requirement as raw version
+   - Process: Add 10 to shared values
+   - Store: Write 11s back to global tensor
+
+This pattern shows how LayoutTensor maintains the performance benefits of shared memory while providing a more ergonomic API and built-in features.
 </div>
 </details>

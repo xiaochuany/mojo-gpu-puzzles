@@ -67,10 +67,47 @@ expected: HostBuffer([11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0])
 
 <div class="solution-explanation">
 
-This solution:
-- Waits for shared memory load with `barrier()`
-- Guards against out-of-bounds with `if global_i < size`
-- Reads from shared memory using `shared[local_i]`
-- Writes result to global memory at `out[global_i]`
+This solution demonstrates key concepts of shared memory usage in GPU programming:
+
+1. **Memory hierarchy**
+   - Global memory: `a` and `out` arrays (slow, visible to all blocks)
+   - Shared memory: `shared` array (fast, thread-block local)
+   - Example for 8 elements with 4 threads per block:
+     ```txt
+     Global array a: [1 1 1 1 | 1 1 1 1]  # Input: all ones
+
+     Block (0):      Block (1):
+     shared[0..3]    shared[0..3]
+     [1 1 1 1]       [1 1 1 1]
+     ```
+
+2. **Thread coordination**
+   - Load phase:
+     ```txt
+     Thread 0: shared[0] = a[0]=1    Thread 2: shared[2] = a[2]=1
+     Thread 1: shared[1] = a[1]=1    Thread 3: shared[3] = a[3]=1
+     barrier()    ↓         ↓        ↓         ↓   # Wait for all loads
+     ```
+   - Process phase: Each thread adds 10 to its shared memory value
+   - Result: `out[i] = shared[local_i] + 10 = 11`
+
+3. **Index mapping**
+   - Global index: `block_dim.x * block_idx.x + thread_idx.x`
+     ```txt
+     Block 0 output: [11 11 11 11]
+     Block 1 output: [11 11 11 11]
+     ```
+   - Local index: `thread_idx.x` for shared memory access
+     ```txt
+     Both blocks process: 1 + 10 = 11
+     ```
+
+4. **Memory access pattern**
+   - Load: Global → Shared (coalesced reads of 1s)
+   - Sync: `barrier()` ensures all loads complete
+   - Process: Add 10 to shared values
+   - Store: Write 11s back to global memory
+
+This pattern shows how to use shared memory to optimize data access while maintaining thread coordination within blocks.
 </div>
 </details>
