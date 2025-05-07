@@ -28,9 +28,9 @@ The key insight is understanding how blocks of threads work together to process 
 
 <div class="solution-tips">
 
-1. Calculate global index: `global_i = block_dim.x * block_idx.x + thread_idx.x`
-2. Add guard: `if global_i < size`
-3. Inside guard: `out[global_i] = a[global_i] + 10.0`
+1. Calculate global index: `i = block_dim.x * block_idx.x + thread_idx.x`
+2. Add guard: `if i < size`
+3. Inside guard: `out[i] = a[i] + 10.0`
 </div>
 </details>
 
@@ -59,9 +59,39 @@ expected: HostBuffer([10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0])
 
 <div class="solution-explanation">
 
-This solution:
-- Computes global thread index from block and thread indices
-- Guards against out-of-bounds with `if global_i < size`
-- Inside guard: adds 10 to input value at global index
+This solution demonstrates key concepts of block-based GPU processing:
+
+1. **Global thread indexing**
+   - Combines block and thread indices: `block_dim.x * block_idx.x + thread_idx.x`
+   - Maps each thread to a unique global position
+   - Example for 3 threads per block:
+     ```txt
+     Block 0: [0 1 2]
+     Block 1: [3 4 5]
+     Block 2: [6 7 8]
+     ```
+
+2. **Block coordination**
+   - Each block processes a contiguous chunk of data
+   - Block size (3) < Data size (9) requires multiple blocks
+   - Automatic work distribution across blocks:
+     ```txt
+     Data:    [0 1 2 3 4 5 6 7 8]
+     Block 0: [0 1 2]
+     Block 1:       [3 4 5]
+     Block 2:             [6 7 8]
+     ```
+
+3. **Bounds checking**
+   - Guard condition `i < size` handles edge cases
+   - Prevents out-of-bounds access when size isn't perfectly divisible by block size
+   - Essential for handling partial blocks at the end of data
+
+4. **Memory access pattern**
+   - Coalesced memory access: threads in a block access contiguous memory
+   - Each thread processes one element: `out[i] = a[i] + 10.0`
+   - Block-level parallelism enables efficient memory bandwidth utilization
+
+This pattern forms the foundation for processing large datasets that exceed the size of a single thread block.
 </div>
 </details>
