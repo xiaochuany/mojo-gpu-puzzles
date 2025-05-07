@@ -46,9 +46,9 @@ Thread 5 (i=5):  if 5 < size:  ❌ Skip (out of bounds)
 
 <div class="solution-tips">
 
-1. Store `thread_idx.x` in `local_i`
-2. Add guard: `if local_i < size`
-3. Inside guard: `out[local_i] = a[local_i] + 10.0`
+1. Store `thread_idx.x` in `i`
+2. Add guard: `if i < size`
+3. Inside guard: `out[i] = a[i] + 10.0`
 </div>
 </details>
 
@@ -78,8 +78,8 @@ expected: HostBuffer([10.0, 11.0, 12.0, 13.0])
 <div class="solution-explanation">
 
 This solution:
-- Gets thread index with `local_i = thread_idx.x`
-- Guards against out-of-bounds access with `if local_i < size`
+- Gets thread index with `i = thread_idx.x`
+- Guards against out-of-bounds access with `if i < size`
 - Inside guard: adds 10 to input value
 </div>
 </details>
