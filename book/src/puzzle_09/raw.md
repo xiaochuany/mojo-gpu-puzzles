@@ -66,30 +66,54 @@ expected: HostBuffer([0.0, 1.0, 3.0, 6.0, 9.0, 12.0, 15.0, 18.0])
 
 The solution implements a sliding window sum using shared memory with these key steps:
 
-1. **Shared Memory Setup**:
-   - Allocates `TPB` elements in shared memory
+1. **Shared memory setup**
+   - Allocates `TPB` elements in shared memory:
+     ```txt
+     Input array:  [0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0]
+     Block shared: [0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0]
+     ```
    - Each thread loads one element from global memory
-   - Uses `barrier()` to ensure all data is loaded
+   - `barrier()` ensures all data is loaded
 
-2. **Boundary Cases**:
-   - Position 0: `out[0] = shared[0]` (only first element)
-   - Position 1: `out[1] = shared[0] + shared[1]` (sum of first two elements)
+2. **Boundary cases**
+   - Position 0: Single element
+     ```txt
+     out[0] = shared[0] = 0.0
+     ```
+   - Position 1: Sum of first two elements
+     ```txt
+     out[1] = shared[0] + shared[1] = 0.0 + 1.0 = 1.0
+     ```
 
-3. **Main Window Operation**:
-   - For positions 2 and beyond: `out[i] = shared[i-2] + shared[i-1] + shared[i]`
-   - Uses local indices for shared memory access
-   - Maintains coalesced memory access pattern
+3. **Main window operation**
+   - For positions 2 and beyond:
+     ```txt
+     Position 2: shared[0] + shared[1] + shared[2] = 0.0 + 1.0 + 2.0 = 3.0
+     Position 3: shared[1] + shared[2] + shared[3] = 1.0 + 2.0 + 3.0 = 6.0
+     Position 4: shared[2] + shared[3] + shared[4] = 2.0 + 3.0 + 4.0 = 9.0
+     ...
+     ```
+   - Window calculation using local indices:
+     ```txt
+     # Sliding window of 3 elements
+     window_sum = shared[i-2] + shared[i-1] + shared[i]
+     ```
 
-4. **Memory Access Pattern**:
+4. **Memory access pattern**
    - One global read per thread into shared memory
    - One global write per thread from shared memory
    - Uses shared memory for efficient neighbor access
-   - Avoids redundant global memory loads
+   - Maintains coalesced memory access pattern
 
-This approach is efficient because:
-- Minimizes global memory access
-- Uses shared memory for fast neighbor lookups
-- Handles boundary conditions without branching in the main case
-- Maintains good memory coalescing
+This approach optimizes performance through:
+- Minimal global memory access
+- Fast shared memory neighbor lookups
+- Clean boundary handling
+- Efficient memory coalescing
+
+The final output shows the cumulative window sums:
+```txt
+[0.0, 1.0, 3.0, 6.0, 9.0, 12.0, 15.0, 18.0]
+```
 </div>
 </details>

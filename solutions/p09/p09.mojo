@@ -34,8 +34,7 @@ fn pooling(
         out[0] = shared[0]
     elif global_i == 1:
         out[1] = shared[0] + shared[1]
-
-    if 1 < global_i < size:
+    elif 1 < global_i < size:
         out[global_i] = (
             shared[local_i - 2] + shared[local_i - 1] + shared[local_i]
         )

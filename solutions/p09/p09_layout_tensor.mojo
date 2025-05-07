@@ -36,11 +36,10 @@ fn pooling[
     # Handle first two special cases
     if global_i == 0:
         out[0] = shared[0]
-    if global_i == 1:
+    elif global_i == 1:
         out[1] = shared[0] + shared[1]
-
     # Handle general case
-    if 1 < global_i < size:
+    elif 1 < global_i < size:
         out[global_i] = (
             shared[local_i - 2] + shared[local_i - 1] + shared[local_i]
         )

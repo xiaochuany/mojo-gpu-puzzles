@@ -68,32 +68,60 @@ expected: HostBuffer([0.0, 1.0, 3.0, 6.0, 9.0, 12.0, 15.0, 18.0])
 
 The solution implements a sliding window sum using LayoutTensor with these key steps:
 
-1. **Shared Memory Setup**:
-   - Uses tensor builder for clean shared memory allocation
-   - Natural indexing for data loading
-   - Thread synchronization with `barrier()`
+1. **Shared memory setup**
+   - Tensor builder creates block-local storage:
+     ```txt
+     shared = tb[dtype]().row_major[TPB]().shared().alloc()
+     ```
+   - Each thread loads one element:
+     ```txt
+     Input array:  [0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0]
+     Block shared: [0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0]
+     ```
+   - `barrier()` ensures all data is loaded
 
-2. **Boundary Cases**:
-   - Position 0: Single element output
+2. **Boundary cases**
+   - Position 0: Single element
+     ```txt
+     out[0] = shared[0] = 0.0
+     ```
    - Position 1: Sum of first two elements
-   - Clean indexing with LayoutTensor bounds checking
+     ```txt
+     out[1] = shared[0] + shared[1] = 0.0 + 1.0 = 1.0
+     ```
 
-3. **Main Window Operation**:
-   - Natural indexing for 3-element window
-   - Safe access to neighboring elements
-   - Automatic bounds checking
+3. **Main window operation**
+   - For positions 2 and beyond:
+     ```txt
+     Position 2: shared[0] + shared[1] + shared[2] = 0.0 + 1.0 + 2.0 = 3.0
+     Position 3: shared[1] + shared[2] + shared[3] = 1.0 + 2.0 + 3.0 = 6.0
+     Position 4: shared[2] + shared[3] + shared[4] = 2.0 + 3.0 + 4.0 = 9.0
+     ...
+     ```
+   - Natural indexing with LayoutTensor:
+     ```txt
+     # Sliding window of 3 elements
+     window_sum = shared[i-2] + shared[i-1] + shared[i]
+     ```
 
-4. **Memory Access Pattern**:
-   - Efficient shared memory usage
-   - Type-safe operations
-   - Layout-aware indexing
-   - Automatic alignment handling
+4. **Memory access pattern**
+   - One global read per thread into shared tensor
+   - Efficient neighbor access through shared memory
+   - LayoutTensor benefits:
+     - Automatic bounds checking
+     - Natural window indexing
+     - Layout-aware memory access
+     - Type safety throughout
 
-Benefits over raw approach:
-- Cleaner shared memory allocation
-- Safer memory access
-- Natural indexing syntax
-- Built-in bounds checking
-- Layout management
+This approach combines the performance of shared memory with LayoutTensor's safety and ergonomics:
+- Minimizes global memory access
+- Simplifies window operations
+- Handles boundaries cleanly
+- Maintains coalesced access patterns
+
+The final output shows the cumulative window sums:
+```txt
+[0.0, 1.0, 3.0, 6.0, 9.0, 12.0, 15.0, 18.0]
+```
 </div>
 </details>
