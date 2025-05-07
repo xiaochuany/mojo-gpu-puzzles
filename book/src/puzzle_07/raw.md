@@ -29,9 +29,9 @@ The key insight is understanding how to coordinate multiple blocks of threads to
 
 <div class="solution-tips">
 
-1. Calculate global indices: `global_i = block_dim.x * block_idx.x + thread_idx.x`
-2. Add guard: `if global_i < size and global_j < size`
-3. Inside guard: `out[global_j * size + global_i] = a[global_j * size + global_i] + 10.0`
+1. Calculate global indices: `row = block_dim.y * block_idx.y + thread_idx.y`, `col = block_dim.x * block_idx.x + thread_idx.x`
+2. Add guard: `if row < size and col < size`
+3. Inside guard: think about how to add 10 in row-major way!
 </div>
 </details>
 
@@ -60,9 +60,51 @@ expected: HostBuffer([11.0, 11.0, 11.0, ... , 11.0])
 
 <div class="solution-explanation">
 
-This solution:
-- Computes global indices with `block_dim * block_idx + thread_idx`
-- Guards against out-of-bounds with `if global_i < size and global_j < size`
-- Uses row-major indexing to access and update matrix elements
+This solution demonstrates key concepts of 2D block-based processing with raw memory:
+
+1. **2D thread indexing**
+   - Global row: `block_dim.y * block_idx.y + thread_idx.y`
+   - Global col: `block_dim.x * block_idx.x + thread_idx.x`
+   - Maps thread grid to matrix elements:
+     ```txt
+     5×5 matrix with 3×3 blocks:
+
+     Block (0,0)         Block (1,0)
+     [(0,0) (0,1) (0,2)] [(0,3) (0,4)    *  ]
+     [(1,0) (1,1) (1,2)] [(1,3) (1,4)    *  ]
+     [(2,0) (2,1) (2,2)] [(2,3) (2,4)    *  ]
+
+     Block (0,1)         Block (1,1)
+     [(3,0) (3,1) (3,2)] [(3,3) (3,4)    *  ]
+     [(4,0) (4,1) (4,2)] [(4,3) (4,4)    *  ]
+     [  *     *     *  ] [  *     *      *  ]
+     ```
+     (* = thread exists but outside matrix bounds)
+
+2. **Memory layout**
+   - Row-major linear memory: `index = row * size + col`
+   - Example for 5×5 matrix:
+     ```txt
+     2D indices:    Linear memory:
+     (2,1) -> 11   [00 01 02 03 04]
+                   [05 06 07 08 09]
+                   [10 11 12 13 14]
+                   [15 16 17 18 19]
+                   [20 21 22 23 24]
+     ```
+
+3. **Bounds checking**
+   - Guard `row < size and col < size` handles:
+     - Excess threads in partial blocks
+     - Edge cases at matrix boundaries
+     - 2×2 block grid with 3×3 threads each = 36 threads for 25 elements
+
+4. **Block coordination**
+   - Each 3×3 block processes part of 5×5 matrix
+   - 2×2 grid of blocks ensures full coverage
+   - Overlapping threads handled by bounds check
+   - Efficient parallel processing across blocks
+
+This pattern shows how to handle 2D data larger than block size while maintaining efficient memory access and thread coordination.
 </div>
 </details>

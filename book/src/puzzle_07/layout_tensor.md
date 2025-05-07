@@ -35,9 +35,9 @@ The key insight is that `LayoutTensor` simplifies 2D indexing while still requir
 
 <div class="solution-tips">
 
-1. Calculate global indices: `global_i = block_dim.x * block_idx.x + thread_idx.x`
-2. Add guard: `if global_i < size and global_j < size`
-3. Inside guard: `out[global_i, global_j] = a[global_i, global_j] + 10.0`
+1. Calculate global indices: `row = block_dim.y * block_idx.y + thread_idx.y`, `col = block_dim.x * block_idx.x + thread_idx.x`
+2. Add guard: `if row < size and col < size`
+3. Inside guard: think about how to add 10 to 2D LayoutTensor
 </div>
 </details>
 
@@ -66,9 +66,52 @@ expected: HostBuffer([11.0, 11.0, 11.0, ... , 11.0])
 
 <div class="solution-explanation">
 
-This solution:
-- Computes global indices with `block_dim * block_idx + thread_idx`
-- Guards against out-of-bounds with `if global_i < size and global_j < size`
-- Uses `LayoutTensor`'s 2D indexing: `out[global_i, global_j] = a[global_i, global_j] + 10.0`
+This solution demonstrates how LayoutTensor simplifies 2D block-based processing:
+
+1. **2D thread indexing**
+   - Global row: `block_dim.y * block_idx.y + thread_idx.y`
+   - Global col: `block_dim.x * block_idx.x + thread_idx.x`
+   - Maps thread grid to tensor elements:
+     ```txt
+     5×5 tensor with 3×3 blocks:
+
+     Block (0,0)         Block (1,0)
+     [(0,0) (0,1) (0,2)] [(0,3) (0,4)    *  ]
+     [(1,0) (1,1) (1,2)] [(1,3) (1,4)    *  ]
+     [(2,0) (2,1) (2,2)] [(2,3) (2,4)    *  ]
+
+     Block (0,1)         Block (1,1)
+     [(3,0) (3,1) (3,2)] [(3,3) (3,4)    *  ]
+     [(4,0) (4,1) (4,2)] [(4,3) (4,4)    *  ]
+     [  *     *     *  ] [  *     *      *  ]
+     ```
+     (* = thread exists but outside tensor bounds)
+
+2. **LayoutTensor benefits**
+   - Natural 2D indexing: `tensor[row, col]` instead of manual offset calculation
+   - Automatic memory layout optimization
+   - Example access pattern:
+     ```txt
+     Raw memory:         LayoutTensor:
+     row * size + col    tensor[row, col]
+     (2,1) -> 11        (2,1) -> same element
+     ```
+
+3. **Bounds checking**
+   - Guard `row < size and col < size` handles:
+     - Excess threads in partial blocks
+     - Edge cases at tensor boundaries
+     - Automatic memory layout handling by LayoutTensor
+     - 36 threads (2×2 blocks of 3×3) for 25 elements
+
+4. **Block coordination**
+   - Each 3×3 block processes part of 5×5 tensor
+   - LayoutTensor handles:
+     - Memory layout optimization
+     - Efficient access patterns
+     - Block boundary coordination
+     - Cache-friendly data access
+
+This pattern shows how LayoutTensor simplifies 2D block processing while maintaining optimal memory access patterns and thread coordination.
 </div>
 </details>
