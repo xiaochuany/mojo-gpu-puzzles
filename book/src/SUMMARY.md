@@ -46,7 +46,7 @@
     - [📐 Tiled Version](./puzzle_14/tiled.md)
 
 # Part III: Interfacing with Python via MAX Graph Custom Ops
-- [Puzzle 15: 1D Convolution Op]()
+- [Puzzle 15: 1D Convolution Op](./puzzle_15/puzzle_15.md)
 - [Puzzle 16: Softmax Op]()
 - [Puzzle 17: Attention Op]()
 - [🎯 Bonus Challenges]()
