@@ -1,4 +1,4 @@
-# Complete version: Block Boundary Case
+# Block Boundary Version
 
 ## Configuration
 - Input array size: `SIZE_2 = 15` elements
@@ -43,8 +43,8 @@ magic run p11 --block-boundary
 
 Your output will look like this if the puzzle isn't solved yet:
 ```txt
-out: HostBuffer([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-expected: HostBuffer([5.0, 8.0, 11.0, 14.0, 5.0, 0.0])
+out: HostBuffer([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+expected: HostBuffer([14.0, 20.0, 26.0, 32.0, 38.0, 44.0, 50.0, 56.0, 62.0, 68.0, 74.0, 80.0, 41.0, 14.0, 0.0])
 ```
 
 ## Solution
@@ -60,7 +60,7 @@ expected: HostBuffer([5.0, 8.0, 11.0, 14.0, 5.0, 0.0])
 
 The solution handles block boundary cases in 1D convolution using extended shared memory. Here's a detailed analysis:
 
-### Memory Layout and Sizing
+### Memory layout and sizing
 ```txt
 Test Configuration:
 - Full array size: SIZE_2 = 15 elements
@@ -76,7 +76,7 @@ Size calculation:
 - Total: TPB + CONV_2 - 1 = 8 + 4 - 1 = 11 elements
 ```
 
-### Implementation Details
+### Implementation details
 
 1. **Shared Memory Allocation**:
    ```mojo
@@ -123,7 +123,7 @@ Size calculation:
    - Proper type inference with `out.element_type`
    - Extended bounds check for overlap region
 
-### Memory Access Pattern Analysis
+### Memory access pattern analysis
 
 1. **Block 0 Access Pattern**:
    ```txt
@@ -142,7 +142,7 @@ Size calculation:
    Thread 7: [14 0 0 0] × [0 1 2 3]  // Zero padding at end
    ```
 
-### Performance Optimizations
+### Performance optimizations
 
 1. **Memory Coalescing**:
    - Main data load: Consecutive threads access consecutive memory
