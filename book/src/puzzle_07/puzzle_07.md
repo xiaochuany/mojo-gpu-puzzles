@@ -25,7 +25,6 @@ Implement a kernel that adds 10 to each position of matrix `a` and stores it in 
 > col = block_dim.x * block_idx.x + thread_idx.x
 > ```
 >
-> [TODO: replace with animation]
 > For example, with 2×2 blocks in a 4×4 grid:
 > ```txt
 > Block (0,0):   Block (1,0):

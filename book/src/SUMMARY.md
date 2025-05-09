@@ -34,7 +34,7 @@
   - [📐 LayoutTensor Version](./puzzle_10/layout_tensor.md)
 - [Puzzle 11: 1D Convolution](./puzzle_11/puzzle_11.md)
   - [🔰 Simple Version](./puzzle_11/simple.md)
-  - [⭐ Block Boundary Version](./puzzle_11/complete.md)
+  - [⭐ Block Boundary Version](./puzzle_11/block_boundary.md)
 - [Puzzle 12: Prefix Sum](./puzzle_12/puzzle_12.md)
   - [🔰 Simple Version](./puzzle_12/simple.md)
   - [⭐ Complete Version](./puzzle_12/complete.md)
