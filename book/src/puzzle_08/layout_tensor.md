@@ -27,7 +27,7 @@ The key insight is how LayoutTensor simplifies shared memory management while ma
 
    ```mojo
    # Raw approach
-   shared = stack_allocation[TPB * sizeof[dtype](), ...]()
+   shared = stack_allocation[TPB, Scalar[dtype]]()
 
    # LayoutTensor approach
    shared = LayoutTensorBuild[dtype]().row_major[TPB]().shared().alloc()
