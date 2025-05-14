@@ -39,6 +39,7 @@ jobs:
         with:
           pixi-version: v0.47.0
           cache: true
+          post-cleanup: false
 
       - name: Build
         shell: bash
