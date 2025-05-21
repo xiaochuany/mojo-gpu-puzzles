@@ -95,6 +95,10 @@ fn conv_1d_block_boundary[
         next_idx = global_i + TPB
         if next_idx < SIZE_2:
             shared_a[TPB + local_i] = a[next_idx]
+        else:
+            # Initialize out-of-bounds elements to 0 to avoid reading from uninitialized memory
+            # which is an undefined behavior
+            shared_a[TPB + local_i] = 0
 
     if local_i < CONV_2:
         shared_b[local_i] = b[local_i]
