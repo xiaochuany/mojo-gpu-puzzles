@@ -12,7 +12,7 @@ body:
         - Your GPU meets the [minimum requirements](https://docs.modular.com/max/faq#gpu-requirements)
 
   - type: input
-    id: uv-version/pixi-version
+    id: uv-or-pixi-version
     attributes:
       label: uv/pixi CLI Version
       description: Run `uv --version` or `pixi --version`
