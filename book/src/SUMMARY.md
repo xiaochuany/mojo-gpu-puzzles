@@ -40,8 +40,8 @@
   - [⭐ Complete Version](./puzzle_12/complete.md)
 - [Puzzle 13: Axis Sum](./puzzle_13/puzzle_13.md)
 - [Puzzle 14: Matrix Multiplication (MatMul)](./puzzle_14/puzzle_14.md)
-    - [🔰 Naive Version with Global Memory](./puzzle_14/naive.md)
-    - [📚 Learn about Roofline Model]()
+    - [🔰 Naïve Version with Global Memory](./puzzle_14/naïve.md)
+    - [📚 Learn about Roofline Model](./puzzle_14/roofline.md)
     - [🤝 Shared Memory Version](./puzzle_14/shared_memory.md)
     - [📐 Tiled Version](./puzzle_14/tiled.md)
 
