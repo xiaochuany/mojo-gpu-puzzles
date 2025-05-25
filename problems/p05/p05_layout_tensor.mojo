@@ -8,9 +8,9 @@ alias SIZE = 2
 alias BLOCKS_PER_GRID = 1
 alias THREADS_PER_BLOCK = (3, 3)
 alias dtype = DType.float32
-alias out_layout = Layout.row_major(SIZE, SIZE)
-alias a_layout = Layout.row_major(1, SIZE)
-alias b_layout = Layout.row_major(SIZE, 1)
+alias out_layout = Layout.row_major(SIZE, SIZE) # [[0,1],[2,3]]
+alias a_layout = Layout.row_major(1, SIZE) # [[0,1]]
+alias b_layout = Layout.row_major(SIZE, 1) # [[0],[1]]
 
 
 fn broadcast_add[
@@ -26,7 +26,8 @@ fn broadcast_add[
     row = thread_idx.y
     col = thread_idx.x
     # FILL ME IN (roughly 2 lines)
-
+    if row < size and col < size:
+        out[row, col] = a[0,row]+ b[col,0]
 
 # ANCHOR_END: broadcast_add_layout_tensor
 def main():
