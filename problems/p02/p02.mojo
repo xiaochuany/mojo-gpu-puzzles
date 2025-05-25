@@ -1,32 +1,26 @@
 from memory import UnsafePointer
-from gpu import thread_idx, block_dim, block_idx
+from gpu import thread_idx
 from gpu.host import DeviceContext
 from testing import assert_equal
 
-# ANCHOR: add
 alias SIZE = 4
 alias BLOCKS_PER_GRID = 1
 alias THREADS_PER_BLOCK = SIZE
 alias dtype = DType.float32
-
 
 fn add(
     out: UnsafePointer[Scalar[dtype]],
     a: UnsafePointer[Scalar[dtype]],
     b: UnsafePointer[Scalar[dtype]],
 ):
-    i = thread_idx.x
-    # FILL ME IN (roughly 1 line)
-
-
-# ANCHOR_END: add
-
+    i = thread_idx.x # 1d thread index map on 1d array data 
+    out[i] = a[i] + b[i]
 
 def main():
     with DeviceContext() as ctx:
         out = ctx.enqueue_create_buffer[dtype](SIZE).enqueue_fill(0)
-        a = ctx.enqueue_create_buffer[dtype](SIZE).enqueue_fill(0)
-        b = ctx.enqueue_create_buffer[dtype](SIZE).enqueue_fill(0)
+        a = ctx.enqueue_create_buffer[dtype](SIZE).enqueue_fill(0) # size of the input data is conveniently block_size
+        b = ctx.enqueue_create_buffer[dtype](SIZE).enqueue_fill(0) 
         expected = ctx.enqueue_create_host_buffer[dtype](SIZE).enqueue_fill(0)
         with a.map_to_host() as a_host, b.map_to_host() as b_host:
             for i in range(SIZE):
