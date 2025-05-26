@@ -4,7 +4,7 @@ version = "0.0.0"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "modular>=25.3.0",
+    "max>=25.4.0.dev2025051305",
     "poethepoet>=0.34.0",
 ]
 
