@@ -17,6 +17,8 @@ fn add_10_blocks(
 ):
     i = block_dim.x * block_idx.x + thread_idx.x
     # FILL ME IN (roughly 2 lines)
+    if i<SIZE:
+        out[i] = a[i] + 10
 
 
 # ANCHOR_END: add_10_blocks
@@ -26,9 +28,11 @@ def main():
     with DeviceContext() as ctx:
         out = ctx.enqueue_create_buffer[dtype](SIZE).enqueue_fill(0)
         a = ctx.enqueue_create_buffer[dtype](SIZE).enqueue_fill(0)
+        expected = ctx.enqueue_create_host_buffer[dtype](SIZE).enqueue_fill(0)
         with a.map_to_host() as a_host:
             for i in range(SIZE):
                 a_host[i] = i
+                expected[i] = i + 10    
 
         ctx.enqueue_function[add_10_blocks](
             out.unsafe_ptr(),
@@ -38,12 +42,7 @@ def main():
             block_dim=THREADS_PER_BLOCK,
         )
 
-        expected = ctx.enqueue_create_host_buffer[dtype](SIZE).enqueue_fill(0)
-
         ctx.synchronize()
-
-        for i in range(SIZE):
-            expected[i] = i + 10
 
         with out.map_to_host() as out_host:
             print("out:", out_host)
