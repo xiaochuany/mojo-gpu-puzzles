@@ -8,6 +8,7 @@ from testing import assert_equal
 alias TPB = 15
 alias BLOCKS_PER_GRID = (2, 1)
 
+
 fn conv1d_kernel[
     in_layout: Layout,
     out_layout: Layout,
@@ -34,6 +35,10 @@ fn conv1d_kernel[
         next_idx = global_i + TPB
         if next_idx < input_size:
             shared_a[TPB + local_i] = input[next_idx]
+        else:
+            # Initialize out-of-bounds elements to 0 to avoid reading from uninitialized memory
+            # which is an undefined behavior
+            shared_a[TPB + local_i] = 0
 
     if local_i < conv_size:
         shared_b[local_i] = kernel[local_i]
@@ -96,13 +101,13 @@ struct Conv1DCustomOp:
             )
             # ANCHOR: conv1d_custom_op_solution
             gpu_ctx.enqueue_function[
-                conv1d_kernel[in_layout, out_layout, conv_layout, input_size, conv_size]
+                conv1d_kernel[
+                    in_layout, out_layout, conv_layout, input_size, conv_size
+                ]
             ](
                 out_tensor,
                 input_tensor,
                 kernel_tensor,
-                input_size,
-                conv_size,
                 grid_dim=BLOCKS_PER_GRID,
                 block_dim=(TPB, 1),
             )

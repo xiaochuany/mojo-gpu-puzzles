@@ -42,9 +42,26 @@ Notes:
 
 To test your solution, run the following command in your terminal:
 
+<div class="code-tabs" data-tab-group="package-manager">
+  <div class="tab-buttons">
+    <button class="tab-button">uv</button>
+    <button class="tab-button">pixi</button>
+  </div>
+  <div class="tab-content">
+
 ```bash
-magic run p11 --block-boundary
+uv run poe p11 --block-boundary
 ```
+
+  </div>
+  <div class="tab-content">
+
+```bash
+pixi run p11 --block-boundary
+```
+
+  </div>
+</div>
 
 Your output will look like this if the puzzle isn't solved yet:
 ```txt
@@ -102,10 +119,15 @@ Size calculation:
        next_idx = global_i + TPB
        if next_idx < a_size:
            shared_a[TPB + local_i] = a[next_idx]
+       else:
+           # Initialize out-of-bounds elements to 0 to avoid reading from uninitialized memory
+           # which is an undefined behavior
+           shared_a[TPB + local_i] = 0
    ```
    - Only threads with `local_i < CONV_2 - 1` load boundary data
    - Prevents unnecessary thread divergence
    - Maintains memory coalescing for main data load
+   - Explicitly zeroes out-of-bounds elements to avoid undefined behavior
 
 3. **Kernel Loading**:
    ```mojo
@@ -165,8 +187,7 @@ Size calculation:
    - Efficient reuse of loaded data
 
 4. **Boundary Handling**:
-   - Implicit zero padding at array end
-   - Seamless block transition
+   - Explicit zero initialization for out-of-bounds elements which prevents reading from uninitialized shared memory
    - Proper handling of edge cases
 
 This implementation achieves efficient cross-block convolution while maintaining:
